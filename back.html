@@ -937,6 +937,14 @@
       if (!rawSpan) return;
 
       const raw = rawSpan.innerHTML;
+
+      // Normalize block-level HTML (div, p) to <br> for consistent parsing
+      var normalized = raw
+        .replace(/<\/?(div|p|section|article)(?:\s[^>]*)?>\s*/gi, "<br>")
+        .replace(/(<br\s*\/?>\s*){2,}/gi, "<br><br>")
+        .replace(/^\s*(?:<br\s*\/?>\s*)*/i, "")
+        .replace(/(?:\s*<br\s*\/?>)*\s*$/i, "");
+
       const sectionKeywords = [
         "About",
         "Caution",
@@ -966,7 +974,7 @@
       // Parse sections
       var parsedSections = [];
 
-      if (testPattern.test(raw)) {
+      if (testPattern.test(normalized)) {
         var sectionPattern = new RegExp(
           "(?:^|<br\\s*/?>|\\n)\\s*(" +
             sectionKeywords.join("|") +
@@ -975,12 +983,12 @@
             ")\\b|$)",
           "gi",
         );
-        var firstMatch = raw.search(testPattern);
+        var firstMatch = normalized.search(testPattern);
         var preamble =
-          firstMatch > 0 ? raw.substring(0, firstMatch).trim() : "";
+          firstMatch > 0 ? normalized.substring(0, firstMatch).trim() : "";
         sectionPattern.lastIndex = 0;
         var m;
-        while ((m = sectionPattern.exec(raw)) !== null) {
+        while ((m = sectionPattern.exec(normalized)) !== null) {
           var content = (m[2] || "")
             .replace(/^[\s]*(<br\s*\/?>[\s]*)*/gi, "")
             .trim();
@@ -996,9 +1004,9 @@
         }
       }
 
-      // No sections found => show raw as single item
+      // No sections found => show normalized as single item
       if (parsedSections.length === 0) {
-        parsedSections.push({ keyword: "", content: raw, preamble: "" });
+        parsedSections.push({ keyword: "", content: normalized, preamble: "" });
       }
 
       // Build section elements
@@ -1099,7 +1107,7 @@
         };
       });
 
-      // J/K navigation for notes (lowercase, only when notes visible)
+      // H/L navigation for notes (only when notes visible)
       document.addEventListener("keydown", function (e) {
         if (totalSections <= 1) return;
         if (e.ctrlKey || e.altKey || e.metaKey) return;
@@ -1116,11 +1124,11 @@
         )
           return;
 
-        if (e.key === "j") {
+        if (e.key === "h" || e.key === "H") {
           e.preventDefault();
           handleNoteToggle("left");
         }
-        if (e.key === "k") {
+        if (e.key === "l" || e.key === "L") {
           e.preventDefault();
           handleNoteToggle("right");
         }
@@ -2251,7 +2259,7 @@
       }
 
       if (e.ctrlKey) {
-        if (e.key === "ArrowLeft") {
+        if (e.key === "j" || e.key === "J") {
           e.preventDefault();
           e.stopPropagation();
           if (typeof initialPlayTimeout !== "undefined")
@@ -2260,7 +2268,7 @@
           currentIndex--;
           if (currentIndex < 0) currentIndex = totalSlides - 1;
           updateDisplay(true);
-        } else if (e.key === "ArrowRight") {
+        } else if (e.key === "k" || e.key === "K") {
           e.preventDefault();
           e.stopPropagation();
           if (typeof initialPlayTimeout !== "undefined")
