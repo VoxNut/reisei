@@ -1368,28 +1368,37 @@
       const sectionKeywords = [
         "About",
         "Caution",
+        "Fun Fact",
         "Synonym",
         "Antonym",
         "Related",
+        "Misc",
       ];
       const testPattern = new RegExp(
-        "(?:^|<br\\s*/?>|\\n)\\s*(" + sectionKeywords.join("|") + ")\\b",
+        "(?:^|<br\\s*/?>|\\n)\\s*(" + sectionKeywords.join("|") + ")\\b\\.?",
         "i",
       );
       const iconMap = {
         about: "fa-circle-info",
         caution: "fa-triangle-exclamation",
+        "fun fact": "fa-lightbulb",
         synonym: "fa-equals",
         antonym: "fa-right-left",
         related: "fa-link",
+        misc: "fa-puzzle-piece",
       };
       const colorMap = {
         about: "var(--notes-section-about)",
         caution: "var(--notes-section-caution)",
+        "fun fact": "var(--notes-section-fun-fact)",
         synonym: "var(--notes-section-synonym)",
         antonym: "var(--notes-section-antonym)",
         related: "var(--notes-section-related)",
+        misc: "var(--notes-section-misc)",
       };
+
+      // Sections that use card grid layout (pipe-delimited)
+      const cardGridSections = ["synonym", "antonym", "related", "misc"];
 
       // Parse sections
       var parsedSections = [];
@@ -1398,9 +1407,9 @@
         var sectionPattern = new RegExp(
           "(?:^|<br\\s*/?>|\\n)\\s*(" +
             sectionKeywords.join("|") +
-            ")\\b([^]*?)(?=(?:<br\\s*/?>|\\n)\\s*(?:" +
+            ")\\b\\.?([^]*?)(?=(?:<br\\s*/?>|\\n)\\s*(?:" +
             sectionKeywords.join("|") +
-            ")\\b|$)",
+            ")\\b\\.?|$)",
           "gi",
         );
         var firstMatch = normalized.search(testPattern);
@@ -1446,19 +1455,83 @@
           var key = sec.keyword.toLowerCase();
           var icon = iconMap[key] || "fa-circle-info";
           var color = colorMap[key] || colorMap.about;
-          html +=
-            '<div class="notes-section" data-section="' +
-            key +
-            '" style="--section-color: ' +
-            color +
-            '">';
-          html += '<div class="notes-section-header">';
-          html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
-          html +=
-            '<span class="notes-section-title">' + sec.keyword + "</span>";
-          html += "</div>";
-          html += '<div class="notes-section-body">' + sec.content + "</div>";
-          html += "</div>";
+
+          // Card grid layout for Synonym/Antonym/Related/Misc sections (pipe-delimited entries)
+          if (
+            cardGridSections.indexOf(key) !== -1 &&
+            sec.content.indexOf("|") !== -1
+          ) {
+            var lines = sec.content.split(/<br\s*\/?>/gi).filter(function (l) {
+              return l.trim();
+            });
+
+            html +=
+              '<div class="notes-section notes-card-section" data-section="' +
+              key +
+              '" style="--section-color: ' +
+              color +
+              '">';
+            html += '<div class="notes-card-toolbar">';
+            html += '<div class="notes-section-header">';
+            html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
+            html +=
+              '<span class="notes-section-title">' + sec.keyword + "</span>";
+            html += "</div>";
+            html +=
+              '<button class="notes-card-toggle-all tappable" data-state="expanded">Collapse All</button>';
+            html += "</div>";
+
+            html += '<div class="notes-card-grid">';
+            lines.forEach(function (line) {
+              var parts = line.split("|").map(function (p) {
+                return p.trim();
+              });
+              var word = parts[0] || "";
+              var meaning = parts[1] || "";
+              var level = parts[2] || "";
+              var desc = parts[3] || "";
+
+              html += '<div class="notes-card tappable">';
+              html += '<div class="notes-card-top">';
+              html += '<div class="notes-card-info">';
+              html += '<div class="notes-card-word">' + word + "</div>";
+              if (meaning)
+                html += '<div class="notes-card-meaning">' + meaning + "</div>";
+              if (level) {
+                html +=
+                  '<div class="notes-card-badge"><i class="fas fa-times badge-icon"></i> ' +
+                  level +
+                  "</div>";
+              }
+              html += "</div>";
+              html +=
+                '<span class="notes-card-link tappable" data-word="' +
+                word.replace(/"/g, "&quot;") +
+                '" title="Browse in Anki"><i class="fas fa-external-link-alt"></i></span>';
+              html += "</div>";
+              if (desc) {
+                html += '<div class="notes-card-desc">' + desc + "</div>";
+              }
+              html += "</div>";
+            });
+            html += "</div>";
+            html += "</div>";
+          } else {
+            // Default section rendering
+            html +=
+              '<div class="notes-section" data-section="' +
+              key +
+              '" style="--section-color: ' +
+              color +
+              '">';
+            html += '<div class="notes-section-header">';
+            html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
+            html +=
+              '<span class="notes-section-title">' + sec.keyword + "</span>";
+            html += "</div>";
+            html += '<div class="notes-section-body">' + sec.content + "</div>";
+            html += "</div>";
+          }
         } else {
           html += '<div class="notes-section-body">' + sec.content + "</div>";
         }
@@ -1470,6 +1543,79 @@
 
       // Grammar hover for Related/Synonym/Antonym sections
       initGrammarHover(notesBox);
+
+      // Card grid: Collapse/Expand All buttons
+      notesBox
+        .querySelectorAll(".notes-card-toggle-all")
+        .forEach(function (btn) {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var section = btn.closest(".notes-card-section");
+            if (!section) return;
+            var descs = section.querySelectorAll(".notes-card-desc");
+            var isExpanded = btn.getAttribute("data-state") === "expanded";
+
+            descs.forEach(function (desc) {
+              if (isExpanded) {
+                desc.classList.add("is-collapsed");
+              } else {
+                desc.classList.remove("is-collapsed");
+              }
+            });
+
+            btn.setAttribute(
+              "data-state",
+              isExpanded ? "collapsed" : "expanded",
+            );
+            btn.textContent = isExpanded ? "Expand All" : "Collapse All";
+
+            if (!notesPanel.classList.contains("is-collapsed")) {
+              notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
+            }
+          });
+        });
+
+      // Card grid: Individual card click to toggle description
+      notesBox.querySelectorAll(".notes-card").forEach(function (card) {
+        card.addEventListener("click", function (e) {
+          if (e.target.closest(".notes-card-link")) return;
+          var desc = card.querySelector(".notes-card-desc");
+          if (!desc) return;
+          desc.classList.toggle("is-collapsed");
+
+          if (!notesPanel.classList.contains("is-collapsed")) {
+            setTimeout(function () {
+              notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
+            }, 10);
+          }
+        });
+      });
+
+      // Card grid: Anki browse links
+      notesBox.querySelectorAll(".notes-card-link").forEach(function (link) {
+        link.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var word = link.getAttribute("data-word");
+          if (!word || !window.senrenAnkiRequest) return;
+
+          window
+            .senrenAnkiRequest("findNotes", { query: '"word:' + word + '"' })
+            .then(function (noteIds) {
+              if (noteIds && noteIds.length > 0) {
+                window.senrenAnkiRequest("guiBrowse", {
+                  query: '"word:' + word + '"',
+                });
+              } else {
+                var origHTML = link.innerHTML;
+                link.innerHTML =
+                  '<span style="font-size: 0.65rem; color: #bf616a;">Not Found</span>';
+                setTimeout(function () {
+                  link.innerHTML = origHTML;
+                }, 2000);
+              }
+            });
+        });
+      });
 
       var totalSections = sectionEls.length;
       var currentNoteIndex = 0;

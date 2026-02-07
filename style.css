@@ -23,6 +23,8 @@
   --notes-section-synonym: #a3be8c;
   --notes-section-antonym: #d08770;
   --notes-section-related: #b48ead;
+  --notes-section-misc: #88c0d0;
+  --notes-section-fun-fact: #ebcb8b;
   /* CARD SETTINGS - Default States (true/false)
   ============================================ */
   /* General */
@@ -1785,6 +1787,202 @@ img {
 
 .card.nightMode .notes-section[data-section="caution"] {
   background: rgba(191, 97, 106, 0.1);
+}
+
+/* ============================================
+   NOTES CARD GRID (Related / Misc sections)
+   ============================================ */
+
+/* Card section container */
+.notes-card-section {
+  border-left: none;
+  background: transparent !important;
+  padding: 0;
+}
+
+/* Toolbar: section title + Collapse/Expand All button */
+.notes-card-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.notes-card-toolbar .notes-section-header {
+  margin-bottom: 0;
+}
+
+.notes-card-toggle-all {
+  font-size: 0.72rem;
+  padding: 4px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: var(--border-radius-sm);
+  background: rgba(0, 0, 0, 0.03);
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease;
+  white-space: nowrap;
+  font-family: var(--sans);
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-card-toggle-all {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notes-card-toggle-all:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-card-toggle-all:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Card grid layout */
+.notes-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 600px) {
+  .notes-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Individual card */
+.notes-card {
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: var(--border-radius-ms);
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-card {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.notes-card:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Card top row: info + link icon */
+.notes-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.notes-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Word */
+.notes-card-word {
+  font-size: 1.3rem;
+  font-weight: bold;
+  font-family: var(--serif);
+  line-height: 1.3;
+}
+
+/* English meaning */
+.notes-card-meaning {
+  font-size: 0.82rem;
+  opacity: 0.6;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* Level badge (e.g. N2 Grammar) */
+.notes-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(191, 97, 106, 0.15);
+  color: #bf616a;
+  margin-top: 6px;
+  width: fit-content;
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-card-badge {
+  background: rgba(191, 97, 106, 0.2);
+  color: #d08770;
+}
+
+.notes-card-badge .badge-icon {
+  font-size: 0.6rem;
+}
+
+/* External link icon */
+.notes-card-link {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  margin-top: 2px;
+}
+
+.notes-card-link:hover {
+  opacity: 1;
+}
+
+.notes-card-link i {
+  font-size: 0.78rem;
+}
+
+/* Card description */
+.notes-card-desc {
+  font-size: var(--definition-size);
+  line-height: 1.65;
+  opacity: 0.82;
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  max-height: 500px;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.3s ease,
+    margin-top 0.3s ease,
+    padding-top 0.3s ease;
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-card-desc {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.notes-card-desc.is-collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  padding-top: 0;
+  border-top-color: transparent;
 }
 
 /* Definition + Glossary */
