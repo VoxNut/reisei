@@ -2186,9 +2186,13 @@
       totalSlides = audioParts.length;
     }
 
-    // Picture Group — support group-based indexing like sentences
+    // Picture Group — build scene-to-image mapping from group classes
     const pictureContainer = ELS.pictureContainer;
-    if (pictureContainer && !pictureContainer.getAttribute("data-split-done")) {
+    var sceneToImageIndex = null; // null = no group classes, use original behavior
+    if (
+      pictureContainer &&
+      !pictureContainer.getAttribute("data-picture-mapped")
+    ) {
       const allChildren = Array.from(pictureContainer.children);
       const groupWrappers = allChildren.filter((el) => {
         return (
@@ -2198,46 +2202,41 @@
       });
 
       if (groupWrappers.length > 0) {
-        // Remove original children except nav-arrow and toggle buttons
-        allChildren.forEach((el) => {
-          if (
-            !el.classList.contains("nav-arrow") &&
-            !el.classList.contains("toggle-image-visibility")
-          ) {
-            el.remove();
+        // 1) Build mapping BEFORE unwrapping: scene index → image src
+        var sceneToSrc = {};
+        groupWrappers.forEach((wrapper) => {
+          var cls = wrapper.className.match(/group(\d+)/);
+          if (cls) {
+            var sceneIdx = parseInt(cls[1], 10) - 1;
+            var img = wrapper.querySelector("img");
+            if (img) sceneToSrc[sceneIdx] = img.getAttribute("src");
           }
         });
 
-        // Create totalSlides slots, fill matching groups
-        for (let i = 0; i < totalSlides; i++) {
-          const div = document.createElement("div");
-          div.classList.add("split-picture");
-          div.style.display = "none";
-
-          // Find a group element that matches this index
-          const match = groupWrappers.find((el) => {
-            const cls = el.className.match(/group(\d+)/);
-            return cls && parseInt(cls[1], 10) - 1 === i;
+        // 2) Unwrap: move imgs out of group spans into container directly
+        var insertRef = pictureContainer.querySelector(
+          ".nav-arrow, .toggle-image-visibility",
+        );
+        groupWrappers.forEach((wrapper) => {
+          var imgs = Array.from(wrapper.querySelectorAll("img"));
+          imgs.forEach((img) => {
+            pictureContainer.insertBefore(img, insertRef);
           });
-          // Also handle plain "group" (no number) for index 0
-          if (!match && i === 0) {
-            const plain = groupWrappers.find((el) =>
-              el.className.split(/\s+/).includes("group"),
-            );
-            if (plain) div.innerHTML = plain.innerHTML;
-          } else if (match) {
-            div.innerHTML = match.innerHTML;
-          }
-          // Empty div = no image for this scene
+          wrapper.remove();
+        });
 
-          pictureContainer.insertBefore(
-            div,
-            pictureContainer.querySelector(
-              ".nav-arrow, .toggle-image-visibility",
-            ),
+        // 3) Build final mapping: scene index → image DOM index
+        var allImgs = Array.from(pictureContainer.querySelectorAll("img"));
+        sceneToImageIndex = {};
+        for (var sceneIdx in sceneToSrc) {
+          var src = sceneToSrc[sceneIdx];
+          var imgIdx = allImgs.findIndex(
+            (img) => img.getAttribute("src") === src,
           );
+          if (imgIdx !== -1) sceneToImageIndex[sceneIdx] = imgIdx;
         }
-        pictureContainer.setAttribute("data-split-done", "true");
+
+        pictureContainer.setAttribute("data-picture-mapped", "true");
       }
     }
 
@@ -2342,32 +2341,26 @@
     function updateDisplay(shouldPlayAudio = false) {
       const pictureContainer = ELS.pictureContainer;
       if (pictureContainer) {
-        const splitPictures = Array.from(
-          pictureContainer.querySelectorAll(".split-picture"),
-        );
-
-        if (splitPictures.length > 0) {
-          // Group-based: show/hide split-picture divs and toggle container visibility
-          let hasImage = false;
-          splitPictures.forEach((part, i) => {
-            const shouldShow = i === currentIndex;
-            part.style.setProperty(
-              "display",
-              shouldShow ? "block" : "none",
-              "important",
-            );
-            if (shouldShow && part.querySelector("img")) {
-              hasImage = true;
+        // Show the image mapped to current scene (if group classes were used)
+        if (sceneToImageIndex !== null) {
+          var allImgs = Array.from(pictureContainer.querySelectorAll("img"));
+          if (allImgs.length > 0) {
+            // Determine which image to show for this scene
+            var targetImgIdx = sceneToImageIndex[currentIndex];
+            if (targetImgIdx === undefined) {
+              // No group assigned for this scene → show first image
+              targetImgIdx = 0;
             }
-          });
-          // Hide entire container if current scene has no image
-          pictureContainer.style.setProperty(
-            "display",
-            hasImage ? "" : "none",
-            "important",
-          );
+            allImgs.forEach((img, i) => {
+              img.style.setProperty(
+                "display",
+                i === targetImgIdx ? "block" : "none",
+                "important",
+              );
+            });
+          }
         } else {
-          // Fallback: original index-based behavior
+          // Original behavior: index-based
           const pictureParts = Array.from(pictureContainer.children).filter(
             (el) =>
               el.tagName !== "BR" &&
