@@ -211,6 +211,7 @@
     {{dictionaryPreference}}
   </div>
   <div id="kanji-tooltip"></div>
+  <div id="grammar-tooltip"></div>
 </div>
 <!-- /BACK -->
 
@@ -926,6 +927,425 @@
     const sentenceEng = document.querySelector("#sentenceEng");
 
     // ============================================
+    // GRAMMAR HOVER (for Related/Synonym/Antonym)
+    // ============================================
+    function initGrammarHover(notesBox) {
+      var grammarTooltip = document.getElementById("grammar-tooltip");
+      if (!grammarTooltip) return;
+
+      var ankiConnectUrl = "http://localhost:8765";
+      var grammarCache = {};
+      var hideGrammarTimeout = null;
+
+      async function ankiRequest(action, params) {
+        try {
+          var response = await fetch(ankiConnectUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: action,
+              version: 6,
+              params: params || {},
+            }),
+          });
+          if (!response.ok) return null;
+          var data = await response.json();
+          if (data.error) return null;
+          return data.result;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // Ensure senrenAnkiRequest is available for click-to-browse
+      if (!window.senrenAnkiRequest) {
+        window.senrenAnkiRequest = ankiRequest;
+      }
+
+      function positionGrammarTooltip(tooltip, targetEl) {
+        var back = document.querySelector(".back");
+        if (!back) return;
+        var targetRect = targetEl.getBoundingClientRect();
+        var backRect = back.getBoundingClientRect();
+        var arrowSize = 7;
+
+        var relTop = targetRect.bottom - backRect.top;
+        var relLeft = targetRect.left - backRect.left;
+
+        tooltip.style.left = relLeft + "px";
+        tooltip.style.top = relTop + "px";
+        tooltip.classList.remove("tooltip-above");
+        tooltip.style.setProperty(
+          "--tooltip-arrow-left",
+          targetRect.width / 2 + "px",
+        );
+
+        // Adjust if overflows right
+        var tRect = tooltip.getBoundingClientRect();
+        if (tRect.right > window.innerWidth) {
+          tooltip.style.left =
+            relLeft + (window.innerWidth - tRect.right - 10) + "px";
+        }
+        // Adjust if overflows left
+        var finalLeft = parseFloat(tooltip.style.left || "0");
+        if (finalLeft + backRect.left < 0) {
+          tooltip.style.left = -backRect.left + 10 + "px";
+        }
+        // Flip above if overflows bottom
+        if (tRect.bottom > window.innerHeight - 10) {
+          var aboveTop =
+            targetRect.top - backRect.top - tRect.height - arrowSize;
+          if (aboveTop + backRect.top > 0) {
+            tooltip.style.top = aboveTop + "px";
+            tooltip.classList.add("tooltip-above");
+          }
+        }
+        // Recalculate arrow position
+        var fLeft = parseFloat(tooltip.style.left || "0");
+        var arrowLeft =
+          targetRect.left - backRect.left + targetRect.width / 2 - fLeft;
+        var tWidth = tooltip.offsetWidth;
+        arrowLeft = Math.max(
+          arrowSize,
+          Math.min(arrowLeft, tWidth - arrowSize),
+        );
+        tooltip.style.setProperty("--tooltip-arrow-left", arrowLeft + "px");
+      }
+
+      function hideGrammarInfo(force) {
+        clearTimeout(hideGrammarTimeout);
+        hideGrammarTimeout = setTimeout(
+          function () {
+            var overTerm = document.querySelector(".grammar-term:hover");
+            var overTooltip = grammarTooltip.matches(":hover");
+            if (!overTerm && !overTooltip) {
+              grammarTooltip.classList.remove("active");
+              grammarTooltip.style.display = "none";
+            }
+          },
+          force ? 0 : 150,
+        );
+      }
+
+      async function showGrammarInfo(termEl) {
+        clearTimeout(hideGrammarTimeout);
+        var term = termEl.dataset.term;
+        if (!term) return;
+
+        grammarTooltip.innerHTML =
+          '<div class="grammar-tooltip-loading">Searching\u2026</div>';
+        grammarTooltip.classList.add("active");
+        grammarTooltip.style.display = "block";
+        positionGrammarTooltip(grammarTooltip, termEl);
+
+        if (grammarCache[term]) {
+          renderGrammarResults(term, termEl);
+          return;
+        }
+
+        // Search for cards with this grammar in the word field
+        var query = 'note:Senren+ "word:' + term + '"';
+        var noteIds = await ankiRequest("findNotes", { query: query });
+
+        if (!noteIds || noteIds.length === 0) {
+          grammarCache[term] = [];
+          renderGrammarResults(term, termEl);
+          return;
+        }
+
+        var notesInfo = await ankiRequest("notesInfo", { notes: noteIds });
+        if (!notesInfo) {
+          grammarCache[term] = [];
+          renderGrammarResults(term, termEl);
+          return;
+        }
+
+        // Get card types for new/review status
+        var allCardIds = [];
+        notesInfo.forEach(function (n) {
+          if (n.cards && n.cards.length)
+            allCardIds.push.apply(allCardIds, n.cards);
+        });
+        var cardTypeMap = {};
+        if (allCardIds.length > 0) {
+          var cardsInfo = await ankiRequest("cardsInfo", { cards: allCardIds });
+          if (cardsInfo) {
+            cardsInfo.forEach(function (c) {
+              cardTypeMap[c.cardId] = c.type;
+            });
+          }
+        }
+
+        var results = [];
+        var uniqueWords = new Set();
+
+        notesInfo.forEach(function (note) {
+          var fields = note.fields;
+          if (!fields || !fields.word || !fields.word.value) return;
+
+          var tempDiv = document.createElement("div");
+          tempDiv.innerHTML = fields.word.value;
+          var wordValue = (
+            tempDiv.textContent ||
+            tempDiv.innerText ||
+            ""
+          ).trim();
+
+          if (uniqueWords.has(wordValue)) return;
+          uniqueWords.add(wordValue);
+
+          var readingHtml = "";
+          var readingVal = fields.reading ? fields.reading.value : "";
+          if (readingVal && readingVal.includes("<li")) {
+            var tDiv = document.createElement("div");
+            tDiv.innerHTML = readingVal;
+            var firstLi = tDiv.querySelector("li");
+            if (firstLi) readingHtml = firstLi.innerHTML;
+          } else {
+            readingHtml = readingVal.split(/[,\u3001\u30FB]/)[0].trim();
+          }
+
+          var sentenceVal = fields.sentence ? fields.sentence.value : "";
+          var pitchVal = fields.pitch ? fields.pitch.value : "";
+          var pitchPosVal = fields.pitchPosition
+            ? fields.pitchPosition.value
+            : "";
+          var tagsVal = fields.Tags ? fields.Tags.value : "";
+          var isNew = !note.cards.some(function (cid) {
+            return cardTypeMap[cid] > 0;
+          });
+
+          results.push({
+            word: wordValue,
+            reading: readingHtml,
+            sentence: sentenceVal,
+            pitch: pitchVal,
+            pitchPosition: pitchPosVal,
+            tags: tagsVal,
+            isNew: isNew,
+            noteId: note.noteId,
+          });
+        });
+
+        grammarCache[term] = results;
+        renderGrammarResults(term, termEl);
+      }
+
+      function renderGrammarResults(term, termEl) {
+        var results = grammarCache[term] || [];
+
+        if (results.length === 0) {
+          grammarTooltip.innerHTML =
+            '<div class="grammar-tooltip-empty">No cards found for \u300C' +
+            term +
+            "\u300D</div>";
+          positionGrammarTooltip(grammarTooltip, termEl);
+          return;
+        }
+
+        var html = '<ul class="grammar-tooltip-list">';
+        var maxItems = 5;
+
+        results.forEach(function (item, idx) {
+          var newClass = item.isNew ? "is-new-card" : "";
+          var displayStyle = idx >= maxItems ? ' style="display: none;"' : "";
+
+          // Pitch info
+          var firstPitchCategory = "";
+          var formattedPosition = "";
+          if (item.pitchPosition) {
+            var numbers = [];
+            var numMatch;
+            var numRegex = /\d+/g;
+            while ((numMatch = numRegex.exec(item.pitchPosition)) !== null) {
+              var n = parseInt(numMatch[0], 10);
+              if (numbers.indexOf(n) === -1) numbers.push(n);
+            }
+            if (numbers.length > 0 && window.senrenGetPitchType) {
+              var tempRt = null;
+              if (item.reading) {
+                var tDiv = document.createElement("div");
+                tDiv.innerHTML = item.reading;
+                var txt = tDiv.textContent || "";
+                if (txt) {
+                  tempRt = document.createElement("rt");
+                  tempRt.textContent = txt;
+                }
+              }
+              formattedPosition = numbers
+                .map(function (num) {
+                  var pt = window.senrenGetPitchType(num, tempRt);
+                  pt = pt.split(",")[0].trim();
+                  return (
+                    '<span class="pitch-number ' + pt + '">' + num + "</span>"
+                  );
+                })
+                .join("\u30FB");
+              var types = numbers.map(function (num) {
+                return window
+                  .senrenGetPitchType(num, tempRt)
+                  .split(",")[0]
+                  .trim();
+              });
+              firstPitchCategory = types[0] || "";
+            }
+          }
+          if (!firstPitchCategory) {
+            firstPitchCategory = item.pitch
+              ? item.pitch.split(",")[0].trim()
+              : "";
+          }
+
+          var sentenceHtml = "";
+          if (item.sentence) {
+            var s = item.sentence.trim();
+            sentenceHtml = '<div class="related-sentence">' + s + "</div>";
+          }
+
+          var clickAction =
+            "onclick=\"window.senrenAnkiRequest('guiBrowse', { query: 'nid:" +
+            item.noteId +
+            "' })\"";
+
+          html +=
+            '<li class="' +
+            newClass +
+            " " +
+            (firstPitchCategory || "") +
+            '"' +
+            displayStyle +
+            ">" +
+            '<div class="related-word-container pitch card-a">' +
+            '<span class="pitch-info ' +
+            (firstPitchCategory || "") +
+            " " +
+            (item.tags || "") +
+            '">' +
+            "<ruby>" +
+            '<span class="related-word clickable-word" ' +
+            clickAction +
+            ">" +
+            item.word +
+            "</span>" +
+            (item.reading ? "<rt>" + item.reading + "</rt>" : "") +
+            "</ruby>" +
+            (formattedPosition
+              ? '<div class="position">' + formattedPosition + "</div>"
+              : "") +
+            "</span>" +
+            "</div>" +
+            sentenceHtml +
+            "</li>";
+        });
+
+        html += "</ul>";
+
+        if (results.length > maxItems) {
+          html +=
+            '<button class="show-more-btn">Show More (' +
+            (results.length - maxItems) +
+            ")</button>";
+        }
+
+        grammarTooltip.innerHTML = html;
+
+        // Draw pitch lines if available
+        if (typeof drawTooltipPitchLines === "function") {
+          drawTooltipPitchLines(grammarTooltip);
+        } else if (window.senrenDrawPitchLines) {
+          window.senrenDrawPitchLines(grammarTooltip);
+        }
+
+        grammarTooltip.classList.add("active");
+        grammarTooltip.style.display = "block";
+        positionGrammarTooltip(grammarTooltip, termEl);
+
+        var showMoreBtn = grammarTooltip.querySelector(".show-more-btn");
+        if (showMoreBtn) {
+          showMoreBtn.addEventListener("click", function () {
+            var hidden = grammarTooltip.querySelectorAll(
+              'li[style="display: none;"]',
+            );
+            hidden.forEach(function (el) {
+              el.style.display = "";
+            });
+            showMoreBtn.remove();
+            positionGrammarTooltip(grammarTooltip, termEl);
+          });
+        }
+
+        grammarTooltip.onmouseover = function () {
+          clearTimeout(hideGrammarTimeout);
+        };
+        grammarTooltip.onmouseout = function () {
+          hideGrammarInfo();
+        };
+      }
+
+      // Find Related/Synonym/Antonym section bodies and wrap terms
+      var hoverableSections = notesBox.querySelectorAll(
+        '.notes-section[data-section="related"] .notes-section-body, ' +
+          '.notes-section[data-section="synonym"] .notes-section-body, ' +
+          '.notes-section[data-section="antonym"] .notes-section-body',
+      );
+
+      hoverableSections.forEach(function (body) {
+        var rawContent = body.innerHTML;
+        // Split by common delimiters: full-width space, comma, ・, 、, <br>
+        // but preserve the delimiters
+        var parts = rawContent.split(
+          /(\u3000|[,\uFF0C]\s*|\u30FB|\u3001|<br\s*\/?>)/gi,
+        );
+        var newHtml = "";
+
+        parts.forEach(function (part) {
+          var trimmed = part.trim();
+          // Check if it's a delimiter or whitespace
+          if (
+            !trimmed ||
+            /^(\u3000|[,\uFF0C]\s*|\u30FB|\u3001|<br\s*\/?>)$/i.test(
+              part.trim(),
+            )
+          ) {
+            newHtml += part;
+          } else {
+            // Strip any existing HTML tags from the term for the data attribute
+            var tempDiv = document.createElement("div");
+            tempDiv.innerHTML = trimmed;
+            var cleanTerm = (
+              tempDiv.textContent ||
+              tempDiv.innerText ||
+              ""
+            ).trim();
+            if (cleanTerm) {
+              newHtml +=
+                '<span class="grammar-term" data-term="' +
+                cleanTerm.replace(/"/g, "&quot;") +
+                '">' +
+                trimmed +
+                "</span>";
+            } else {
+              newHtml += part;
+            }
+          }
+        });
+
+        body.innerHTML = newHtml;
+
+        // Attach hover events
+        var terms = body.querySelectorAll(".grammar-term");
+        terms.forEach(function (termEl) {
+          termEl.addEventListener("mouseover", function () {
+            showGrammarInfo(termEl);
+          });
+          termEl.addEventListener("mouseout", function () {
+            hideGrammarInfo();
+          });
+        });
+      });
+    }
+
+    // ============================================
     // NOTES SECTIONS (navigable like glossary)
     // ============================================
     (function initNotesSections() {
@@ -1048,6 +1468,9 @@
         sectionEls.push(div);
       });
 
+      // Grammar hover for Related/Synonym/Antonym sections
+      initGrammarHover(notesBox);
+
       var totalSections = sectionEls.length;
       var currentNoteIndex = 0;
 
@@ -1139,6 +1562,42 @@
 
     // Toggle notes expand/collapse via header button
     applyClickToggleEffect(".toggle-notes", "#notes");
+
+    // N key to toggle notes expand/collapse
+    (function () {
+      var notesPanelN = document.getElementById("notes");
+      if (!notesPanelN) return;
+      if (notesPanelN.innerHTML.trim() === "") return;
+
+      document.addEventListener("keydown", function (e) {
+        if (e.ctrlKey || e.altKey || e.metaKey) return;
+        if (
+          document.activeElement &&
+          (document.activeElement.tagName === "INPUT" ||
+            document.activeElement.tagName === "TEXTAREA")
+        )
+          return;
+        if (
+          typeof lightbox !== "undefined" &&
+          lightbox.classList.contains("active")
+        )
+          return;
+
+        if (e.key === "n" || e.key === "N") {
+          e.preventDefault();
+          requestAnimationFrame(function () {
+            var isCollapsed = notesPanelN.classList.contains("is-collapsed");
+            if (isCollapsed) {
+              notesPanelN.classList.remove("is-collapsed");
+              notesPanelN.style.maxHeight = notesPanelN.scrollHeight + "px";
+            } else {
+              notesPanelN.classList.add("is-collapsed");
+              notesPanelN.style.maxHeight = "0";
+            }
+          });
+        }
+      });
+    })();
 
     // Auto-expand notes if setting is true
     var notesPanel = document.getElementById("notes");
