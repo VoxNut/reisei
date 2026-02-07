@@ -2186,6 +2186,61 @@
       totalSlides = audioParts.length;
     }
 
+    // Picture Group — support group-based indexing like sentences
+    const pictureContainer = ELS.pictureContainer;
+    if (pictureContainer && !pictureContainer.getAttribute("data-split-done")) {
+      const allChildren = Array.from(pictureContainer.children);
+      const groupWrappers = allChildren.filter((el) => {
+        return (
+          el.className &&
+          el.className.split(/\s+/).some((c) => /^group\d*$/.test(c))
+        );
+      });
+
+      if (groupWrappers.length > 0) {
+        // Remove original children except nav-arrow and toggle buttons
+        allChildren.forEach((el) => {
+          if (
+            !el.classList.contains("nav-arrow") &&
+            !el.classList.contains("toggle-image-visibility")
+          ) {
+            el.remove();
+          }
+        });
+
+        // Create totalSlides slots, fill matching groups
+        for (let i = 0; i < totalSlides; i++) {
+          const div = document.createElement("div");
+          div.classList.add("split-picture");
+          div.style.display = "none";
+
+          // Find a group element that matches this index
+          const match = groupWrappers.find((el) => {
+            const cls = el.className.match(/group(\d+)/);
+            return cls && parseInt(cls[1], 10) - 1 === i;
+          });
+          // Also handle plain "group" (no number) for index 0
+          if (!match && i === 0) {
+            const plain = groupWrappers.find((el) =>
+              el.className.split(/\s+/).includes("group"),
+            );
+            if (plain) div.innerHTML = plain.innerHTML;
+          } else if (match) {
+            div.innerHTML = match.innerHTML;
+          }
+          // Empty div = no image for this scene
+
+          pictureContainer.insertBefore(
+            div,
+            pictureContainer.querySelector(
+              ".nav-arrow, .toggle-image-visibility",
+            ),
+          );
+        }
+        pictureContainer.setAttribute("data-split-done", "true");
+      }
+    }
+
     let currentIndex = 0;
 
     function playActiveAudio() {
@@ -2287,22 +2342,49 @@
     function updateDisplay(shouldPlayAudio = false) {
       const pictureContainer = ELS.pictureContainer;
       if (pictureContainer) {
-        const pictureParts = Array.from(pictureContainer.children).filter(
-          (el) =>
-            el.tagName !== "BR" &&
-            !el.classList.contains("nav-arrow") &&
-            !el.classList.contains("toggle-image-visibility"),
+        const splitPictures = Array.from(
+          pictureContainer.querySelectorAll(".split-picture"),
         );
 
-        if (pictureParts.length > 0) {
-          pictureParts.forEach((part, i) => {
+        if (splitPictures.length > 0) {
+          // Group-based: show/hide split-picture divs and toggle container visibility
+          let hasImage = false;
+          splitPictures.forEach((part, i) => {
             const shouldShow = i === currentIndex;
             part.style.setProperty(
               "display",
               shouldShow ? "block" : "none",
               "important",
             );
+            if (shouldShow && part.querySelector("img")) {
+              hasImage = true;
+            }
           });
+          // Hide entire container if current scene has no image
+          pictureContainer.style.setProperty(
+            "display",
+            hasImage ? "" : "none",
+            "important",
+          );
+        } else {
+          // Fallback: original index-based behavior
+          const pictureParts = Array.from(pictureContainer.children).filter(
+            (el) =>
+              el.tagName !== "BR" &&
+              !el.classList.contains("nav-arrow") &&
+              !el.classList.contains("toggle-image-visibility"),
+          );
+
+          if (pictureParts.length > 0) {
+            pictureParts.forEach((part, i) => {
+              const shouldShow = i === currentIndex;
+              part.style.setProperty(
+                "display",
+                shouldShow ? "block" : "none",
+                "important",
+              );
+            });
+          }
         }
       }
 
