@@ -25,6 +25,8 @@
   --notes-section-related: #b48ead;
   --notes-section-misc: #88c0d0;
   --notes-section-fun-fact: #ebcb8b;
+  --notes-section-structure: #81a1c1;
+  --notes-section-details: #8fbcbb;
   /* CARD SETTINGS - Default States (true/false)
   ============================================ */
   /* General */
@@ -1988,6 +1990,330 @@ img {
   margin-top: 0;
   padding-top: 0;
   border-top-color: transparent;
+}
+
+/* ============================================
+   STRUCTURE SECTION (Standard/Polite toggle)
+   ============================================ */
+
+.notes-structure-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: 0.4em;
+}
+
+.notes-structure-header .notes-section-header {
+  margin-bottom: 0;
+}
+
+.notes-structure-toggle {
+  display: flex;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-structure-toggle {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.notes-structure-btn {
+  font-size: 0.72rem;
+  padding: 4px 14px;
+  border: none;
+  background: rgba(0, 0, 0, 0.03);
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease;
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-structure-btn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notes-structure-btn:hover {
+  opacity: 0.85;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-structure-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.notes-structure-btn.active {
+  background: var(--section-color);
+  color: #fff;
+  opacity: 1;
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-structure-btn.active {
+  background: var(--section-color);
+  color: #fff;
+}
+
+.notes-structure-content {
+  margin-top: var(--spacing-sm);
+}
+
+.notes-structure-panel {
+  display: none;
+  line-height: 1.8;
+  font-size: var(--definition-size);
+  opacity: 0.88;
+}
+
+.notes-structure-panel.active {
+  display: block;
+}
+
+/* ============================================
+   DETAILS SECTION (Part of Speech / Word Type / Register)
+   ============================================ */
+
+.notes-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+@media (max-width: 500px) {
+  .notes-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.notes-details-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notes-details-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.55;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+}
+
+.notes-details-value {
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.notes-details-info {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--section-color);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  font-size: 0.75rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.notes-details-info:hover {
+  opacity: 1;
+}
+
+/* ============================================
+   LEGEND POPUP (Info popup for Details section)
+   ============================================ */
+
+.notes-legend-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+}
+
+.notes-legend-overlay.active {
+  display: flex;
+}
+
+.notes-legend-modal {
+  background: #fff;
+  border-radius: var(--border-radius-ms);
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-legend-modal {
+  background: #2e3440;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.notes-legend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-legend-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.notes-legend-title {
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: var(--sans);
+}
+
+.notes-legend-close {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notes-legend-close:hover {
+  opacity: 1;
+}
+
+.notes-legend-body {
+  overflow-y: auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.notes-legend-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.notes-legend-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.5;
+  padding: 6px 12px 6px 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+  font-family: var(--sans);
+  font-weight: 600;
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-legend-table th {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.notes-legend-table td {
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+:is(.card.nightMode, .custom-dark-mode) .notes-legend-table td {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.notes-legend-table tr:last-child td {
+  border-bottom: none;
+}
+
+.notes-legend-term {
+  white-space: nowrap;
+  font-weight: 600;
+  min-width: 120px;
+}
+
+.notes-legend-term-en {
+  display: block;
+}
+
+.notes-legend-term-jp {
+  display: block;
+  font-size: 0.78rem;
+  opacity: 0.65;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.notes-legend-reading {
+  font-size: 0.72rem;
+}
+
+.notes-legend-desc {
+  opacity: 0.82;
+}
+
+/* Highlighted row (matches current value) */
+.notes-legend-table tr.legend-highlight {
+  background: rgba(129, 161, 193, 0.12);
+  border-radius: 4px;
+}
+
+.notes-legend-table tr.legend-highlight td {
+  border-bottom-color: rgba(129, 161, 193, 0.15);
+}
+
+.notes-legend-table tr.legend-highlight .notes-legend-term-en {
+  color: #81a1c1;
+}
+
+:is(.card.nightMode, .custom-dark-mode)
+  .notes-legend-table
+  tr.legend-highlight {
+  background: rgba(129, 161, 193, 0.15);
+}
+
+:is(.card.nightMode, .custom-dark-mode)
+  .notes-legend-table
+  tr.legend-highlight
+  td {
+  border-bottom-color: rgba(129, 161, 193, 0.2);
+}
+
+@media (max-width: 500px) {
+  .notes-legend-modal {
+    max-width: 95vw;
+  }
+
+  .notes-legend-term {
+    white-space: normal;
+    min-width: 80px;
+  }
 }
 
 /* Definition + Glossary */

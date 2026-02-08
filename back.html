@@ -395,7 +395,9 @@
 
   // Manages cycling between Selection Text, Definition, and Glossary
   function toggleDefinition() {
-    const toggleAreas = document.querySelectorAll(".toggle-area");
+    const toggleAreas = document.querySelectorAll(
+      ".toggle-area:not(#notes .toggle-area)",
+    );
     const selectionText = ELS.selectionText;
     const definition = ELS.definition;
     const glossary = ELS.glossary;
@@ -815,12 +817,13 @@
 
     window.senrenDefinitionKeyHandler = (e) => {
       if (totalVisibleItemsCount <= 1) return;
-      if (e.ctrlKey) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
       if (
         typeof lightbox !== "undefined" &&
         lightbox.classList.contains("active")
       )
         return;
+      if (document.querySelector(".notes-legend-overlay.active")) return;
       if (
         document.activeElement &&
         (document.activeElement.tagName === "INPUT" ||
@@ -1418,6 +1421,8 @@
         "Antonym",
         "Related",
         "Misc",
+        "Structure",
+        "Details",
       ];
       const testPattern = new RegExp(
         "(?:^|<br\\s*/?>|\\n)\\s*(" + sectionKeywords.join("|") + ")\\b\\.?",
@@ -1431,6 +1436,8 @@
         antonym: "fa-right-left",
         related: "fa-link",
         misc: "fa-puzzle-piece",
+        structure: "fa-cubes",
+        details: "fa-tags",
       };
       const colorMap = {
         about: "var(--notes-section-about)",
@@ -1440,6 +1447,8 @@
         antonym: "var(--notes-section-antonym)",
         related: "var(--notes-section-related)",
         misc: "var(--notes-section-misc)",
+        structure: "var(--notes-section-structure)",
+        details: "var(--notes-section-details)",
       };
 
       // Sections that use card grid layout (pipe-delimited)
@@ -1561,6 +1570,91 @@
             });
             html += "</div>";
             html += "</div>";
+          } else if (key === "structure") {
+            // Structure section: Standard/Polite toggle
+            var structureParts = sec.content.split("||").map(function (p) {
+              return p.trim();
+            });
+            var standardContent = structureParts[0] || "";
+            var politeContent =
+              structureParts.length > 1 ? structureParts[1] : "";
+            var hasPolite = politeContent.length > 0;
+
+            html +=
+              '<div class="notes-section notes-structure-section" data-section="structure" style="--section-color: ' +
+              color +
+              '">';
+            html += '<div class="notes-structure-header">';
+            html += '<div class="notes-section-header">';
+            html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
+            html +=
+              '<span class="notes-section-title">' + sec.keyword + "</span>";
+            html += "</div>";
+            if (hasPolite) {
+              html += '<div class="notes-structure-toggle">';
+              html +=
+                '<button class="notes-structure-btn tappable active" data-mode="standard">Standard</button>';
+              html +=
+                '<button class="notes-structure-btn tappable" data-mode="polite">Polite</button>';
+              html += "</div>";
+            }
+            html += "</div>";
+            html += '<div class="notes-structure-content">';
+            html +=
+              '<div class="notes-structure-panel active" data-panel="standard">' +
+              standardContent +
+              "</div>";
+            if (hasPolite) {
+              html +=
+                '<div class="notes-structure-panel" data-panel="polite">' +
+                politeContent +
+                "</div>";
+            }
+            html += "</div>";
+            html += "</div>";
+          } else if (key === "details") {
+            // Details section: Part of Speech / Word Type / Register
+            var detailParts = sec.content.split("|").map(function (p) {
+              return p.trim();
+            });
+            var partOfSpeech = detailParts[0] || "";
+            var wordType = detailParts[1] || "";
+            var register = detailParts[2] || "";
+
+            html +=
+              '<div class="notes-section notes-details-section" data-section="details" style="--section-color: ' +
+              color +
+              '">';
+            html += '<div class="notes-section-header">';
+            html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
+            html +=
+              '<span class="notes-section-title">' + sec.keyword + "</span>";
+            html += "</div>";
+            html += '<div class="notes-details-grid">';
+            if (partOfSpeech) {
+              html += '<div class="notes-details-item">';
+              html +=
+                '<div class="notes-details-label">Part of Speech <button class="notes-details-info tappable" data-legend="pos" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
+              html +=
+                '<div class="notes-details-value">' + partOfSpeech + "</div>";
+              html += "</div>";
+            }
+            if (wordType) {
+              html += '<div class="notes-details-item">';
+              html +=
+                '<div class="notes-details-label">Word Type <button class="notes-details-info tappable" data-legend="wordtype" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
+              html += '<div class="notes-details-value">' + wordType + "</div>";
+              html += "</div>";
+            }
+            if (register) {
+              html += '<div class="notes-details-item">';
+              html +=
+                '<div class="notes-details-label">Register <button class="notes-details-info tappable" data-legend="register" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
+              html += '<div class="notes-details-value">' + register + "</div>";
+              html += "</div>";
+            }
+            html += "</div>";
+            html += "</div>";
           } else {
             // Default section rendering
             html +=
@@ -1662,6 +1756,348 @@
         });
       });
 
+      // Structure section: Standard/Polite toggle
+      notesBox.querySelectorAll(".notes-structure-btn").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var section = btn.closest(".notes-structure-section");
+          if (!section) return;
+          var mode = btn.getAttribute("data-mode");
+
+          section
+            .querySelectorAll(".notes-structure-btn")
+            .forEach(function (b) {
+              b.classList.remove("active");
+            });
+          btn.classList.add("active");
+
+          section
+            .querySelectorAll(".notes-structure-panel")
+            .forEach(function (p) {
+              p.classList.remove("active");
+            });
+          var target = section.querySelector(
+            '.notes-structure-panel[data-panel="' + mode + '"]',
+          );
+          if (target) target.classList.add("active");
+
+          if (!notesPanel.classList.contains("is-collapsed")) {
+            notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
+          }
+        });
+      });
+
+      // Details section: Legend popup data
+      var legendData = {
+        pos: {
+          title: "Parts of Speech",
+          entries: [
+            {
+              term: "Expression",
+              jp: "表現",
+              reading: "ひょうげん",
+              desc: "A set combination of words that together convey a specific meaning or grammatical function.",
+            },
+            {
+              term: "Adjective",
+              jp: "形容詞",
+              reading: "けいようし",
+              desc: "A word that describes or modifies a noun, expressing qualities, states, or characteristics.",
+            },
+            {
+              term: "Adverb",
+              jp: "副詞",
+              reading: "ふくし",
+              desc: "A word that modifies a verb, adjective, or another adverb, expressing manner, degree, or frequency.",
+            },
+            {
+              term: "Auxiliary Verb",
+              jp: "助動詞",
+              reading: "じょどうし",
+              desc: "Verbs that attach to other words to add grammatical meaning such as tense, negation, or politeness.",
+            },
+            {
+              term: "Conjunctive Particle",
+              jp: "接続助詞",
+              reading: "せつぞくじょし",
+              desc: "Suffixes or particles that connect clauses, indicating relationships like cause, condition, or contrast.",
+            },
+            {
+              term: "Noun",
+              jp: "名詞",
+              reading: "めいし",
+              desc: "A word that represents a person, place, thing, or concept.",
+            },
+            {
+              term: "Particle",
+              jp: "助詞",
+              reading: "じょし",
+              desc: "A suffix that indicates the grammatical relationship of a word within a sentence.",
+            },
+            {
+              term: "Pronoun",
+              jp: "代名詞",
+              reading: "だいめいし",
+              desc: "A word that takes the place of a noun, referring to people, things, or concepts.",
+            },
+            {
+              term: "Verb",
+              jp: "動詞",
+              reading: "どうし",
+              desc: "A word used to describe an action, state, or occurrence.",
+            },
+          ],
+        },
+        wordtype: {
+          title: "Word Types",
+          entries: [
+            {
+              term: "Abbreviation",
+              desc: "A shortened form of a word or phrase.",
+            },
+            {
+              term: "Adjectival Noun",
+              desc: "A noun that functions as an adjective, typically using な to modify other nouns (な-adjective).",
+            },
+            {
+              term: "Adjective",
+              desc: "An い-adjective that directly modifies nouns and conjugates for tense and negation.",
+            },
+            {
+              term: "Adverb",
+              desc: "A word that modifies verbs, adjectives, or other adverbs.",
+            },
+            {
+              term: "Adverb Phrase",
+              desc: "A group of words functioning together as an adverb.",
+            },
+            {
+              term: "Adverbial Particle",
+              desc: "A particle that adds adverbial meaning to the word it follows.",
+            },
+            {
+              term: "Auxiliary Verb",
+              desc: "A verb that attaches to another verb to add grammatical meaning.",
+            },
+            {
+              term: "Case Marking Particle",
+              desc: "A particle that marks the grammatical role of a noun in a sentence (e.g. が, を, に).",
+            },
+            {
+              term: "Conjunction",
+              desc: "A word that connects words, phrases, or clauses together.",
+            },
+            {
+              term: "Conjunctive Particle",
+              desc: "A particle that connects clauses, indicating cause, condition, or contrast.",
+            },
+            {
+              term: "Definite Article",
+              desc: "A word that specifies a particular noun (not native to Japanese, used in comparative grammar).",
+            },
+            {
+              term: "Demonstrative Pronoun",
+              desc: "A pronoun that points to a specific thing (e.g. これ, それ, あれ).",
+            },
+            {
+              term: "Dependent Word",
+              desc: "A word that cannot stand alone and must be attached to another word.",
+            },
+            {
+              term: "Dictionary Form",
+              desc: "The base, unconjugated form of a verb as it appears in the dictionary.",
+            },
+            {
+              term: "Indefinite Article",
+              desc: "A word that refers to a non-specific noun (not native to Japanese, used in comparative grammar).",
+            },
+            {
+              term: "Independent Word",
+              desc: "A word that can stand alone and carry meaning by itself.",
+            },
+            {
+              term: "Informal Speech",
+              desc: "Casual language used in relaxed or familiar contexts.",
+            },
+            {
+              term: "Linking Particle",
+              desc: "A particle that connects elements within a sentence.",
+            },
+            {
+              term: "Noun",
+              desc: "A word representing a person, place, thing, or idea.",
+            },
+            {
+              term: "Ordinary",
+              desc: "Standard, everyday language without special formality.",
+            },
+            {
+              term: "Personal Pronoun",
+              desc: "A pronoun referring to a specific person (e.g. 私, あなた, 彼).",
+            },
+            {
+              term: "Plural",
+              desc: "A form indicating more than one of something.",
+            },
+            {
+              term: "Possessive",
+              desc: "A form indicating ownership or association.",
+            },
+            {
+              term: "Possessive Pronoun",
+              desc: "A pronoun indicating possession (e.g. 私の).",
+            },
+            {
+              term: "Predicate",
+              desc: "The part of a sentence that describes what the subject does or is.",
+            },
+            {
+              term: "Present Simple Tense",
+              desc: "The verb form expressing current or habitual actions.",
+            },
+            {
+              term: "Pronoun",
+              desc: "A word that substitutes for a noun.",
+            },
+            {
+              term: "Question Sentence Order",
+              desc: "The word order used when forming questions in Japanese.",
+            },
+            {
+              term: "Sentence Ending Particle",
+              desc: "A particle placed at the end of a sentence to add nuance (e.g. よ, ね, か).",
+            },
+            {
+              term: "Verb",
+              desc: "A word describing an action, state, or occurrence.",
+            },
+          ],
+        },
+        register: {
+          title: "Register",
+          entries: [
+            {
+              term: "Standard",
+              jp: "標準語",
+              reading: "ひょうじゅんご",
+              desc: "The default level of formality used in everyday conversation and general writing.",
+            },
+            {
+              term: "Formal",
+              jp: "正式",
+              reading: "せいしき",
+              desc: "Used in official contexts, ceremonial situations, business documents, and formal speeches.",
+            },
+            {
+              term: "Polite",
+              jp: "丁寧語",
+              reading: "ていねいご",
+              desc: "Shows respect through polite forms (です/ます), appropriate for most social interactions.",
+            },
+            {
+              term: "Casual",
+              jp: "くだけた表現",
+              reading: "",
+              desc: "Informal speech used among close friends, family, or in relaxed social settings.",
+            },
+          ],
+        },
+      };
+
+      // Legend popup: create overlay lazily, show/hide
+      var legendOverlay = null;
+
+      function showLegend(type, currentValue) {
+        var data = legendData[type];
+        if (!data) return;
+        var matchValue = (currentValue || "").trim().toLowerCase();
+
+        if (!legendOverlay) {
+          legendOverlay = document.createElement("div");
+          legendOverlay.className = "notes-legend-overlay";
+          legendOverlay.innerHTML =
+            '<div class="notes-legend-modal">' +
+            '<div class="notes-legend-header">' +
+            '<span class="notes-legend-title"></span>' +
+            '<button class="notes-legend-close tappable"><i class="fas fa-times"></i></button>' +
+            "</div>" +
+            '<div class="notes-legend-body"></div>' +
+            "</div>";
+          document.body.appendChild(legendOverlay);
+
+          legendOverlay.addEventListener("click", function (e) {
+            if (e.target === legendOverlay) closeLegend();
+          });
+          legendOverlay
+            .querySelector(".notes-legend-close")
+            .addEventListener("click", closeLegend);
+        }
+
+        legendOverlay.querySelector(".notes-legend-title").textContent =
+          data.title;
+
+        var bodyHtml = '<table class="notes-legend-table">';
+        bodyHtml += "<thead><tr><th>Term</th><th>Description</th></tr></thead>";
+        bodyHtml += "<tbody>";
+        data.entries.forEach(function (entry) {
+          var isMatch = matchValue && entry.term.toLowerCase() === matchValue;
+          bodyHtml +=
+            "<tr" + (isMatch ? ' class="legend-highlight"' : "") + ">";
+          bodyHtml += '<td class="notes-legend-term">';
+          bodyHtml +=
+            '<span class="notes-legend-term-en">' + entry.term + "</span>";
+          if (entry.jp) {
+            bodyHtml += '<span class="notes-legend-term-jp">' + entry.jp;
+            if (entry.reading)
+              bodyHtml +=
+                ' <span class="notes-legend-reading">(' +
+                entry.reading +
+                ")</span>";
+            bodyHtml += "</span>";
+          }
+          bodyHtml += "</td>";
+          bodyHtml += '<td class="notes-legend-desc">' + entry.desc + "</td>";
+          bodyHtml += "</tr>";
+        });
+        bodyHtml += "</tbody></table>";
+
+        legendOverlay.querySelector(".notes-legend-body").innerHTML = bodyHtml;
+        legendOverlay.classList.add("active");
+
+        // Scroll highlighted row into view
+        var highlighted = legendOverlay.querySelector(".legend-highlight");
+        if (highlighted) {
+          highlighted.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
+      }
+
+      function closeLegend() {
+        if (legendOverlay) legendOverlay.classList.remove("active");
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (
+          e.key === "Escape" &&
+          legendOverlay &&
+          legendOverlay.classList.contains("active")
+        ) {
+          closeLegend();
+        }
+      });
+
+      // Details section: info icon click → show legend
+      notesBox.querySelectorAll(".notes-details-info").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var type = btn.getAttribute("data-legend");
+          var item = btn.closest(".notes-details-item");
+          var value = item
+            ? item.querySelector(".notes-details-value").textContent
+            : "";
+          showLegend(type, value);
+        });
+      });
+
       var totalSections = sectionEls.length;
       var currentNoteIndex = 0;
 
@@ -1737,6 +2173,7 @@
           lightbox.classList.contains("active")
         )
           return;
+        if (document.querySelector(".notes-legend-overlay.active")) return;
 
         if (e.key === "h") {
           e.preventDefault();
@@ -1758,7 +2195,6 @@
     (function () {
       var notesPanelN = document.getElementById("notes");
       if (!notesPanelN) return;
-      if (notesPanelN.innerHTML.trim() === "") return;
 
       document.addEventListener("keydown", function (e) {
         if (e.ctrlKey || e.altKey || e.metaKey) return;
@@ -1773,6 +2209,7 @@
           lightbox.classList.contains("active")
         )
           return;
+        if (document.querySelector(".notes-legend-overlay.active")) return;
 
         if (e.key === "n") {
           e.preventDefault();
@@ -2921,6 +3358,12 @@
       if (
         document.activeElement &&
         ["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)
+      )
+        return;
+      if (document.querySelector(".notes-legend-overlay.active")) return;
+      if (
+        typeof lightbox !== "undefined" &&
+        lightbox.classList.contains("active")
       )
         return;
 
