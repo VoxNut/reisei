@@ -1397,795 +1397,830 @@
     // NOTES SECTIONS (navigable like glossary)
     // ============================================
     (function initNotesSections() {
-      const notesPanel = document.getElementById("notes");
-      if (!notesPanel) return;
+      try {
+        const notesPanel = document.getElementById("notes");
+        if (!notesPanel) return;
 
-      const notesBox = notesPanel.querySelector(".notes-box");
-      const rawSpan = notesPanel.querySelector(".notes-raw");
-      if (!rawSpan) return;
+        const notesBox = notesPanel.querySelector(".notes-box");
+        const rawSpan = notesPanel.querySelector(".notes-raw");
+        if (!rawSpan) return;
 
-      const raw = rawSpan.innerHTML;
+        const raw = rawSpan.innerHTML;
 
-      // Normalize block-level HTML (div, p) to <br> for consistent parsing
-      var normalized = raw
-        .replace(/<\/?(div|p|section|article)(?:\s[^>]*)?>\s*/gi, "<br>")
-        .replace(/(<br\s*\/?>\s*){2,}/gi, "<br><br>")
-        .replace(/^\s*(?:<br\s*\/?>\s*)*/i, "")
-        .replace(/(?:\s*<br\s*\/?>)*\s*$/i, "");
+        // Normalize block-level HTML (div, p) to <br> for consistent parsing
+        var normalized = raw
+          .replace(/<\/?(div|p|section|article)(?:\s[^>]*)?>\s*/gi, "<br>")
+          .replace(/(<br\s*\/?>\s*){2,}/gi, "<br><br>")
+          .replace(/^\s*(?:<br\s*\/?>\s*)*/i, "")
+          .replace(/(?:\s*<br\s*\/?>)*\s*$/i, "");
 
-      const sectionKeywords = [
-        "About",
-        "Caution",
-        "Fun Fact",
-        "Synonym",
-        "Antonym",
-        "Related",
-        "Misc",
-        "Structure",
-        "Details",
-      ];
-      const testPattern = new RegExp(
-        "(?:^|<br\\s*/?>|\\n)\\s*(" + sectionKeywords.join("|") + ")\\b\\.?",
-        "i",
-      );
-      const iconMap = {
-        about: "fa-circle-info",
-        caution: "fa-triangle-exclamation",
-        "fun fact": "fa-lightbulb",
-        synonym: "fa-equals",
-        antonym: "fa-right-left",
-        related: "fa-link",
-        misc: "fa-puzzle-piece",
-        structure: "fa-cubes",
-        details: "fa-tags",
-      };
-      const colorMap = {
-        about: "var(--notes-section-about)",
-        caution: "var(--notes-section-caution)",
-        "fun fact": "var(--notes-section-fun-fact)",
-        synonym: "var(--notes-section-synonym)",
-        antonym: "var(--notes-section-antonym)",
-        related: "var(--notes-section-related)",
-        misc: "var(--notes-section-misc)",
-        structure: "var(--notes-section-structure)",
-        details: "var(--notes-section-details)",
-      };
-
-      // Sections that use card grid layout (pipe-delimited)
-      const cardGridSections = ["synonym", "antonym", "related", "misc"];
-
-      // Parse sections
-      var parsedSections = [];
-
-      if (testPattern.test(normalized)) {
-        var sectionPattern = new RegExp(
-          "(?:^|<br\\s*/?>|\\n)\\s*(" +
-            sectionKeywords.join("|") +
-            ")\\b\\.?([^]*?)(?=(?:<br\\s*/?>|\\n)\\s*(?:" +
-            sectionKeywords.join("|") +
-            ")\\b\\.?|$)",
-          "gi",
+        const sectionKeywords = [
+          "About",
+          "Caution",
+          "Fun Fact",
+          "Synonym",
+          "Antonym",
+          "Related",
+          "Misc",
+          "Structure",
+          "Details",
+        ];
+        const testPattern = new RegExp(
+          "(?:^|<br\\s*/?>|\\n)\\s*(" + sectionKeywords.join("|") + ")\\b\\.?",
+          "i",
         );
-        var firstMatch = normalized.search(testPattern);
-        var preamble =
-          firstMatch > 0 ? normalized.substring(0, firstMatch).trim() : "";
-        sectionPattern.lastIndex = 0;
-        var m;
-        while ((m = sectionPattern.exec(normalized)) !== null) {
-          var content = (m[2] || "")
-            .replace(/^[\s]*(<br\s*\/?>[\s]*)*/gi, "")
-            .trim();
-          content = content.replace(/(<br\s*\/?>[\s]*)*$/gi, "").trim();
+        const iconMap = {
+          about: "fa-circle-info",
+          caution: "fa-triangle-exclamation",
+          "fun fact": "fa-lightbulb",
+          synonym: "fa-equals",
+          antonym: "fa-right-left",
+          related: "fa-link",
+          misc: "fa-puzzle-piece",
+          structure: "fa-cubes",
+          details: "fa-tags",
+        };
+        const colorMap = {
+          about: "var(--notes-section-about)",
+          caution: "var(--notes-section-caution)",
+          "fun fact": "var(--notes-section-fun-fact)",
+          synonym: "var(--notes-section-synonym)",
+          antonym: "var(--notes-section-antonym)",
+          related: "var(--notes-section-related)",
+          misc: "var(--notes-section-misc)",
+          structure: "var(--notes-section-structure)",
+          details: "var(--notes-section-details)",
+        };
+
+        // Sections that use card grid layout (pipe-delimited)
+        const cardGridSections = ["synonym", "antonym", "related", "misc"];
+
+        // Parse sections
+        var parsedSections = [];
+
+        if (testPattern.test(normalized)) {
+          var sectionPattern = new RegExp(
+            "(?:^|<br\\s*/?>|\\n)\\s*(" +
+              sectionKeywords.join("|") +
+              ")\\b\\.?([^]*?)(?=(?:<br\\s*/?>|\\n)\\s*(?:" +
+              sectionKeywords.join("|") +
+              ")\\b\\.?|$)",
+            "gi",
+          );
+          var firstMatch = normalized.search(testPattern);
+          var preamble =
+            firstMatch > 0 ? normalized.substring(0, firstMatch).trim() : "";
+          sectionPattern.lastIndex = 0;
+          var m;
+          while ((m = sectionPattern.exec(normalized)) !== null) {
+            var content = (m[2] || "")
+              .replace(/^[\s]*(<br\s*\/?>[\s]*)*/gi, "")
+              .trim();
+            content = content.replace(/(<br\s*\/?>[\s]*)*$/gi, "").trim();
+            parsedSections.push({
+              keyword: m[1],
+              content: content,
+              preamble: "",
+            });
+          }
+          if (preamble && parsedSections.length > 0) {
+            parsedSections[0].preamble = preamble;
+          }
+        }
+
+        // No sections found => show normalized as single item
+        if (parsedSections.length === 0) {
           parsedSections.push({
-            keyword: m[1],
-            content: content,
+            keyword: "",
+            content: normalized,
             preamble: "",
           });
         }
-        if (preamble && parsedSections.length > 0) {
-          parsedSections[0].preamble = preamble;
-        }
-      }
 
-      // No sections found => show normalized as single item
-      if (parsedSections.length === 0) {
-        parsedSections.push({ keyword: "", content: normalized, preamble: "" });
-      }
+        // Build section elements
+        var sectionEls = [];
+        notesBox.innerHTML = "";
 
-      // Build section elements
-      var sectionEls = [];
-      notesBox.innerHTML = "";
+        parsedSections.forEach(function (sec, i) {
+          var div = document.createElement("div");
+          div.className = "notes-section-item";
+          div.style.display = i === 0 ? "block" : "none";
 
-      parsedSections.forEach(function (sec, i) {
-        var div = document.createElement("div");
-        div.className = "notes-section-item";
-        div.style.display = i === 0 ? "block" : "none";
+          var html = "";
+          if (sec.preamble) {
+            html += '<div class="notes-preamble">' + sec.preamble + "</div>";
+          }
+          if (sec.keyword) {
+            var key = sec.keyword.toLowerCase();
+            var icon = iconMap[key] || "fa-circle-info";
+            var color = colorMap[key] || colorMap.about;
 
-        var html = "";
-        if (sec.preamble) {
-          html += '<div class="notes-preamble">' + sec.preamble + "</div>";
-        }
-        if (sec.keyword) {
-          var key = sec.keyword.toLowerCase();
-          var icon = iconMap[key] || "fa-circle-info";
-          var color = colorMap[key] || colorMap.about;
+            // Card grid layout for Synonym/Antonym/Related/Misc sections (pipe-delimited entries)
+            if (
+              cardGridSections.indexOf(key) !== -1 &&
+              sec.content.indexOf("|") !== -1
+            ) {
+              var lines = sec.content
+                .split(/<br\s*\/?>/gi)
+                .filter(function (l) {
+                  return l.trim();
+                });
 
-          // Card grid layout for Synonym/Antonym/Related/Misc sections (pipe-delimited entries)
-          if (
-            cardGridSections.indexOf(key) !== -1 &&
-            sec.content.indexOf("|") !== -1
-          ) {
-            var lines = sec.content.split(/<br\s*\/?>/gi).filter(function (l) {
-              return l.trim();
-            });
+              html +=
+                '<div class="notes-section notes-card-section" data-section="' +
+                key +
+                '" style="--section-color: ' +
+                color +
+                '">';
+              html += '<div class="notes-card-toolbar">';
+              html += '<div class="notes-section-header">';
+              html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
+              html +=
+                '<span class="notes-section-title">' + sec.keyword + "</span>";
+              html += "</div>";
+              html +=
+                '<button class="notes-card-toggle-all tappable" data-state="expanded">Collapse All</button>';
+              html += "</div>";
 
-            html +=
-              '<div class="notes-section notes-card-section" data-section="' +
-              key +
-              '" style="--section-color: ' +
-              color +
-              '">';
-            html += '<div class="notes-card-toolbar">';
-            html += '<div class="notes-section-header">';
-            html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
-            html +=
-              '<span class="notes-section-title">' + sec.keyword + "</span>";
-            html += "</div>";
-            html +=
-              '<button class="notes-card-toggle-all tappable" data-state="expanded">Collapse All</button>';
-            html += "</div>";
+              html += '<div class="notes-card-grid">';
+              lines.forEach(function (line) {
+                var parts = line.split("|").map(function (p) {
+                  return p.trim();
+                });
+                var word = parts[0] || "";
+                var meaning = parts[1] || "";
+                var level = parts[2] || "";
+                var desc = parts[3] || "";
 
-            html += '<div class="notes-card-grid">';
-            lines.forEach(function (line) {
-              var parts = line.split("|").map(function (p) {
+                html += '<div class="notes-card tappable">';
+                html += '<div class="notes-card-top">';
+                html += '<div class="notes-card-info">';
+                html += '<div class="notes-card-word">' + word + "</div>";
+                if (meaning)
+                  html +=
+                    '<div class="notes-card-meaning">' + meaning + "</div>";
+                if (level) {
+                  html +=
+                    '<div class="notes-card-badge"><i class="fas fa-times badge-icon"></i> ' +
+                    level +
+                    "</div>";
+                }
+                html += "</div>";
+                html +=
+                  '<span class="notes-card-link tappable" data-word="' +
+                  word.replace(/"/g, "&quot;") +
+                  '" title="Browse in Anki"><i class="fas fa-external-link-alt"></i></span>';
+                html += "</div>";
+                if (desc) {
+                  html += '<div class="notes-card-desc">' + desc + "</div>";
+                }
+                html += "</div>";
+              });
+              html += "</div>";
+              html += "</div>";
+            } else if (key === "structure") {
+              // Structure section: Standard/Polite toggle
+              var structureParts = sec.content.split("||").map(function (p) {
                 return p.trim();
               });
-              var word = parts[0] || "";
-              var meaning = parts[1] || "";
-              var level = parts[2] || "";
-              var desc = parts[3] || "";
+              var standardContent = structureParts[0] || "";
+              var politeContent =
+                structureParts.length > 1 ? structureParts[1] : "";
+              var hasPolite = politeContent.length > 0;
 
-              html += '<div class="notes-card tappable">';
-              html += '<div class="notes-card-top">';
-              html += '<div class="notes-card-info">';
-              html += '<div class="notes-card-word">' + word + "</div>";
-              if (meaning)
-                html += '<div class="notes-card-meaning">' + meaning + "</div>";
-              if (level) {
+              html +=
+                '<div class="notes-section notes-structure-section" data-section="structure" style="--section-color: ' +
+                color +
+                '">';
+              html += '<div class="notes-structure-header">';
+              html += '<div class="notes-section-header">';
+              html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
+              html +=
+                '<span class="notes-section-title">' + sec.keyword + "</span>";
+              html += "</div>";
+              if (hasPolite) {
+                html += '<div class="notes-structure-toggle">';
                 html +=
-                  '<div class="notes-card-badge"><i class="fas fa-times badge-icon"></i> ' +
-                  level +
+                  '<button class="notes-structure-btn tappable active" data-mode="standard">Standard</button>';
+                html +=
+                  '<button class="notes-structure-btn tappable" data-mode="polite">Polite</button>';
+                html += "</div>";
+              }
+              html += "</div>";
+              html += '<div class="notes-structure-content">';
+              html +=
+                '<div class="notes-structure-panel active" data-panel="standard">' +
+                standardContent +
+                "</div>";
+              if (hasPolite) {
+                html +=
+                  '<div class="notes-structure-panel" data-panel="polite">' +
+                  politeContent +
                   "</div>";
               }
               html += "</div>";
-              html +=
-                '<span class="notes-card-link tappable" data-word="' +
-                word.replace(/"/g, "&quot;") +
-                '" title="Browse in Anki"><i class="fas fa-external-link-alt"></i></span>';
               html += "</div>";
-              if (desc) {
-                html += '<div class="notes-card-desc">' + desc + "</div>";
+            } else if (key === "details") {
+              // Details section: Part of Speech / Word Type / Register
+              var detailParts = sec.content.split("|").map(function (p) {
+                return p.trim();
+              });
+              var partOfSpeech = detailParts[0] || "";
+              var wordType = detailParts[1] || "";
+              var register = detailParts[2] || "";
+
+              html +=
+                '<div class="notes-section notes-details-section" data-section="details" style="--section-color: ' +
+                color +
+                '">';
+              html += '<div class="notes-section-header">';
+              html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
+              html +=
+                '<span class="notes-section-title">' + sec.keyword + "</span>";
+              html += "</div>";
+              html += '<div class="notes-details-grid">';
+              if (partOfSpeech) {
+                html += '<div class="notes-details-item">';
+                html +=
+                  '<div class="notes-details-label">Part of Speech <button class="notes-details-info tappable" data-legend="pos" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
+                html +=
+                  '<div class="notes-details-value">' + partOfSpeech + "</div>";
+                html += "</div>";
+              }
+              if (wordType) {
+                html += '<div class="notes-details-item">';
+                html +=
+                  '<div class="notes-details-label">Word Type <button class="notes-details-info tappable" data-legend="wordtype" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
+                html +=
+                  '<div class="notes-details-value">' + wordType + "</div>";
+                html += "</div>";
+              }
+              if (register) {
+                html += '<div class="notes-details-item">';
+                html +=
+                  '<div class="notes-details-label">Register <button class="notes-details-info tappable" data-legend="register" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
+                html +=
+                  '<div class="notes-details-value">' + register + "</div>";
+                html += "</div>";
               }
               html += "</div>";
-            });
-            html += "</div>";
-            html += "</div>";
-          } else if (key === "structure") {
-            // Structure section: Standard/Polite toggle
-            var structureParts = sec.content.split("||").map(function (p) {
-              return p.trim();
-            });
-            var standardContent = structureParts[0] || "";
-            var politeContent =
-              structureParts.length > 1 ? structureParts[1] : "";
-            var hasPolite = politeContent.length > 0;
-
-            html +=
-              '<div class="notes-section notes-structure-section" data-section="structure" style="--section-color: ' +
-              color +
-              '">';
-            html += '<div class="notes-structure-header">';
-            html += '<div class="notes-section-header">';
-            html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
-            html +=
-              '<span class="notes-section-title">' + sec.keyword + "</span>";
-            html += "</div>";
-            if (hasPolite) {
-              html += '<div class="notes-structure-toggle">';
+              html += "</div>";
+            } else {
+              // Default section rendering
               html +=
-                '<button class="notes-structure-btn tappable active" data-mode="standard">Standard</button>';
+                '<div class="notes-section" data-section="' +
+                key +
+                '" style="--section-color: ' +
+                color +
+                '">';
+              html += '<div class="notes-section-header">';
+              html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
               html +=
-                '<button class="notes-structure-btn tappable" data-mode="polite">Polite</button>';
+                '<span class="notes-section-title">' + sec.keyword + "</span>";
+              html += "</div>";
+              html +=
+                '<div class="notes-section-body">' + sec.content + "</div>";
               html += "</div>";
             }
-            html += "</div>";
-            html += '<div class="notes-structure-content">';
-            html +=
-              '<div class="notes-structure-panel active" data-panel="standard">' +
-              standardContent +
-              "</div>";
-            if (hasPolite) {
-              html +=
-                '<div class="notes-structure-panel" data-panel="polite">' +
-                politeContent +
-                "</div>";
-            }
-            html += "</div>";
-            html += "</div>";
-          } else if (key === "details") {
-            // Details section: Part of Speech / Word Type / Register
-            var detailParts = sec.content.split("|").map(function (p) {
-              return p.trim();
-            });
-            var partOfSpeech = detailParts[0] || "";
-            var wordType = detailParts[1] || "";
-            var register = detailParts[2] || "";
-
-            html +=
-              '<div class="notes-section notes-details-section" data-section="details" style="--section-color: ' +
-              color +
-              '">';
-            html += '<div class="notes-section-header">';
-            html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
-            html +=
-              '<span class="notes-section-title">' + sec.keyword + "</span>";
-            html += "</div>";
-            html += '<div class="notes-details-grid">';
-            if (partOfSpeech) {
-              html += '<div class="notes-details-item">';
-              html +=
-                '<div class="notes-details-label">Part of Speech <button class="notes-details-info tappable" data-legend="pos" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
-              html +=
-                '<div class="notes-details-value">' + partOfSpeech + "</div>";
-              html += "</div>";
-            }
-            if (wordType) {
-              html += '<div class="notes-details-item">';
-              html +=
-                '<div class="notes-details-label">Word Type <button class="notes-details-info tappable" data-legend="wordtype" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
-              html += '<div class="notes-details-value">' + wordType + "</div>";
-              html += "</div>";
-            }
-            if (register) {
-              html += '<div class="notes-details-item">';
-              html +=
-                '<div class="notes-details-label">Register <button class="notes-details-info tappable" data-legend="register" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
-              html += '<div class="notes-details-value">' + register + "</div>";
-              html += "</div>";
-            }
-            html += "</div>";
-            html += "</div>";
           } else {
-            // Default section rendering
-            html +=
-              '<div class="notes-section" data-section="' +
-              key +
-              '" style="--section-color: ' +
-              color +
-              '">';
-            html += '<div class="notes-section-header">';
-            html += '<i class="fas ' + icon + ' notes-section-icon"></i>';
-            html +=
-              '<span class="notes-section-title">' + sec.keyword + "</span>";
-            html += "</div>";
             html += '<div class="notes-section-body">' + sec.content + "</div>";
-            html += "</div>";
           }
-        } else {
-          html += '<div class="notes-section-body">' + sec.content + "</div>";
-        }
 
-        div.innerHTML = html;
-        notesBox.appendChild(div);
-        sectionEls.push(div);
-      });
+          div.innerHTML = html;
+          notesBox.appendChild(div);
+          sectionEls.push(div);
+        });
 
-      // Grammar hover for Related/Synonym/Antonym sections
-      initGrammarHover(notesBox);
+        // Grammar hover for Related/Synonym/Antonym sections
+        initGrammarHover(notesBox);
 
-      // Card grid: Collapse/Expand All buttons
-      notesBox
-        .querySelectorAll(".notes-card-toggle-all")
-        .forEach(function (btn) {
-          btn.addEventListener("click", function (e) {
-            e.stopPropagation();
-            var section = btn.closest(".notes-card-section");
-            if (!section) return;
-            var descs = section.querySelectorAll(".notes-card-desc");
-            var isExpanded = btn.getAttribute("data-state") === "expanded";
+        // Card grid: Collapse/Expand All buttons
+        notesBox
+          .querySelectorAll(".notes-card-toggle-all")
+          .forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              var section = btn.closest(".notes-card-section");
+              if (!section) return;
+              var descs = section.querySelectorAll(".notes-card-desc");
+              var isExpanded = btn.getAttribute("data-state") === "expanded";
 
-            descs.forEach(function (desc) {
-              if (isExpanded) {
-                desc.classList.add("is-collapsed");
-              } else {
-                desc.classList.remove("is-collapsed");
+              descs.forEach(function (desc) {
+                if (isExpanded) {
+                  desc.classList.add("is-collapsed");
+                } else {
+                  desc.classList.remove("is-collapsed");
+                }
+              });
+
+              btn.setAttribute(
+                "data-state",
+                isExpanded ? "collapsed" : "expanded",
+              );
+              btn.textContent = isExpanded ? "Expand All" : "Collapse All";
+
+              if (!notesPanel.classList.contains("is-collapsed")) {
+                notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
               }
             });
+          });
 
-            btn.setAttribute(
-              "data-state",
-              isExpanded ? "collapsed" : "expanded",
-            );
-            btn.textContent = isExpanded ? "Expand All" : "Collapse All";
+        // Card grid: Individual card click to toggle description
+        notesBox.querySelectorAll(".notes-card").forEach(function (card) {
+          card.addEventListener("click", function (e) {
+            if (e.target.closest(".notes-card-link")) return;
+            var desc = card.querySelector(".notes-card-desc");
+            if (!desc) return;
+            desc.classList.toggle("is-collapsed");
 
             if (!notesPanel.classList.contains("is-collapsed")) {
-              notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
+              setTimeout(function () {
+                notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
+              }, 10);
             }
           });
         });
 
-      // Card grid: Individual card click to toggle description
-      notesBox.querySelectorAll(".notes-card").forEach(function (card) {
-        card.addEventListener("click", function (e) {
-          if (e.target.closest(".notes-card-link")) return;
-          var desc = card.querySelector(".notes-card-desc");
-          if (!desc) return;
-          desc.classList.toggle("is-collapsed");
+        // Card grid: Anki browse links
+        notesBox.querySelectorAll(".notes-card-link").forEach(function (link) {
+          link.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var word = link.getAttribute("data-word");
+            if (!word || !window.senrenAnkiRequest) return;
 
-          if (!notesPanel.classList.contains("is-collapsed")) {
-            setTimeout(function () {
-              notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
-            }, 10);
-          }
+            window
+              .senrenAnkiRequest("findNotes", { query: '"word:' + word + '"' })
+              .then(function (noteIds) {
+                if (noteIds && noteIds.length > 0) {
+                  window.senrenAnkiRequest("guiBrowse", {
+                    query: '"word:' + word + '"',
+                  });
+                } else {
+                  var origHTML = link.innerHTML;
+                  link.innerHTML =
+                    '<span style="font-size: 0.65rem; color: #bf616a;">Not Found</span>';
+                  setTimeout(function () {
+                    link.innerHTML = origHTML;
+                  }, 2000);
+                }
+              });
+          });
         });
-      });
 
-      // Card grid: Anki browse links
-      notesBox.querySelectorAll(".notes-card-link").forEach(function (link) {
-        link.addEventListener("click", function (e) {
-          e.stopPropagation();
-          var word = link.getAttribute("data-word");
-          if (!word || !window.senrenAnkiRequest) return;
+        // Structure section: Standard/Polite toggle
+        notesBox
+          .querySelectorAll(".notes-structure-btn")
+          .forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              var section = btn.closest(".notes-structure-section");
+              if (!section) return;
+              var mode = btn.getAttribute("data-mode");
 
-          window
-            .senrenAnkiRequest("findNotes", { query: '"word:' + word + '"' })
-            .then(function (noteIds) {
-              if (noteIds && noteIds.length > 0) {
-                window.senrenAnkiRequest("guiBrowse", {
-                  query: '"word:' + word + '"',
+              section
+                .querySelectorAll(".notes-structure-btn")
+                .forEach(function (b) {
+                  b.classList.remove("active");
                 });
-              } else {
-                var origHTML = link.innerHTML;
-                link.innerHTML =
-                  '<span style="font-size: 0.65rem; color: #bf616a;">Not Found</span>';
-                setTimeout(function () {
-                  link.innerHTML = origHTML;
-                }, 2000);
+              btn.classList.add("active");
+
+              section
+                .querySelectorAll(".notes-structure-panel")
+                .forEach(function (p) {
+                  p.classList.remove("active");
+                });
+              var target = section.querySelector(
+                '.notes-structure-panel[data-panel="' + mode + '"]',
+              );
+              if (target) target.classList.add("active");
+
+              if (!notesPanel.classList.contains("is-collapsed")) {
+                notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
               }
             });
-        });
-      });
+          });
 
-      // Structure section: Standard/Polite toggle
-      notesBox.querySelectorAll(".notes-structure-btn").forEach(function (btn) {
-        btn.addEventListener("click", function (e) {
-          e.stopPropagation();
-          var section = btn.closest(".notes-structure-section");
-          if (!section) return;
-          var mode = btn.getAttribute("data-mode");
+        // Details section: Legend popup data
+        var legendData = {
+          pos: {
+            title: "Parts of Speech",
+            entries: [
+              {
+                term: "Expression",
+                jp: "表現",
+                reading: "ひょうげん",
+                desc: "A set combination of words that together convey a specific meaning or grammatical function.",
+              },
+              {
+                term: "Adjective",
+                jp: "形容詞",
+                reading: "けいようし",
+                desc: "A word that describes or modifies a noun, expressing qualities, states, or characteristics.",
+              },
+              {
+                term: "Adverb",
+                jp: "副詞",
+                reading: "ふくし",
+                desc: "A word that modifies a verb, adjective, or another adverb, expressing manner, degree, or frequency.",
+              },
+              {
+                term: "Auxiliary Verb",
+                jp: "助動詞",
+                reading: "じょどうし",
+                desc: "Verbs that attach to other words to add grammatical meaning such as tense, negation, or politeness.",
+              },
+              {
+                term: "Conjunctive Particle",
+                jp: "接続助詞",
+                reading: "せつぞくじょし",
+                desc: "Suffixes or particles that connect clauses, indicating relationships like cause, condition, or contrast.",
+              },
+              {
+                term: "Noun",
+                jp: "名詞",
+                reading: "めいし",
+                desc: "A word that represents a person, place, thing, or concept.",
+              },
+              {
+                term: "Particle",
+                jp: "助詞",
+                reading: "じょし",
+                desc: "A suffix that indicates the grammatical relationship of a word within a sentence.",
+              },
+              {
+                term: "Pronoun",
+                jp: "代名詞",
+                reading: "だいめいし",
+                desc: "A word that takes the place of a noun, referring to people, things, or concepts.",
+              },
+              {
+                term: "Verb",
+                jp: "動詞",
+                reading: "どうし",
+                desc: "A word used to describe an action, state, or occurrence.",
+              },
+            ],
+          },
+          wordtype: {
+            title: "Word Types",
+            entries: [
+              {
+                term: "Abbreviation",
+                desc: "A shortened form of a word or phrase.",
+              },
+              {
+                term: "Adjectival Noun",
+                desc: "A noun that functions as an adjective, typically using な to modify other nouns (な-adjective).",
+              },
+              {
+                term: "Adjective",
+                desc: "An い-adjective that directly modifies nouns and conjugates for tense and negation.",
+              },
+              {
+                term: "Adverb",
+                desc: "A word that modifies verbs, adjectives, or other adverbs.",
+              },
+              {
+                term: "Adverb Phrase",
+                desc: "A group of words functioning together as an adverb.",
+              },
+              {
+                term: "Adverbial Particle",
+                desc: "A particle that adds adverbial meaning to the word it follows.",
+              },
+              {
+                term: "Auxiliary Verb",
+                desc: "A verb that attaches to another verb to add grammatical meaning.",
+              },
+              {
+                term: "Case Marking Particle",
+                desc: "A particle that marks the grammatical role of a noun in a sentence (e.g. が, を, に).",
+              },
+              {
+                term: "Conjunction",
+                desc: "A word that connects words, phrases, or clauses together.",
+              },
+              {
+                term: "Conjunctive Particle",
+                desc: "A particle that connects clauses, indicating cause, condition, or contrast.",
+              },
+              {
+                term: "Definite Article",
+                desc: "A word that specifies a particular noun (not native to Japanese, used in comparative grammar).",
+              },
+              {
+                term: "Demonstrative Pronoun",
+                desc: "A pronoun that points to a specific thing (e.g. これ, それ, あれ).",
+              },
+              {
+                term: "Dependent Word",
+                desc: "A word that cannot stand alone and must be attached to another word.",
+              },
+              {
+                term: "Dictionary Form",
+                desc: "The base, unconjugated form of a verb as it appears in the dictionary.",
+              },
+              {
+                term: "Indefinite Article",
+                desc: "A word that refers to a non-specific noun (not native to Japanese, used in comparative grammar).",
+              },
+              {
+                term: "Independent Word",
+                desc: "A word that can stand alone and carry meaning by itself.",
+              },
+              {
+                term: "Informal Speech",
+                desc: "Casual language used in relaxed or familiar contexts.",
+              },
+              {
+                term: "Linking Particle",
+                desc: "A particle that connects elements within a sentence.",
+              },
+              {
+                term: "Noun",
+                desc: "A word representing a person, place, thing, or idea.",
+              },
+              {
+                term: "Ordinary",
+                desc: "Standard, everyday language without special formality.",
+              },
+              {
+                term: "Personal Pronoun",
+                desc: "A pronoun referring to a specific person (e.g. 私, あなた, 彼).",
+              },
+              {
+                term: "Plural",
+                desc: "A form indicating more than one of something.",
+              },
+              {
+                term: "Possessive",
+                desc: "A form indicating ownership or association.",
+              },
+              {
+                term: "Possessive Pronoun",
+                desc: "A pronoun indicating possession (e.g. 私の).",
+              },
+              {
+                term: "Predicate",
+                desc: "The part of a sentence that describes what the subject does or is.",
+              },
+              {
+                term: "Present Simple Tense",
+                desc: "The verb form expressing current or habitual actions.",
+              },
+              {
+                term: "Pronoun",
+                desc: "A word that substitutes for a noun.",
+              },
+              {
+                term: "Question Sentence Order",
+                desc: "The word order used when forming questions in Japanese.",
+              },
+              {
+                term: "Sentence Ending Particle",
+                desc: "A particle placed at the end of a sentence to add nuance (e.g. よ, ね, か).",
+              },
+              {
+                term: "Verb",
+                desc: "A word describing an action, state, or occurrence.",
+              },
+            ],
+          },
+          register: {
+            title: "Register",
+            entries: [
+              {
+                term: "Standard",
+                jp: "標準語",
+                reading: "ひょうじゅんご",
+                desc: "The default level of formality used in everyday conversation and general writing.",
+              },
+              {
+                term: "Formal",
+                jp: "正式",
+                reading: "せいしき",
+                desc: "Used in official contexts, ceremonial situations, business documents, and formal speeches.",
+              },
+              {
+                term: "Polite",
+                jp: "丁寧語",
+                reading: "ていねいご",
+                desc: "Shows respect through polite forms (です/ます), appropriate for most social interactions.",
+              },
+              {
+                term: "Casual",
+                jp: "くだけた表現",
+                reading: "",
+                desc: "Informal speech used among close friends, family, or in relaxed social settings.",
+              },
+            ],
+          },
+        };
 
-          section
-            .querySelectorAll(".notes-structure-btn")
-            .forEach(function (b) {
-              b.classList.remove("active");
+        // Legend popup: create overlay lazily, show/hide
+        var legendOverlay = null;
+
+        function showLegend(type, currentValue) {
+          var data = legendData[type];
+          if (!data) return;
+          var matchValue = (currentValue || "").trim().toLowerCase();
+
+          if (!legendOverlay) {
+            legendOverlay = document.createElement("div");
+            legendOverlay.className = "notes-legend-overlay";
+            legendOverlay.innerHTML =
+              '<div class="notes-legend-modal">' +
+              '<div class="notes-legend-header">' +
+              '<span class="notes-legend-title"></span>' +
+              '<button class="notes-legend-close tappable"><i class="fas fa-times"></i></button>' +
+              "</div>" +
+              '<div class="notes-legend-body"></div>' +
+              "</div>";
+            document.body.appendChild(legendOverlay);
+
+            legendOverlay.addEventListener("click", function (e) {
+              if (e.target === legendOverlay) closeLegend();
             });
-          btn.classList.add("active");
+            legendOverlay
+              .querySelector(".notes-legend-close")
+              .addEventListener("click", closeLegend);
+          }
 
-          section
-            .querySelectorAll(".notes-structure-panel")
-            .forEach(function (p) {
-              p.classList.remove("active");
-            });
-          var target = section.querySelector(
-            '.notes-structure-panel[data-panel="' + mode + '"]',
+          legendOverlay.querySelector(".notes-legend-title").textContent =
+            data.title;
+
+          var bodyHtml = '<table class="notes-legend-table">';
+          bodyHtml +=
+            "<thead><tr><th>Term</th><th>Description</th></tr></thead>";
+          bodyHtml += "<tbody>";
+          data.entries.forEach(function (entry) {
+            var isMatch = matchValue && entry.term.toLowerCase() === matchValue;
+            bodyHtml +=
+              "<tr" + (isMatch ? ' class="legend-highlight"' : "") + ">";
+            bodyHtml += '<td class="notes-legend-term">';
+            bodyHtml +=
+              '<span class="notes-legend-term-en">' + entry.term + "</span>";
+            if (entry.jp) {
+              bodyHtml += '<span class="notes-legend-term-jp">' + entry.jp;
+              if (entry.reading)
+                bodyHtml +=
+                  ' <span class="notes-legend-reading">(' +
+                  entry.reading +
+                  ")</span>";
+              bodyHtml += "</span>";
+            }
+            bodyHtml += "</td>";
+            bodyHtml += '<td class="notes-legend-desc">' + entry.desc + "</td>";
+            bodyHtml += "</tr>";
+          });
+          bodyHtml += "</tbody></table>";
+
+          legendOverlay.querySelector(".notes-legend-body").innerHTML =
+            bodyHtml;
+          legendOverlay.classList.add("active");
+
+          // Scroll highlighted row into view
+          var highlighted = legendOverlay.querySelector(".legend-highlight");
+          if (highlighted) {
+            highlighted.scrollIntoView({ block: "center", behavior: "smooth" });
+          }
+        }
+
+        function closeLegend() {
+          if (legendOverlay) legendOverlay.classList.remove("active");
+        }
+
+        if (window._senrenLegendKeyHandler) {
+          document.removeEventListener(
+            "keydown",
+            window._senrenLegendKeyHandler,
           );
-          if (target) target.classList.add("active");
+        }
+        window._senrenLegendKeyHandler = function (e) {
+          if (
+            e.key === "Escape" &&
+            legendOverlay &&
+            legendOverlay.classList.contains("active")
+          ) {
+            closeLegend();
+          }
+        };
+        document.addEventListener("keydown", window._senrenLegendKeyHandler);
 
+        // Details section: info icon click → show legend
+        notesBox
+          .querySelectorAll(".notes-details-info")
+          .forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              var type = btn.getAttribute("data-legend");
+              var item = btn.closest(".notes-details-item");
+              var value = item
+                ? item.querySelector(".notes-details-value").textContent
+                : "";
+              showLegend(type, value);
+            });
+          });
+
+        var totalSections = sectionEls.length;
+        var currentNoteIndex = 0;
+
+        // Counter
+        var counterEl = notesPanel.querySelector(".notes-counter");
+        function updateCounter() {
+          if (counterEl && totalSections > 1) {
+            counterEl.textContent =
+              currentNoteIndex + 1 + " / " + totalSections;
+            counterEl.style.display = "block";
+          } else if (counterEl) {
+            counterEl.style.display = "none";
+          }
+        }
+
+        // Toggle areas
+        var toggleAreas = notesPanel.querySelectorAll(".toggle-area");
+        if (totalSections <= 1) {
+          toggleAreas.forEach(function (a) {
+            a.style.display = "none";
+          });
+        }
+
+        function showSection(index) {
+          sectionEls.forEach(function (el, i) {
+            el.style.display = i === index ? "block" : "none";
+          });
+          currentNoteIndex = index;
+          updateCounter();
+          // Recalculate max-height for the panel
           if (!notesPanel.classList.contains("is-collapsed")) {
             notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
           }
-        });
-      });
-
-      // Details section: Legend popup data
-      var legendData = {
-        pos: {
-          title: "Parts of Speech",
-          entries: [
-            {
-              term: "Expression",
-              jp: "表現",
-              reading: "ひょうげん",
-              desc: "A set combination of words that together convey a specific meaning or grammatical function.",
-            },
-            {
-              term: "Adjective",
-              jp: "形容詞",
-              reading: "けいようし",
-              desc: "A word that describes or modifies a noun, expressing qualities, states, or characteristics.",
-            },
-            {
-              term: "Adverb",
-              jp: "副詞",
-              reading: "ふくし",
-              desc: "A word that modifies a verb, adjective, or another adverb, expressing manner, degree, or frequency.",
-            },
-            {
-              term: "Auxiliary Verb",
-              jp: "助動詞",
-              reading: "じょどうし",
-              desc: "Verbs that attach to other words to add grammatical meaning such as tense, negation, or politeness.",
-            },
-            {
-              term: "Conjunctive Particle",
-              jp: "接続助詞",
-              reading: "せつぞくじょし",
-              desc: "Suffixes or particles that connect clauses, indicating relationships like cause, condition, or contrast.",
-            },
-            {
-              term: "Noun",
-              jp: "名詞",
-              reading: "めいし",
-              desc: "A word that represents a person, place, thing, or concept.",
-            },
-            {
-              term: "Particle",
-              jp: "助詞",
-              reading: "じょし",
-              desc: "A suffix that indicates the grammatical relationship of a word within a sentence.",
-            },
-            {
-              term: "Pronoun",
-              jp: "代名詞",
-              reading: "だいめいし",
-              desc: "A word that takes the place of a noun, referring to people, things, or concepts.",
-            },
-            {
-              term: "Verb",
-              jp: "動詞",
-              reading: "どうし",
-              desc: "A word used to describe an action, state, or occurrence.",
-            },
-          ],
-        },
-        wordtype: {
-          title: "Word Types",
-          entries: [
-            {
-              term: "Abbreviation",
-              desc: "A shortened form of a word or phrase.",
-            },
-            {
-              term: "Adjectival Noun",
-              desc: "A noun that functions as an adjective, typically using な to modify other nouns (な-adjective).",
-            },
-            {
-              term: "Adjective",
-              desc: "An い-adjective that directly modifies nouns and conjugates for tense and negation.",
-            },
-            {
-              term: "Adverb",
-              desc: "A word that modifies verbs, adjectives, or other adverbs.",
-            },
-            {
-              term: "Adverb Phrase",
-              desc: "A group of words functioning together as an adverb.",
-            },
-            {
-              term: "Adverbial Particle",
-              desc: "A particle that adds adverbial meaning to the word it follows.",
-            },
-            {
-              term: "Auxiliary Verb",
-              desc: "A verb that attaches to another verb to add grammatical meaning.",
-            },
-            {
-              term: "Case Marking Particle",
-              desc: "A particle that marks the grammatical role of a noun in a sentence (e.g. が, を, に).",
-            },
-            {
-              term: "Conjunction",
-              desc: "A word that connects words, phrases, or clauses together.",
-            },
-            {
-              term: "Conjunctive Particle",
-              desc: "A particle that connects clauses, indicating cause, condition, or contrast.",
-            },
-            {
-              term: "Definite Article",
-              desc: "A word that specifies a particular noun (not native to Japanese, used in comparative grammar).",
-            },
-            {
-              term: "Demonstrative Pronoun",
-              desc: "A pronoun that points to a specific thing (e.g. これ, それ, あれ).",
-            },
-            {
-              term: "Dependent Word",
-              desc: "A word that cannot stand alone and must be attached to another word.",
-            },
-            {
-              term: "Dictionary Form",
-              desc: "The base, unconjugated form of a verb as it appears in the dictionary.",
-            },
-            {
-              term: "Indefinite Article",
-              desc: "A word that refers to a non-specific noun (not native to Japanese, used in comparative grammar).",
-            },
-            {
-              term: "Independent Word",
-              desc: "A word that can stand alone and carry meaning by itself.",
-            },
-            {
-              term: "Informal Speech",
-              desc: "Casual language used in relaxed or familiar contexts.",
-            },
-            {
-              term: "Linking Particle",
-              desc: "A particle that connects elements within a sentence.",
-            },
-            {
-              term: "Noun",
-              desc: "A word representing a person, place, thing, or idea.",
-            },
-            {
-              term: "Ordinary",
-              desc: "Standard, everyday language without special formality.",
-            },
-            {
-              term: "Personal Pronoun",
-              desc: "A pronoun referring to a specific person (e.g. 私, あなた, 彼).",
-            },
-            {
-              term: "Plural",
-              desc: "A form indicating more than one of something.",
-            },
-            {
-              term: "Possessive",
-              desc: "A form indicating ownership or association.",
-            },
-            {
-              term: "Possessive Pronoun",
-              desc: "A pronoun indicating possession (e.g. 私の).",
-            },
-            {
-              term: "Predicate",
-              desc: "The part of a sentence that describes what the subject does or is.",
-            },
-            {
-              term: "Present Simple Tense",
-              desc: "The verb form expressing current or habitual actions.",
-            },
-            {
-              term: "Pronoun",
-              desc: "A word that substitutes for a noun.",
-            },
-            {
-              term: "Question Sentence Order",
-              desc: "The word order used when forming questions in Japanese.",
-            },
-            {
-              term: "Sentence Ending Particle",
-              desc: "A particle placed at the end of a sentence to add nuance (e.g. よ, ね, か).",
-            },
-            {
-              term: "Verb",
-              desc: "A word describing an action, state, or occurrence.",
-            },
-          ],
-        },
-        register: {
-          title: "Register",
-          entries: [
-            {
-              term: "Standard",
-              jp: "標準語",
-              reading: "ひょうじゅんご",
-              desc: "The default level of formality used in everyday conversation and general writing.",
-            },
-            {
-              term: "Formal",
-              jp: "正式",
-              reading: "せいしき",
-              desc: "Used in official contexts, ceremonial situations, business documents, and formal speeches.",
-            },
-            {
-              term: "Polite",
-              jp: "丁寧語",
-              reading: "ていねいご",
-              desc: "Shows respect through polite forms (です/ます), appropriate for most social interactions.",
-            },
-            {
-              term: "Casual",
-              jp: "くだけた表現",
-              reading: "",
-              desc: "Informal speech used among close friends, family, or in relaxed social settings.",
-            },
-          ],
-        },
-      };
-
-      // Legend popup: create overlay lazily, show/hide
-      var legendOverlay = null;
-
-      function showLegend(type, currentValue) {
-        var data = legendData[type];
-        if (!data) return;
-        var matchValue = (currentValue || "").trim().toLowerCase();
-
-        if (!legendOverlay) {
-          legendOverlay = document.createElement("div");
-          legendOverlay.className = "notes-legend-overlay";
-          legendOverlay.innerHTML =
-            '<div class="notes-legend-modal">' +
-            '<div class="notes-legend-header">' +
-            '<span class="notes-legend-title"></span>' +
-            '<button class="notes-legend-close tappable"><i class="fas fa-times"></i></button>' +
-            "</div>" +
-            '<div class="notes-legend-body"></div>' +
-            "</div>";
-          document.body.appendChild(legendOverlay);
-
-          legendOverlay.addEventListener("click", function (e) {
-            if (e.target === legendOverlay) closeLegend();
-          });
-          legendOverlay
-            .querySelector(".notes-legend-close")
-            .addEventListener("click", closeLegend);
         }
 
-        legendOverlay.querySelector(".notes-legend-title").textContent =
-          data.title;
-
-        var bodyHtml = '<table class="notes-legend-table">';
-        bodyHtml += "<thead><tr><th>Term</th><th>Description</th></tr></thead>";
-        bodyHtml += "<tbody>";
-        data.entries.forEach(function (entry) {
-          var isMatch = matchValue && entry.term.toLowerCase() === matchValue;
-          bodyHtml +=
-            "<tr" + (isMatch ? ' class="legend-highlight"' : "") + ">";
-          bodyHtml += '<td class="notes-legend-term">';
-          bodyHtml +=
-            '<span class="notes-legend-term-en">' + entry.term + "</span>";
-          if (entry.jp) {
-            bodyHtml += '<span class="notes-legend-term-jp">' + entry.jp;
-            if (entry.reading)
-              bodyHtml +=
-                ' <span class="notes-legend-reading">(' +
-                entry.reading +
-                ")</span>";
-            bodyHtml += "</span>";
-          }
-          bodyHtml += "</td>";
-          bodyHtml += '<td class="notes-legend-desc">' + entry.desc + "</td>";
-          bodyHtml += "</tr>";
-        });
-        bodyHtml += "</tbody></table>";
-
-        legendOverlay.querySelector(".notes-legend-body").innerHTML = bodyHtml;
-        legendOverlay.classList.add("active");
-
-        // Scroll highlighted row into view
-        var highlighted = legendOverlay.querySelector(".legend-highlight");
-        if (highlighted) {
-          highlighted.scrollIntoView({ block: "center", behavior: "smooth" });
-        }
-      }
-
-      function closeLegend() {
-        if (legendOverlay) legendOverlay.classList.remove("active");
-      }
-
-      document.addEventListener("keydown", function (e) {
-        if (
-          e.key === "Escape" &&
-          legendOverlay &&
-          legendOverlay.classList.contains("active")
-        ) {
-          closeLegend();
-        }
-      });
-
-      // Details section: info icon click → show legend
-      notesBox.querySelectorAll(".notes-details-info").forEach(function (btn) {
-        btn.addEventListener("click", function (e) {
-          e.stopPropagation();
-          var type = btn.getAttribute("data-legend");
-          var item = btn.closest(".notes-details-item");
-          var value = item
-            ? item.querySelector(".notes-details-value").textContent
-            : "";
-          showLegend(type, value);
-        });
-      });
-
-      var totalSections = sectionEls.length;
-      var currentNoteIndex = 0;
-
-      // Counter
-      var counterEl = notesPanel.querySelector(".notes-counter");
-      function updateCounter() {
-        if (counterEl && totalSections > 1) {
-          counterEl.textContent = currentNoteIndex + 1 + " / " + totalSections;
-          counterEl.style.display = "block";
-        } else if (counterEl) {
-          counterEl.style.display = "none";
-        }
-      }
-
-      // Toggle areas
-      var toggleAreas = notesPanel.querySelectorAll(".toggle-area");
-      if (totalSections <= 1) {
-        toggleAreas.forEach(function (a) {
-          a.style.display = "none";
-        });
-      }
-
-      function showSection(index) {
-        sectionEls.forEach(function (el, i) {
-          el.style.display = i === index ? "block" : "none";
-        });
-        currentNoteIndex = index;
-        updateCounter();
-        // Recalculate max-height for the panel
-        if (!notesPanel.classList.contains("is-collapsed")) {
-          notesPanel.style.maxHeight = notesPanel.scrollHeight + "px";
-        }
-      }
-
-      function handleNoteToggle(direction) {
-        if (totalSections <= 1) return;
-        var next;
-        if (direction === "right") {
-          next = (currentNoteIndex + 1) % totalSections;
-        } else {
-          next = (currentNoteIndex - 1 + totalSections) % totalSections;
-        }
-        showSection(next);
-      }
-
-      toggleAreas.forEach(function (area) {
-        area.onclick = function () {
+        function handleNoteToggle(direction) {
           if (totalSections <= 1) return;
-          if (
-            area.classList.contains("right") ||
-            area.classList.contains("right-larger")
-          ) {
-            handleNoteToggle("right");
+          var next;
+          if (direction === "right") {
+            next = (currentNoteIndex + 1) % totalSections;
           } else {
+            next = (currentNoteIndex - 1 + totalSections) % totalSections;
+          }
+          showSection(next);
+        }
+
+        toggleAreas.forEach(function (area) {
+          area.onclick = function () {
+            if (totalSections <= 1) return;
+            if (
+              area.classList.contains("right") ||
+              area.classList.contains("right-larger")
+            ) {
+              handleNoteToggle("right");
+            } else {
+              handleNoteToggle("left");
+            }
+          };
+        });
+
+        // H/L navigation for notes (only when notes visible)
+        if (window._senrenNotesNavHandler) {
+          document.removeEventListener(
+            "keydown",
+            window._senrenNotesNavHandler,
+          );
+        }
+        window._senrenNotesNavHandler = function (e) {
+          if (totalSections <= 1) return;
+          if (e.ctrlKey || e.altKey || e.metaKey) return;
+          if (notesPanel.classList.contains("is-collapsed")) return;
+          if (
+            document.activeElement &&
+            (document.activeElement.tagName === "INPUT" ||
+              document.activeElement.tagName === "TEXTAREA")
+          )
+            return;
+          if (
+            typeof lightbox !== "undefined" &&
+            lightbox.classList.contains("active")
+          )
+            return;
+          if (document.querySelector(".notes-legend-overlay.active")) return;
+
+          if (e.key === "h") {
+            e.preventDefault();
             handleNoteToggle("left");
           }
+          if (e.key === "l") {
+            e.preventDefault();
+            handleNoteToggle("right");
+          }
         };
-      });
+        document.addEventListener("keydown", window._senrenNotesNavHandler);
 
-      // H/L navigation for notes (only when notes visible)
-      document.addEventListener("keydown", function (e) {
-        if (totalSections <= 1) return;
-        if (e.ctrlKey || e.altKey || e.metaKey) return;
-        if (notesPanel.classList.contains("is-collapsed")) return;
-        if (
-          document.activeElement &&
-          (document.activeElement.tagName === "INPUT" ||
-            document.activeElement.tagName === "TEXTAREA")
-        )
-          return;
-        if (
-          typeof lightbox !== "undefined" &&
-          lightbox.classList.contains("active")
-        )
-          return;
-        if (document.querySelector(".notes-legend-overlay.active")) return;
-
-        if (e.key === "h") {
-          e.preventDefault();
-          handleNoteToggle("left");
-        }
-        if (e.key === "l") {
-          e.preventDefault();
-          handleNoteToggle("right");
-        }
-      });
-
-      updateCounter();
+        updateCounter();
+      } catch (err) {
+        console.error("initNotesSections error:", err);
+      }
     })();
 
     // Toggle notes expand/collapse via header button
@@ -2196,7 +2231,13 @@
       var notesPanelN = document.getElementById("notes");
       if (!notesPanelN) return;
 
-      document.addEventListener("keydown", function (e) {
+      if (window._senrenNotesToggleHandler) {
+        document.removeEventListener(
+          "keydown",
+          window._senrenNotesToggleHandler,
+        );
+      }
+      window._senrenNotesToggleHandler = function (e) {
         if (e.ctrlKey || e.altKey || e.metaKey) return;
         if (
           document.activeElement &&
@@ -2224,7 +2265,8 @@
             }
           });
         }
-      });
+      };
+      document.addEventListener("keydown", window._senrenNotesToggleHandler);
     })();
 
     // Auto-expand notes if setting is true
