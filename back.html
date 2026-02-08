@@ -161,7 +161,52 @@
     <div class="tags-container"></div>
 
     <!-- External Links -->
+
     <div class="external-links">
+      <!-- Youglish Japanese -->
+      <a
+        data-details="youglish.com"
+        href="https://youglish.com/pronounce/{{text:word}}/japanese"
+      >
+        <img
+          class="light-icon"
+          src="_icon_youglish_light.png"
+          style="width: 70px"
+        />
+        <img
+          class="dark-icon"
+          src="_icon_youglish_dark.png"
+          style="width: 70px"
+        />
+      </a>
+      <!-- OJAD (Pitch Accent Dictionary) -->
+      <a
+        data-details="ojad.gavo.t.u-tokyo.ac.jp"
+        href="https://www.gavo.t.u-tokyo.ac.jp/ojad/search/index/word:{{text:word}}"
+      >
+        <img
+          class="light-icon"
+          src="_icon_ojad_light.png"
+          style="width: 40px"
+        />
+        <img class="dark-icon" src="_icon_ojad_dark.png" style="width: 40px" />
+      </a>
+      <!-- Massif -->
+      <a
+        data-details="massif.la"
+        href="https://massif.la/ja/search?q={{text:word}}"
+      >
+        <img class="light-icon" src="_icon_massif_light.png" />
+        <img class="dark-icon" src="_icon_massif_dark.png" />
+      </a>
+      <!-- Bunpro -->
+      <a
+        data-details="bunpro.jp"
+        href="https://bunpro.jp/grammar_points/{{text:word}}"
+      >
+        <img class="light-icon" src="_icon_bunpro_light.png" />
+        <img class="dark-icon" src="_icon_bunpro_dark.png" />
+      </a>
       <!-- Jpdb -->
       <a data-details="jpdb.io" href="https://jpdb.io/search?q={{text:word}}">
         <img class="light-icon" src="_icon_jpdb_lightmode.png" />
@@ -177,7 +222,7 @@
       <!-- Google Images -->
       <a
         data-details="image_search"
-        href="https://www.google.co.jp/search?q={{text:word}}&amp;tbm=isch"
+        href="https://www.bing.com/images/search?q={{text:word}}&amp;tbm=isch"
       >
         <img class="light-icon" src="_icon_image_black.svg" />
         <img class="dark-icon" src="_icon_image_white.svg" />
@@ -787,7 +832,7 @@
         e.preventDefault();
         handleToggle("left");
       }
-      if (e.key === "h") {
+      if (e.key === "k") {
         e.preventDefault();
         handleToggle("right");
       }
