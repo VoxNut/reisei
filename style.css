@@ -1031,7 +1031,12 @@ b {
 
 .grid-container:not(:has(> .picture-container > img)) {
   grid-template-columns: repeat(1, 1fr);
+  grid-template-areas: "word";
   gap: unset;
+}
+
+.grid-container:not(:has(> .picture-container > img)) > .picture-container {
+  display: none;
 }
 
 @container style(--grid-order: 2) {
@@ -5784,12 +5789,24 @@ li.is-new-card:not(:hover) .related-word {
         grid-template-areas: "word picture";
         grid-template-columns: repeat(2, 1fr);
       }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        grid-template-columns: repeat(1, 1fr);
+        gap: unset;
+      }
     }
 
     @container style(--horizontal-layout: 2) {
       .grid-container {
         grid-template-areas: "picture word";
         grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        grid-template-columns: repeat(1, 1fr);
+        gap: unset;
       }
     }
 
@@ -5801,6 +5818,11 @@ li.is-new-card:not(:hover) .related-word {
         grid-template-columns: repeat(1, 1fr);
         gap: 10px;
       }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        gap: unset;
+      }
     }
 
     @container style(--vertical-layout: 2) {
@@ -5810,6 +5832,11 @@ li.is-new-card:not(:hover) .related-word {
           "word";
         grid-template-columns: repeat(1, 1fr);
         gap: 10px;
+      }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        gap: unset;
       }
     }
   }
@@ -5978,12 +6005,24 @@ li.is-new-card:not(:hover) .related-word {
         grid-template-areas: "word picture";
         grid-template-columns: repeat(2, 1fr);
       }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        grid-template-columns: repeat(1, 1fr);
+        gap: unset;
+      }
     }
 
     @container style(--horizontal-layout: 2) {
       .grid-container {
         grid-template-areas: "picture word";
         grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        grid-template-columns: repeat(1, 1fr);
+        gap: unset;
       }
     }
 
@@ -5995,6 +6034,11 @@ li.is-new-card:not(:hover) .related-word {
         grid-template-columns: repeat(1, 1fr);
         gap: 10px;
       }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        gap: unset;
+      }
     }
 
     @container style(--vertical-layout: 2) {
@@ -6004,6 +6048,11 @@ li.is-new-card:not(:hover) .related-word {
           "word";
         grid-template-columns: repeat(1, 1fr);
         gap: 10px;
+      }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        gap: unset;
       }
     }
   }
@@ -6065,12 +6114,24 @@ li.is-new-card:not(:hover) .related-word {
         grid-template-areas: "word picture";
         grid-template-columns: repeat(2, 1fr);
       }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        grid-template-columns: repeat(1, 1fr);
+        gap: unset;
+      }
     }
 
     @container style(--horizontal-layout: 2) {
       .grid-container {
         grid-template-areas: "picture word";
         grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word";
+        grid-template-columns: repeat(1, 1fr);
+        gap: unset;
       }
     }
 
@@ -6081,6 +6142,11 @@ li.is-new-card:not(:hover) .related-word {
           "picture" !important;
         grid-template-columns: repeat(1, 1fr) !important;
       }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word" !important;
+        gap: unset;
+      }
     }
 
     @container style(--vertical-layout: 2) {
@@ -6089,6 +6155,11 @@ li.is-new-card:not(:hover) .related-word {
           "picture"
           "word" !important;
         grid-template-columns: repeat(1, 1fr) !important;
+      }
+
+      .grid-container:not(:has(> .picture-container > img)) {
+        grid-template-areas: "word" !important;
+        gap: unset;
       }
     }
   }

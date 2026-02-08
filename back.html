@@ -783,11 +783,11 @@
       ) {
         return;
       }
-      if (e.key === "J") {
+      if (e.key === "j") {
         e.preventDefault();
         handleToggle("left");
       }
-      if (e.key === "K") {
+      if (e.key === "h") {
         e.preventDefault();
         handleToggle("right");
       }
@@ -1693,11 +1693,11 @@
         )
           return;
 
-        if (e.key === "h" || e.key === "H") {
+        if (e.key === "h") {
           e.preventDefault();
           handleNoteToggle("left");
         }
-        if (e.key === "l" || e.key === "L") {
+        if (e.key === "l") {
           e.preventDefault();
           handleNoteToggle("right");
         }
@@ -1729,7 +1729,7 @@
         )
           return;
 
-        if (e.key === "n" || e.key === "N") {
+        if (e.key === "n") {
           e.preventDefault();
           requestAnimationFrame(function () {
             var isCollapsed = notesPanelN.classList.contains("is-collapsed");
@@ -2918,7 +2918,7 @@
       }
 
       if (e.ctrlKey) {
-        if (e.key === "j" || e.key === "J") {
+        if (e.key === "j") {
           e.preventDefault();
           e.stopPropagation();
           if (typeof initialPlayTimeout !== "undefined")
@@ -2927,7 +2927,7 @@
           currentIndex--;
           if (currentIndex < 0) currentIndex = totalSlides - 1;
           updateDisplay(true);
-        } else if (e.key === "k" || e.key === "K") {
+        } else if (e.key === "k") {
           e.preventDefault();
           e.stopPropagation();
           if (typeof initialPlayTimeout !== "undefined")
@@ -2965,7 +2965,7 @@
             });
           }
         } else {
-          // Original behavior: index-based
+          // Original behavior: index-based, fallback to first image
           const pictureParts = Array.from(pictureContainer.children).filter(
             (el) =>
               el.tagName !== "BR" &&
@@ -2974,8 +2974,11 @@
           );
 
           if (pictureParts.length > 0) {
+            // If current scene index exceeds available images, show first image
+            const targetIndex =
+              currentIndex < pictureParts.length ? currentIndex : 0;
             pictureParts.forEach((part, i) => {
-              const shouldShow = i === currentIndex;
+              const shouldShow = i === targetIndex;
               part.style.setProperty(
                 "display",
                 shouldShow ? "block" : "none",
