@@ -1580,9 +1580,15 @@
               html += "</div>";
             } else if (key === "structure") {
               // Structure section: Standard/Polite toggle
-              var structureParts = sec.content.split("||").map(function (p) {
-                return p.trim();
-              });
+              // Convert HTML-escaped <br> to actual line breaks
+              var structureContent = sec.content
+                .replace(/&lt;br\s*\/?&gt;/gi, "<br>")
+                .replace(/&lt;BR\s*\/?&gt;/gi, "<br>");
+              var structureParts = structureContent
+                .split("||")
+                .map(function (p) {
+                  return p.trim();
+                });
               var standardContent = structureParts[0] || "";
               var politeContent =
                 structureParts.length > 1 ? structureParts[1] : "";

@@ -7079,4 +7079,228 @@ li.is-new-card:not(:hover) .related-word {
 
 /* CUSTOM CSS START */
 
+/* ============================================
+   RESPONSIVE: Samsung Galaxy A26 & Small Phones
+   (viewport ~360-412px)
+   ============================================ */
+
+/* --- External Links: Allow wrapping on narrow screens --- */
+@media (max-width: 500px) {
+  .external-links {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 3px;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .tags-and-links-wrapper {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .external-links a {
+    min-width: 40px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px !important;
+    padding: 6px !important;
+  }
+
+  .external-links a:first-child,
+  .external-links a:last-child {
+    border-radius: 5px !important;
+  }
+
+  .external-links img {
+    width: clamp(18px, 5vw, var(--base-size)) !important;
+    height: clamp(18px, 5vw, var(--base-size)) !important;
+  }
+}
+
+/* --- Core layout adjustments for small phones --- */
+@media (max-width: 420px) {
+  /* Reduce base padding to reclaim screen space */
+  .front,
+  .back {
+    padding: 12px !important;
+  }
+
+  /* Tighter sentence container margins */
+  .sentence-container {
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+
+  /* Definition/glossary box padding */
+  .glossary-box,
+  .definition-box {
+    padding: var(--spacing-md) !important;
+  }
+
+  /* Misc info padding */
+  .misc-info {
+    padding-left: var(--spacing-ms) !important;
+    padding-right: var(--spacing-ms) !important;
+  }
+
+  /* Tags tighter fit */
+  .tags {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+
+  /* Header gap on mobile */
+  .header {
+    gap: 4px !important;
+  }
+
+  /* Front header buttons closer together */
+  .front > .header {
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  /* Lightbox nav narrower for small screen */
+  .lightbox .lightbox-nav {
+    width: 60px;
+  }
+
+  /* Lightbox grid smaller tiles */
+  .lightbox-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 6px;
+    padding: 10px;
+  }
+
+  /* Notes card grid — single column */
+  .notes-card-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-ms);
+  }
+
+  /* Notes details grid — single column */
+  .notes-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Legend modal full width */
+  .notes-legend-modal {
+    max-width: 98vw;
+  }
+
+  .notes-legend-term {
+    white-space: normal;
+    min-width: 70px;
+  }
+
+  /* Grammar tooltip */
+  #grammar-tooltip {
+    max-width: 95vw;
+  }
+
+  /* Word size scaling for small screens */
+  .mobile-word-layout > .background-box {
+    padding-top: 18px;
+    padding-bottom: 22px;
+  }
+
+  /* Picture height adjustment */
+  .picture-container img {
+    max-height: 250px;
+  }
+
+  /* Frequency box */
+  .frequency-box {
+    font-size: 0.8rem;
+  }
+
+  /* Notes card smaller */
+  .notes-card {
+    padding: var(--spacing-ms) var(--spacing-md);
+  }
+
+  .notes-card-word {
+    font-size: 1.15rem;
+  }
+
+  .notes-card-meaning {
+    font-size: 0.78rem;
+  }
+}
+
+/* --- Extra-narrow phones (360px and below) --- */
+@media (max-width: 370px) {
+  .front,
+  .back {
+    padding: 10px !important;
+  }
+
+  .external-links a {
+    padding: 5px !important;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .back .background-box {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .glossary-box,
+  .definition-box {
+    padding: var(--spacing-ms) !important;
+  }
+
+  /* Sentence font size slightly smaller to prevent overflow */
+  #sentence,
+  #sentence-audio {
+    font-size: clamp(0.85rem, 4vw, var(--sentence-size));
+  }
+}
+
+/* --- Settings modal responsive for Galaxy A26 --- */
+@media (max-width: 420px) {
+  .senren-prompt-box {
+    width: 95vw !important;
+    padding: 16px !important;
+    border-radius: 16px;
+  }
+
+  .senren-prompt-input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .senren-prompt-btn {
+    padding: 10px 0 !important;
+    font-size: 13px;
+  }
+
+  .senren-dialog {
+    border-radius: 0;
+    max-height: 100vh;
+    max-width: 100vw;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .senren-header {
+    padding: 10px 14px;
+  }
+
+  .senren-header h2 {
+    font-size: 15px;
+  }
+
+  .senren-panel {
+    padding: 12px !important;
+  }
+
+  .senren-row {
+    gap: 6px;
+  }
+}
+
 /* CUSTOM CSS END */
