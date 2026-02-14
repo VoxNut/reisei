@@ -345,9 +345,6 @@
       ),
     );
 
-    const fragment = document.createDocumentFragment();
-    let addedCount = 0;
-
     glossaryItems.forEach((img) => {
       const src = img.src;
       if (!src || existingSrcs.has(src)) return;
@@ -372,7 +369,12 @@
       newImg.onload = () => {
         const w = newImg.naturalWidth;
         const h = newImg.naturalHeight;
-        const finalAspectRatio = w / h;
+        const aspectRatio = w / h;
+
+        // Skip small icons and badge-shaped images (e.g. 派生語 tags)
+        if (w < 80 || h < 80 || aspectRatio > 2.2 || aspectRatio < 0.4) return;
+
+        const finalAspectRatio = aspectRatio;
 
         if (
           w >= 120 &&
@@ -382,15 +384,10 @@
         ) {
           newImg.classList.add("tappable");
         }
+
+        pictureContainer.appendChild(newImg);
       };
-
-      fragment.appendChild(newImg);
-      addedCount++;
     });
-
-    if (addedCount > 0) {
-      pictureContainer.appendChild(fragment);
-    }
   }
 
   // Manages cycling between Selection Text, Definition, and Glossary
