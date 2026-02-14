@@ -1547,15 +1547,20 @@
                 var parts = line.split("|").map(function (p) {
                   return p.trim();
                 });
-                var word = parts[0] || "";
+                var rawWord = parts[0] || "";
                 var meaning = parts[1] || "";
                 var level = parts[2] || "";
                 var desc = parts[3] || "";
 
+                // Strip disambiguation parentheses for display: のに (Despite) → のに
+                // Keep full value for Anki browse search
+                var displayWord = rawWord.replace(/\s*\(.*?\)\s*$/, "").trim();
+
                 html += '<div class="notes-card tappable">';
                 html += '<div class="notes-card-top">';
                 html += '<div class="notes-card-info">';
-                html += '<div class="notes-card-word">' + word + "</div>";
+                html +=
+                  '<div class="notes-card-word">' + displayWord + "</div>";
                 if (meaning)
                   html +=
                     '<div class="notes-card-meaning">' + meaning + "</div>";
@@ -1568,7 +1573,7 @@
                 html += "</div>";
                 html +=
                   '<span class="notes-card-link tappable" data-word="' +
-                  word.replace(/"/g, "&quot;") +
+                  rawWord.replace(/"/g, "&quot;") +
                   '" title="Browse in Anki"><i class="fas fa-external-link-alt"></i></span>';
                 html += "</div>";
                 if (desc) {
@@ -1627,13 +1632,14 @@
               html += "</div>";
               html += "</div>";
             } else if (key === "details") {
-              // Details section: Part of Speech / Word Type / Register
+              // Details section: Part of Speech / Word Type / Register / Rare Kanji
               var detailParts = sec.content.split("|").map(function (p) {
                 return p.trim();
               });
               var partOfSpeech = detailParts[0] || "";
               var wordType = detailParts[1] || "";
               var register = detailParts[2] || "";
+              var rareKanji = detailParts[3] || "";
 
               html +=
                 '<div class="notes-section notes-details-section" data-section="details" style="--section-color: ' +
@@ -1667,6 +1673,24 @@
                   '<div class="notes-details-label">Register <button class="notes-details-info tappable" data-legend="register" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
                 html +=
                   '<div class="notes-details-value">' + register + "</div>";
+                html += "</div>";
+              }
+              if (rareKanji) {
+                html += '<div class="notes-details-item">';
+                html +=
+                  '<div class="notes-details-label">Rare Kanji <button class="notes-details-info tappable" data-legend="rarekanji" title="View legend"><i class="fas fa-info-circle"></i></button></div>';
+                html +=
+                  '<div class="notes-details-value notes-details-rare-kanji">';
+                var kanjiParts = rareKanji
+                  .split("\u30FB")
+                  .map(function (k) {
+                    return k.trim();
+                  })
+                  .filter(Boolean);
+                kanjiParts.forEach(function (k) {
+                  html += '<span class="rare-kanji-chip">' + k + "</span>";
+                });
+                html += "</div>";
                 html += "</div>";
               }
               html += "</div>";
@@ -1754,12 +1778,14 @@
             var word = link.getAttribute("data-word");
             if (!word || !window.senrenAnkiRequest) return;
 
+            var query = '"word:' + word + '"';
+
             window
-              .senrenAnkiRequest("findNotes", { query: '"word:' + word + '"' })
+              .senrenAnkiRequest("findNotes", { query: query })
               .then(function (noteIds) {
                 if (noteIds && noteIds.length > 0) {
                   window.senrenAnkiRequest("guiBrowse", {
-                    query: '"word:' + word + '"',
+                    query: query,
                   });
                 } else {
                   var origHTML = link.innerHTML;
@@ -2018,6 +2044,41 @@
                 jp: "くだけた表現",
                 reading: "",
                 desc: "Informal speech used among close friends, family, or in relaxed social settings.",
+              },
+            ],
+          },
+          rarekanji: {
+            title: "Rare Kanji",
+            entries: [
+              {
+                term: "Rare Kanji",
+                jp: "表外漢字",
+                reading: "ひょうがいかんじ",
+                desc: "Kanji not included in the Jōyō kanji list. These characters may appear in literature, names, or older texts but are uncommon in everyday modern usage.",
+              },
+              {
+                term: "Hyōgai Kanji",
+                jp: "表外漢字",
+                reading: "ひょうがいかんじ",
+                desc: "Characters outside the official Jōyō list, sometimes used in formal writing, classical texts, or specialized vocabulary.",
+              },
+              {
+                term: "Variant Form",
+                jp: "異体字",
+                reading: "いたいじ",
+                desc: "An alternative written form of a kanji that carries the same meaning and reading (e.g. 儘 and 侭).",
+              },
+              {
+                term: "Old Form",
+                jp: "旧字体",
+                reading: "きゅうじたい",
+                desc: "The traditional form of a kanji used before the post-war script reform (e.g. 國 → 国).",
+              },
+              {
+                term: "Ateji",
+                jp: "当て字",
+                reading: "あてじ",
+                desc: "Kanji assigned to a word based on phonetic reading rather than meaning.",
               },
             ],
           },
@@ -3071,6 +3132,17 @@
         fullWordText += node.textContent;
         nodesToRemove.push(node);
       }
+    }
+
+    // Strip disambiguation parentheses: のに (Despite) → のに
+    var disambigMatch = fullWordText.match(/^(.+?)\s*\(.*?\)\s*$/);
+    if (disambigMatch) {
+      fullWordText = disambigMatch[1].trim();
+      nodesToRemove.forEach(function (node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          node.textContent = node.textContent.replace(/\s*\(.*?\)\s*$/, "");
+        }
+      });
     }
 
     if (!fullWordText.trim()) return;
