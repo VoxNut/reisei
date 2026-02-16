@@ -87,11 +87,11 @@
 
   /* Font Families */
   --serif:
-    "Hiragino Mincho ProN", "Klee One", klee, "Noto Serif CJK JP", notoserifjp,
+    "Klee One", "Hiragino Mincho ProN", klee, "Noto Serif CJK JP", notoserifjp,
     "Yu Mincho", serif;
   --sans:
-    "Hiragino Kaku Gothic ProN", "Noto Sans CJK JP", notosansjp, "Segoe UI",
-    sans-serif;
+    "Klee One", "Hiragino Kaku Gothic ProN", "Noto Sans CJK JP", notosansjp,
+    "Segoe UI", sans-serif;
 
   /* Word Sizes (Dynamic Scaling) */
   --word-size-base: 2.5rem;
@@ -1422,6 +1422,7 @@ img {
 
 #sentence,
 #sentence-audio {
+  font-family: var(--serif);
   font-size: var(--sentence-size);
   display: inline-block;
   text-align: center;
@@ -2080,22 +2081,27 @@ img {
    ============================================ */
 
 .notes-details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: var(--spacing-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md) var(--spacing-lg);
   margin-top: var(--spacing-sm);
-}
-
-@media (max-width: 500px) {
-  .notes-details-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .notes-details-item {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1 1 0;
+  min-width: 100px;
+}
+
+@media (max-width: 500px) {
+  .notes-details-grid {
+    flex-direction: column;
+  }
+  .notes-details-item {
+    min-width: unset;
+  }
 }
 
 .notes-details-label {
@@ -2108,6 +2114,7 @@ img {
   align-items: center;
   gap: 6px;
   font-family: var(--sans);
+  white-space: nowrap;
 }
 
 .notes-details-value {
@@ -2369,6 +2376,7 @@ img {
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-ms);
   text-align: left;
+  font-family: var(--serif);
 }
 
 .glossary-box,
