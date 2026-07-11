@@ -711,9 +711,53 @@ b {
   list-style: none !important;
 }
 
-/* Focus theme uses the editable dark palette. Theme-specific identity is
-   selected by data-senren-theme; custom-dark-mode remains a compatibility
-   class for shared dark component rules. */
+/* Focus Theme: muted near-black interface with restrained cool accents. */
+html[data-senren-theme="focus"] {
+  --text: #e5e7eb;
+  --dark-devoiced-color: #64748b;
+  --dark-highlight: #60a5fa;
+  --freq-text: rgba(226, 232, 240, 0.42);
+  --freq-text-hover: #f8fafc;
+  --tag-color: rgba(226, 232, 240, 0.68);
+  --tag-color-hover: #f8fafc;
+  --misc-info-text: rgba(226, 232, 240, 0.62);
+  --misc-info-text-hover: #f8fafc;
+
+  --pitch-red: #fb7185;
+  --pitch-blue: #38bdf8;
+  --pitch-orange: #fb923c;
+  --pitch-green: #34d399;
+  --pitch-purple: #c084fc;
+
+  --svg-color: rgba(226, 232, 240, 0.48);
+  --svg-hover: #f8fafc;
+
+  --background: #0b0d10;
+  --card-bg: #15191f;
+  --card-shadow: rgba(0, 0, 0, 0.48);
+  --word-bg: #0f1318;
+  --pitch-position-bg: #1b2430;
+  --picture-bg: #0f1318;
+  --notes-bg: #11151b;
+  --definition-bg: #11151b;
+  --dictionary-collapse-fade: linear-gradient(
+    to bottom,
+    rgba(17, 21, 27, 0),
+    rgba(17, 21, 27, 0.96)
+  );
+  --buttons-bg: #11161d;
+  --buttons-bg-hover: #1f2937;
+  --lightbox-bg: rgba(3, 5, 8, 0.92);
+  --frequency-bg: #151b24;
+  --tag-bg: #151b24;
+  --tag-bg-hover: #263244;
+  --external-links-bg: #11161d;
+  --external-links-bg-hover: #1f2937;
+  --misc-info-bg: #11161d;
+  --misc-info-bg-hover: #1f2937;
+  --button-shadow-dark: 0 3px 12px rgba(0, 0, 0, 0.34);
+}
+
 html[data-senren-theme="focus"] body {
   background: var(--background) !important;
   color: var(--text) !important;

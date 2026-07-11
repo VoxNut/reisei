@@ -143,9 +143,9 @@
     const root = document.documentElement;
 
     themeScopedVariables.forEach((variable) => {
-      if (mode === "cyberpunk") {
-        // Cyberpunk owns its complete palette in style.css. Removing inline
-        // settings prevents an older Nord/Focus preset from leaking into it.
+      if (mode !== "nord") {
+        // Focus and Cyberpunk own complete palettes in style.css. Removing
+        // inline settings prevents an older Nord preset from leaking into them.
         root.style.removeProperty(variable);
         return;
       }

@@ -10,7 +10,7 @@ var senrenConfig = {};
         const shouldApplyDeckPresetVar = (settings, key) => {
             if (!key.startsWith("--") || key === "--theme-mode") return false;
             return !(
-                themeRuntime?.getActive() === "cyberpunk" &&
+                themeRuntime?.getActive() !== "nord" &&
                 themeScopedPresetVars.has(key)
             );
         };

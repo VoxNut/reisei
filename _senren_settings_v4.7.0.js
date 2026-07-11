@@ -476,7 +476,7 @@
   function shouldSkipPresetVar(settings, key) {
     if (key === THEME_MODE_VAR || key === "user-custom-css") return true;
     return (
-      normalizeThemeMode(settings && settings[THEME_MODE_VAR]) === "cyberpunk" &&
+      getActiveThemeMode() !== "nord" &&
       getThemeScopedVars().has(key)
     );
   }
@@ -591,9 +591,9 @@
             : liveSettings[item.var];
         if (item.var === THEME_MODE_VAR) {
           newVal = "nord";
-        } else if (activeThemeMode === "cyberpunk" && item.theme) {
-          // Cyberpunk owns its palette in the dedicated theme block. Do not
-          // rewrite the canonical Nord/Focus values while it is active.
+        } else if (activeThemeMode !== "nord" && item.theme) {
+          // Focus and Cyberpunk own dedicated palettes. Do not rewrite the
+          // canonical Nord values while either dedicated theme is active.
           return;
         }
 
@@ -832,7 +832,7 @@
       if (item.type === 'header' || item.type === 'sub-header') return;
       if (item.type === 'textarea') return;
       if (item.var === THEME_MODE_VAR) return;
-      if (activeThemeMode === "cyberpunk" && item.theme) return;
+      if (activeThemeMode !== "nord" && item.theme) return;
 
       let val = null;
 
@@ -1332,7 +1332,7 @@
 
         items.forEach(item => {
           if (
-            (activeThemeMode === "cyberpunk" && item.theme) ||
+            (activeThemeMode !== "nord" && item.theme) ||
             (item.theme && item.theme !== (isDark ? 'dark' : 'light'))
           ) {
             return;
