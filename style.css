@@ -8861,6 +8861,9 @@ div[data-sc-content="redirect-glossary"] { font-size: 180%; margin-top: 0.2em; }
     margin: 0 !important;
     padding: 0 !important;
     box-sizing: border-box;
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none;
+    touch-action: pan-y pinch-zoom;
   }
 
   .front,
@@ -8874,6 +8877,9 @@ div[data-sc-content="redirect-glossary"] { font-size: 180%; margin-top: 0.2em; }
     padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
     padding-left: max(8px, env(safe-area-inset-left)) !important;
     box-sizing: border-box;
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none;
+    touch-action: pan-y pinch-zoom;
   }
 
   .front::before,
@@ -8896,5 +8902,53 @@ div[data-sc-content="redirect-glossary"] { font-size: 180%; margin-top: 0.2em; }
   .mobile-word-layout > .background-box {
     padding-top: 12px;
     padding-bottom: 14px;
+  }
+
+  /* Dictionary content must wrap inside the viewport instead of creating a
+     nested horizontal scroll area that consumes AnkiDroid grading swipes. */
+  .grid-container,
+  .background-box,
+  .card-b,
+  #definition,
+  #glossary,
+  .definition-box,
+  .glossary-box,
+  .yomitan-glossary,
+  [data-dictionary] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+  }
+
+  .yomitan-glossary table,
+  .yomitan-glossary .gloss-sc-table,
+  :is(.definition-box, .glossary-box) table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed;
+  }
+
+  .yomitan-glossary :is(th, td, .gloss-sc-th, .gloss-sc-td),
+  :is(.definition-box, .glossary-box) :is(th, td) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .yomitan-glossary :is(img, svg, video, canvas),
+  :is(.definition-box, .glossary-box) :is(img, svg, video, canvas) {
+    max-width: 100% !important;
+    height: auto;
+  }
+
+  .yomitan-glossary :is(pre, code),
+  :is(.definition-box, .glossary-box) :is(pre, code) {
+    max-width: 100%;
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 }
