@@ -5901,339 +5901,339 @@ html[data-senren-theme="focus"] .card {
 }
 
 /* Nord Dictionary Palette: BEGIN */
-/* Generated from pop-up.css dictionary colors. Keep after the built-in dictionary mappings. */
+/* Each mapping receives a distinct accent interpolated from the official Nord Frost and Aurora colors. */
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="JMdict"] {
   --dict-color: #5e81ac !important;
   --dict-color-rgb: 94, 129, 172 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="JMDict"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #96bdaa !important;
+  --dict-color-rgb: 150, 189, 170 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="JMdict Forms"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #c46b6c !important;
+  --dict-color-rgb: 196, 107, 108 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="JMnedict"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #82a4c2 !important;
+  --dict-color-rgb: 130, 164, 194 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Jitendex.org"],
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="Jitendex"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #c4c48c !important;
+  --dict-color-rgb: 196, 196, 140 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="NHK"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #b686a1 !important;
+  --dict-color-rgb: 182, 134, 161 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Kansai Pitch Accent"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #89bfcc !important;
+  --dict-color-rgb: 137, 191, 204 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="大辞泉"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #dca67c !important;
+  --dict-color-rgb: 220, 166, 124 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="デジタル大辞泉"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #6682ac !important;
+  --dict-color-rgb: 102, 130, 172 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新明解国語辞典"],
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="新明解"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #94bdae !important;
+  --dict-color-rgb: 148, 189, 174 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="大辞林"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #c56f6c !important;
+  --dict-color-rgb: 197, 111, 108 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="広辞苑"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #81a1c1 !important;
+  --dict-color-rgb: 129, 161, 193 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="精選版　日本国語大辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #bdc38c !important;
+  --dict-color-rgb: 189, 195, 140 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="ハイブリッド新辞林"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #b7829b !important;
+  --dict-color-rgb: 183, 130, 155 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="明鏡国語辞典　第二版"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #89c0ce !important;
+  --dict-color-rgb: 137, 192, 206 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary="明鏡国語辞典 第三版"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #dfac7f !important;
+  --dict-color-rgb: 223, 172, 127 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新選国語辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #6e83ac !important;
+  --dict-color-rgb: 110, 131, 172 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="旺文社国語辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #93bcb2 !important;
+  --dict-color-rgb: 147, 188, 178 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="岩波国語辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #c7726d !important;
+  --dict-color-rgb: 199, 114, 109 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="現代国語例解辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #7e9ebf !important;
+  --dict-color-rgb: 126, 158, 191 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="現代新国語辞典 第七版"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #b7c28c !important;
+  --dict-color-rgb: 183, 194, 140 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="三省堂国語辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #b87e95 !important;
+  --dict-color-rgb: 184, 126, 149 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="例解学習国語辞典"] {
-  --dict-color: #d08770 !important;
-  --dict-color-rgb: 208, 135, 112 !important;
+  --dict-color: #88c0d0 !important;
+  --dict-color-rgb: 136, 192, 208 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="使い方の分かる 類語例解辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #e1b281 !important;
+  --dict-color-rgb: 225, 178, 129 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="実用日本語表現辞典"] {
-  --dict-color: #d08770 !important;
-  --dict-color-rgb: 208, 135, 112 !important;
+  --dict-color: #7585ac !important;
+  --dict-color-rgb: 117, 133, 172 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary="JLPT"],
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="JLPT rev"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #91bcb7 !important;
+  --dict-color-rgb: 145, 188, 183 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="JLPT文法解説まとめ"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #c8766d !important;
+  --dict-color-rgb: 200, 118, 109 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Bunpro Dictionary"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #7b9bbd !important;
+  --dict-color-rgb: 123, 155, 189 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="どんなときどう使う 日本語表現文型辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #b0c08c !important;
+  --dict-color-rgb: 176, 192, 140 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="日本語文法辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #b97a8f !important;
+  --dict-color-rgb: 185, 122, 143 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="日本語文型辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #87bdcf !important;
+  --dict-color-rgb: 135, 189, 207 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="All About Particles"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #e4b884 !important;
+  --dict-color-rgb: 228, 184, 132 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Wikipedia Kanji"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #7d86ac !important;
+  --dict-color-rgb: 125, 134, 172 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Wikipedia"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #8fbcbb !important;
+  --dict-color-rgb: 143, 188, 187 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Jiten"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #ca796e !important;
+  --dict-color-rgb: 202, 121, 110 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="JPDBv2"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #7798bb !important;
+  --dict-color-rgb: 119, 152, 187 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="NonFiction"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #aabf8c !important;
+  --dict-color-rgb: 170, 191, 140 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Novels"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #ba7588 !important;
+  --dict-color-rgb: 186, 117, 136 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="BCCWJ-LUW"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #87bacd !important;
+  --dict-color-rgb: 135, 186, 205 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="BCCWJ2"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #e6bf86 !important;
+  --dict-color-rgb: 230, 191, 134 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="CC100"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #8587ac !important;
+  --dict-color-rgb: 133, 135, 172 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Narou"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #8ebcbd !important;
+  --dict-color-rgb: 142, 188, 189 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Netflix"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #cb7d6e !important;
+  --dict-color-rgb: 203, 125, 110 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Youtube"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #7495b9 !important;
+  --dict-color-rgb: 116, 149, 185 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="VN Freq"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #a3be8c !important;
+  --dict-color-rgb: 163, 190, 140 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Anime & J-drama"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #bb7182 !important;
+  --dict-color-rgb: 187, 113, 130 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="NieR"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #86b8cc !important;
+  --dict-color-rgb: 134, 184, 204 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="jpDicts"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #e9c589 !important;
+  --dict-color-rgb: 233, 197, 137 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="KANJIDIC"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #8d88ad !important;
+  --dict-color-rgb: 141, 136, 173 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary="漢字源"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #8ebdbf !important;
+  --dict-color-rgb: 142, 189, 191 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="角川新字源"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #cd806f !important;
+  --dict-color-rgb: 205, 128, 111 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="漢検四字熟語辞典"],
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="漢検漢字辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #7192b7 !important;
+  --dict-color-rgb: 113, 146, 183 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="JPDB Kanji"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #a1be90 !important;
+  --dict-color-rgb: 161, 190, 144 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="TheKanjiMap Kanji Radicals/Composition"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #bc6d7c !important;
+  --dict-color-rgb: 188, 109, 124 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Innocent Corpus Kanji"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #85b5cb !important;
+  --dict-color-rgb: 133, 181, 203 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="漢字ペディア同訓異義"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #ebcb8b !important;
+  --dict-color-rgb: 235, 203, 139 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="漢字でGo"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #9589ad !important;
+  --dict-color-rgb: 149, 137, 173 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="四字熟語の百科事典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #8dbdc1 !important;
+  --dict-color-rgb: 141, 189, 193 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="ことわざ・慣用句の百科事典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #ce846f !important;
+  --dict-color-rgb: 206, 132, 111 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Proverb Encyclopedia"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #6e90b6 !important;
+  --dict-color-rgb: 110, 144, 182 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新明解四字熟語辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #9fbe95 !important;
+  --dict-color-rgb: 159, 190, 149 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="学研 四字熟語辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #bd6976 !important;
+  --dict-color-rgb: 189, 105, 118 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="四字熟語辞典オンライン"] {
-  --dict-color: #d08770 !important;
-  --dict-color-rgb: 208, 135, 112 !important;
+  --dict-color: #85b2c9 !important;
+  --dict-color-rgb: 133, 178, 201 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="故事・ことわざ・慣用句オンライン"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #e4ca8b !important;
+  --dict-color-rgb: 228, 202, 139 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="類語辞典オンライン"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #9d8aad !important;
+  --dict-color-rgb: 157, 138, 173 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="対義語辞典オンライン"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #8cbdc3 !important;
+  --dict-color-rgb: 140, 189, 195 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="国語辞典オンライン"] {
@@ -6242,53 +6242,53 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="語源由来辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #6b8db4 !important;
+  --dict-color-rgb: 107, 141, 180 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="違い・語源辞典オンライン"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #9ebd99 !important;
+  --dict-color-rgb: 158, 189, 153 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="違いがわかる事典 (Chigai Dictionary)"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #be6570 !important;
+  --dict-color-rgb: 190, 101, 112 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="違いがわかる事典 (chigai.site)"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #84afc8 !important;
+  --dict-color-rgb: 132, 175, 200 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新語時事用語辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #dec98b !important;
+  --dict-color-rgb: 222, 201, 139 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Koohii Kanji Stories"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #a48cad !important;
+  --dict-color-rgb: 164, 140, 173 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="複合語起源"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #8cbec5 !important;
+  --dict-color-rgb: 140, 190, 197 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="青空文庫熟語"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #d28d72 !important;
+  --dict-color-rgb: 210, 141, 114 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="TMW Club v2"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #688ab2 !important;
+  --dict-color-rgb: 104, 138, 178 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="津軽弁辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #9cbd9d !important;
+  --dict-color-rgb: 156, 189, 157 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Namegen"] {
@@ -6297,109 +6297,109 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="全国方言辞典"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #84acc6 !important;
+  --dict-color-rgb: 132, 172, 198 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="全市区町村辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #d7c78b !important;
+  --dict-color-rgb: 215, 199, 139 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="用例.jp"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #ac8dad !important;
+  --dict-color-rgb: 172, 141, 173 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Onomatoproject"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #8bbec6 !important;
+  --dict-color-rgb: 139, 190, 198 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="surasura 擬声語"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #d59375 !important;
+  --dict-color-rgb: 213, 147, 117 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="OnoMangaStrip"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #6487b0 !important;
+  --dict-color-rgb: 100, 135, 176 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="絵でわかる日本語"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #9abda1 !important;
+  --dict-color-rgb: 154, 189, 161 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="絵でわかる慣用句"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #c1646b !important;
+  --dict-color-rgb: 193, 100, 107 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="形容詞・動詞図鑑"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #83a9c5 !important;
+  --dict-color-rgb: 131, 169, 197 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新和英大辞典"],
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary="新和英"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #d1c68b !important;
+  --dict-color-rgb: 209, 198, 139 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Counters & Suffixes"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #b48ead !important;
+  --dict-color-rgb: 180, 142, 173 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="日本語俗語辞書"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #8bbfc8 !important;
+  --dict-color-rgb: 139, 191, 200 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="ネット用語辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #d79a77 !important;
+  --dict-color-rgb: 215, 154, 119 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Living Japanese Slang Dictionary"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #6184ae !important;
+  --dict-color-rgb: 97, 132, 174 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="毎日のんびり日本語教師"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #98bda6 !important;
+  --dict-color-rgb: 152, 189, 166 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Nico/Pixiv"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #c2686b !important;
+  --dict-color-rgb: 194, 104, 107 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Pixiv"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #82a7c4 !important;
+  --dict-color-rgb: 130, 167, 196 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Weblio大阪弁"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #cac58b !important;
+  --dict-color-rgb: 202, 197, 139 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="IMIDASの日本語辞典"] {
-  --dict-color: #5e81ac !important;
-  --dict-color-rgb: 94, 129, 172 !important;
+  --dict-color: #b58aa7 !important;
+  --dict-color-rgb: 181, 138, 167 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="TISMKANJI"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #8abfca !important;
+  --dict-color-rgb: 138, 191, 202 !important;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="コツ"] {
-  --dict-color: #bf616a !important;
-  --dict-color-rgb: 191, 97, 106 !important;
+  --dict-color: #daa07a !important;
+  --dict-color-rgb: 218, 160, 122 !important;
 }
 
 /* Nord Dictionary Palette: END */
