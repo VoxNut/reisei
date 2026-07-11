@@ -1,0 +1,39 @@
+iframe.yomitan-popup[data-theme="light"] {
+  color-scheme: light !important; /* forces light theme so it works on google.com */
+  --outer-bg: linear-gradient(
+    160deg,
+    rgba(12, 24, 21, 0.98),
+    rgba(16, 32, 29, 0.96)
+  );
+  --outer-border: rgba(180, 153, 103, 0.25);
+  --outer-shadow:
+    0 12px 24px rgba(15, 29, 26, 0.15),
+    0 4px 8px rgba(15, 29, 26, 0.08);
+}
+
+iframe.yomitan-popup[data-theme="dark"] {
+  color-scheme: dark !important; /* forces dark theme so it works on google.com */
+  --outer-bg: linear-gradient(
+    165deg,
+    rgba(23, 23, 23, 0.96),
+    rgba(40, 37, 35, 0.94)
+  );
+  --outer-border: rgba(192, 188, 181, 0.2);
+  --outer-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+iframe.yomitan-popup {
+  background: var(--outer-bg) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--outer-border) !important;
+  box-shadow: var(--outer-shadow) !important;
+  /* forced-color-adjust: none !important; */
+
+  /* hide scrollbar */
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important;/* IE, Edge (legacy) */
+}

@@ -1,0 +1,315 @@
+<script>
+  (function () {
+    const normalizeThemeMode = (value) => {
+      const mode = (value || "").toString().trim().toLowerCase();
+      if (mode === "cyber") return "cyberpunk";
+      return ["nord", "focus", "cyberpunk"].includes(mode) ? mode : "";
+    };
+    const themeMode =
+      normalizeThemeMode(
+        localStorage.getItem("senren_--theme-mode") ||
+          localStorage.getItem("senrenTheme"),
+      ) ||
+      (localStorage.getItem("darkMode") === "enabled" ? "focus" : "nord");
+    document.documentElement.classList.toggle("custom-dark-mode", themeMode !== "nord");
+    document.documentElement.classList.toggle("focus-theme", themeMode === "focus");
+    document.documentElement.classList.toggle("cyberpunk-theme", themeMode === "cyberpunk");
+    document.documentElement.dataset.senrenTheme = themeMode;
+    document.documentElement.style.setProperty("--theme-mode", themeMode);
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("senren_--")) {
+          const varName = key.substring(7);
+          const val = localStorage.getItem(key);
+          if (val !== null) {
+            document.documentElement.style.setProperty(varName, val);
+          }
+        }
+      }
+      const customCss = localStorage.getItem("senren_user-custom-css");
+      if (customCss && customCss !== "null") {
+        let styleTag = document.getElementById("senren-live-custom-css");
+        if (!styleTag) {
+          styleTag = document.createElement("style");
+          styleTag.id = "senren-live-custom-css";
+          (document.head || document.documentElement).appendChild(styleTag);
+        }
+        styleTag.textContent = customCss;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    window.__senrenSettingsRestored = true;
+  })();
+</script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  media="print"
+  onload="this.media='all'"
+/>
+
+<!-- BACK -->
+<div class="back" data-tags="{{Tags}}">
+  <!-- HEADER -->
+  <div class="header">
+    <!-- Theme Toggle -->
+    <span class="toggle-custom-dark-mode tappable">
+      <i class="fas fa-sun sun-icon"></i>
+      <i class="fas fa-moon moon-icon"></i>
+    </span>
+
+    <!-- Settings Toggle -->
+    <span class="toggle-settings-btn tappable">
+      <i class="fas fa-cog"></i>
+    </span>
+
+    <!-- Audios -->
+    {{#wordAudio}}
+    <div class="{{Tags}}"><span class="audio">{{wordAudio}}</span></div>
+    {{/wordAudio}} {{#sentenceAudio}}
+    <div class="{{Tags}}">
+      <span class="sentenceaudio">{{sentenceAudio}}</span>
+    </div>
+    {{/sentenceAudio}}
+
+    <!-- Notes Toggle -->
+    {{#notes}}
+    <span class="toggle-notes tappable">
+      <div class="toggle-notes-svg"></div>
+    </span>
+    {{/notes}}
+
+    <!-- Image Toggle -->
+    <span
+      class="toggle-image-visibility show-btn tappable"
+      style="display: none"
+    >
+      <i class="fas fa-image"></i>
+    </span>
+
+    <!-- Frequency Dropdown -->
+    <div id="frequency">
+      <div class="frequency-box tappable">
+        <label class="freqbt" data-freq="{{freqSort}}">
+          {{freqSort}} <i class="fas fa-chevron-down arrow"></i>
+        </label>
+        {{#frequency}}
+        <div class="frequency-content">{{frequency}}</div>
+        {{/frequency}}
+      </div>
+    </div>
+  </div>
+  <!-- /HEADER -->
+
+  <!-- GRID LAYOUT -->
+  <div class="grid-container">
+    <!-- Word -->
+    <div class="background-box tappable">
+      <div id="word" class="pitch card-a">
+        <span class="{{pitch}} {{Tags}}">
+          <ruby>{{word}}<rt>{{reading}}</rt></ruby>
+          <div id="position">{{pitchPosition}}</div>
+          <div id="categories" class="tappable">{{pitch}}</div>
+        </span>
+      </div>
+    </div>
+
+    <!-- Picture -->
+    <div class="picture-container {{Tags}} clickable-image tappable">
+      {{picture}}
+
+      <div class="toggle-image-visibility hide-btn tappable">
+        <i class="fas fa-times"></i>
+      </div>
+
+      <div class="nav-arrow left tappable"></div>
+      <div class="nav-arrow right tappable"></div>
+    </div>
+  </div>
+  <!-- /GRID LAYOUT -->
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <img id="lightbox-img" />
+    <a href="#" class="close tappable"></a>
+    <div class="lightbox-nav left tappable"></div>
+    <div class="lightbox-nav right tappable"></div>
+    <button id="show-all" class="lightbox-grid-toggle tappable">
+      Show All
+    </button>
+  </div>
+
+  <!-- Sentence -->
+  <div class="sentence-container">
+    <div id="sentence">
+      <span id="formattedSentence" class="{{pitch}} tappable"></span>
+    </div>
+    <div id="sentenceEng" class="is-collapsed">{{sentenceEng}}</div>
+  </div>
+
+  <!-- Notes -->
+  {{#notes}}
+  <div id="notes" class="notes-panel is-collapsed">
+    <div class="notes-counter"></div>
+    <div class="toggle-area left-larger tappable"></div>
+    <div class="toggle-area right-larger tappable"></div>
+    <div class="toggle-area left tappable"></div>
+    <div class="toggle-area right tappable"></div>
+    <div class="notes-box">
+      <span class="notes-raw">{{notes}}</span>
+    </div>
+  </div>
+  {{/notes}}
+
+  <!-- Selection Text -->
+  {{#selectionText}}
+  <div id="selectionText" class="card-b" data-type="selectionText">
+    <div class="definition-box">
+      <div class="dictionary-title">Selected Text</div>
+      <div class="dictionary-counter"></div>
+      <div class="toggle-area left-larger tappable"></div>
+      <div class="toggle-area right-larger tappable"></div>
+      <div class="toggle-area left tappable"></div>
+      <div class="toggle-area right tappable"></div>
+      <span>{{selectionText}}</span>
+    </div>
+  </div>
+  {{/selectionText}}
+
+  <!-- Definition -->
+  <div id="definition" class="card-b" data-type="definition">
+    <div class="dictionary-counter"></div>
+    <div class="toggle-area left-larger tappable"></div>
+    <div class="toggle-area right-larger tappable"></div>
+    <div class="toggle-area left tappable"></div>
+    <div class="toggle-area right tappable"></div>
+    <div class="definition-box">
+      <span>{{definition}}</span>
+    </div>
+  </div>
+
+  <!-- Glossary -->
+  <div id="glossary" class="card-b yomitan-glossary" data-type="glossary">
+    <div class="dictionary-counter"></div>
+    <div class="toggle-area left-larger tappable"></div>
+    <div class="toggle-area right-larger tappable"></div>
+    <div class="toggle-area left tappable"></div>
+    <div class="toggle-area right tappable"></div>
+    <div class="glossary-box">
+      <span>{{glossary}}</span>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="tags-and-links-wrapper">
+    <!-- Tags -->
+    <div class="tags-container"></div>
+
+    <!-- External Links -->
+
+    <div class="external-links">
+      <!-- Youglish Japanese -->
+      <a
+        data-details="youglish.com"
+        href="https://youglish.com/pronounce/{{text:word}}/japanese"
+      >
+        <img
+          class="light-icon"
+          src="_icon_youglish_light.png"
+          style="width: 70px"
+        />
+        <img
+          class="dark-icon"
+          src="_icon_youglish_dark.png"
+          style="width: 70px"
+        />
+      </a>
+      <!-- OJAD (Pitch Accent Dictionary) -->
+      <a
+        data-details="ojad.gavo.t.u-tokyo.ac.jp"
+        href="https://www.gavo.t.u-tokyo.ac.jp/ojad/search/index/word:{{text:word}}"
+      >
+        <img
+          class="light-icon"
+          src="_icon_ojad_light.png"
+          style="width: 40px"
+        />
+        <img class="dark-icon" src="_icon_ojad_dark.png" style="width: 40px" />
+      </a>
+      <!-- Massif -->
+      <a
+        data-details="massif.la"
+        href="https://massif.la/ja/search?q={{text:word}}"
+      >
+        <img class="light-icon" src="_icon_massif_light.png" />
+        <img class="dark-icon" src="_icon_massif_dark.png" />
+      </a>
+      <!-- Bunpro -->
+      <a
+        data-details="bunpro.jp"
+        href="https://bunpro.jp/grammar_points/{{text:word}}"
+      >
+        <img class="light-icon" src="_icon_bunpro_light.png" />
+        <img class="dark-icon" src="_icon_bunpro_dark.png" />
+      </a>
+      <!-- Jpdb -->
+      <a data-details="jpdb.io" href="https://jpdb.io/search?q={{text:word}}">
+        <img class="light-icon" src="_icon_jpdb_lightmode.png" />
+        <img class="dark-icon" src="_icon_jpdb_darkmode.png" />
+      </a>
+
+      <!-- Jisho -->
+      <a data-details="jisho.org" href="https://jisho.org/search/{{text:word}}">
+        <img class="light-icon" src="_icon_jisho_lightmode.png" />
+        <img class="dark-icon" src="_icon_jisho_darkmode.png" />
+      </a>
+
+      <!-- Google Images -->
+      <a
+        data-details="image_search"
+        href="https://www.bing.com/images/search?q={{text:word}}&amp;tbm=isch"
+      >
+        <img class="light-icon" src="_icon_image_black.svg" />
+        <img class="dark-icon" src="_icon_image_white.svg" />
+      </a>
+
+      <!-- Nadeshiko -->
+      <a
+        data-details="nadeshiko.co"
+        href="https://nadeshiko.co/search/sentence?query={{text:word}}"
+      >
+        <img class="light-icon" src="_icon_nadeshiko.ico" />
+        <img class="dark-icon" src="_icon_nadeshiko.ico" />
+      </a>
+
+      <!-- Immersion Kit -->
+      <a
+        data-details="immersionkit.com"
+        href="https://immersionkit.com/dictionary?keyword={{text:word}}"
+      >
+        <img class="light-icon" src="_icon_immersion_kit.ico" />
+        <img class="dark-icon" src="_icon_immersion_kit.ico" />
+      </a>
+    </div>
+  </div>
+
+  <!-- Misc Info -->
+  <div class="misc-info">{{miscInfo}}</div>
+  <!-- /FOOTER -->
+
+  <div id="dictionaryPreference" style="display: none">
+    {{dictionaryPreference}}
+  </div>
+  <div id="kanji-tooltip"></div>
+  <div id="grammar-tooltip"></div>
+</div>
+<!-- /BACK -->
+
+
+<!-- Hidden containers to hold sentence and furigana fields for the external script -->
+<div id="hiddenSentence" style="display: none !important">{{sentence}}</div>
+<div id="hiddenSentenceFurigana" style="display: none !important">{{furigana:sentenceFurigana}}</div>
+
+<script src="_senren_back_v4.7.0.js"></script>

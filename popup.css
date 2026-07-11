@@ -1,0 +1,1158 @@
+/* Firefox specific fix for furigana alignment (Remove this rule if not using Firefox) */
+.headword ruby > * {
+  margin-top: -3px;
+  margin-bottom: -10px;
+}
+
+/* General settings */
+:root {
+  --entry-vertical-padding: 0.5em;
+  --entry-horizontal-padding: 0.5em;
+  --line-height-no-units: 16;
+  --sidebar-button-height-no-units: 10;
+  --sidebar-button-icon-size-no-units: 10;
+  --collapsible-definition-line-count: 15;
+}
+
+/* Fix search page width */
+:root[data-page-type="search"] {
+  --content-width: 1400px;
+}
+
+:root[data-theme="light"] {
+  --background-color: transparent;
+  --dict-color-opacity: 100%;
+  --dict-color: var(--tag-dictionary-background-color);
+  --dict-bg-opacity: 0.03;
+  --example-keyword: #b8860b;
+  --tag-text-color: #3d3020;
+  --tag-border-color: transparent;
+  --tag-default-background-color: rgba(218, 200, 170, 0.12);
+  --tag-name-background-color: #c9a877;
+  --tag-expression-background-color: #c9a877;
+  --tag-archaism-background-color: #c9a877;
+  --tag-dictionary-background-color: #b8956e;
+  --tag-frequency-background-color: #a6935f;
+  --tag-part-of-speech-background-color: #c9a877;
+  --tag-search-background-color: #c9a877;
+  --tag-pitch-accent-dictionary-background-color: #996633;
+  --jitendex-separators: rgba(139, 110, 80, 0.25);
+  --text-color: #3d3020;
+  --pitch-accent-annotation-color: #6b5b45;
+  --reason-text-color: #8b6e50;
+  --notification-text-color: #3d3020;
+  --notification-background-color: #fef9f3;
+  --progress-bar-track-color: #c4a77f;
+  --sidebar-background-color: #faf7f2;
+  --sidebar-button-background-color: transparent;
+  --sidebar-button-background-color-hover: #f0e8dd;
+  --sidebar-button-background-color-active: #e3d9cc;
+  --sidebar-button-danger-background-color: transparent;
+  --sidebar-button-danger-background-color-hover: #c9756c;
+  --sidebar-button-danger-background-color-active: #a85a52;
+  --sidebar-button-icon-color: #6b5b45;
+  --sidebar-button-disabled-icon-color: #c4a77f;
+  --sidebar-button-danger-icon-color: #6b5b45;
+  --list-padding1: 0;
+  --entry-card-border: rgba(139, 110, 80, 0.12);
+  --entry-card-shadow:
+    0 6px 12px rgba(139, 110, 80, 0.08),
+    0 2px 4px rgba(139, 110, 80, 0.04);
+  --entry-card-shadow-hover:
+    0 8px 16px rgba(139, 110, 80, 0.12),
+    0 3px 6px rgba(139, 110, 80, 0.08);
+  --entry-card-highlight: rgba(255, 250, 240, 0.6);
+
+  /* Marked Mora */
+  --devoiced-color: #8b6e50;
+  --nasal-color: #c9756c;
+
+  /* Pitch Accent Colors */
+  --pitch-red: #b03a2e;
+  --pitch-blue: #5d6d7e;
+  --pitch-orange: #b7770d;
+  --pitch-green: #4a7c59;
+  --pitch-purple: #7b5ea7;
+  --pitch-background: rgba(255, 250, 240, 0.4);
+
+  /* Fonts */
+  --font-sans:
+    "Hiragino Mincho ProN", "Georgia", "Yu Gothic UI", "BIZ UDPGothic", "Meiryo", "Noto Sans JP",
+    "Hiragino Kaku Gothic ProN", sans-serif;
+  --font-serif:
+     "Hiragino Mincho ProN", "Georgia", "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
+}
+
+:root[data-theme="dark"] {
+  --background-color: transparent;
+  --dict-color-opacity: 100%;
+  --dict-color: var(--tag-dictionary-background-color);
+  --dict-bg-opacity: 0.04;
+  --example-keyword: #e8d4a8;
+  --tag-text-color: #2a1f10;
+  --tag-border-color: transparent;
+  --tag-default-background-color: rgba(201, 170, 128, 0.82);
+  --tag-name-background-color: #c9aa80;
+  --tag-expression-background-color: #c9aa80;
+  --tag-archaism-background-color: #c9aa80;
+  --tag-dictionary-background-color: #bfa858;
+  --tag-frequency-background-color: #c09060;
+  --tag-part-of-speech-background-color: #c9aa80;
+  --tag-search-background-color: #c9aa80;
+  --tag-pitch-accent-dictionary-background-color: #b09070;
+  --jitendex-separators: rgba(200, 180, 150, 0.3);
+  --text-color: #e8d4a8;
+  --subtext-color: #c4a87a;
+  --pitch-accent-annotation-color: #d4c4a8;
+  --reason-text-color: #c9aa80;
+  --notification-text-color: #e8d4a8;
+  --notification-background-color: #3d3020;
+  --progress-bar-track-color: #a08060;
+  --sidebar-background-color: #2d2620;
+  --sidebar-button-background-color: transparent;
+  --sidebar-button-background-color-hover: #453a2f;
+  --sidebar-button-background-color-active: #5a4a38;
+  --sidebar-button-danger-background-color: transparent;
+  --sidebar-button-danger-background-color-hover: #a85a52;
+  --sidebar-button-danger-background-color-active: #8b4642;
+  --sidebar-button-icon-color: #d4c4a8;
+  --sidebar-button-disabled-icon-color: #6b5b45;
+  --sidebar-button-danger-icon-color: #e8d4a8;
+  --list-padding1: 0;
+  --entry-card-border: rgba(200, 180, 150, 0.15);
+  --entry-card-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+  --entry-card-shadow-hover:
+    0 8px 16px rgba(0, 0, 0, 0.4),
+    0 3px 6px rgba(0, 0, 0, 0.25);
+  --entry-card-highlight: rgba(139, 110, 80, 0.05);
+
+  /* Marked Mora */
+  --devoiced-color: #b8956e;
+  --nasal-color: #d4a574;
+
+  /* Pitch Accent Colors */
+  --pitch-red: #e07b6a;
+  --pitch-blue: #89a0b8;
+  --pitch-orange: #d4a04a;
+  --pitch-green: #7ab890;
+  --pitch-purple: #b094cc;
+  --pitch-background: rgba(139, 110, 80, 0.15);
+
+
+  /* Fonts */
+  --font-sans:
+   "Hiragino Mincho ProN", "Yu Gothic UI", "BIZ UDPGothic", "Meiryo", "Noto Sans JP",
+    "Hiragino Kaku Gothic ProN", sans-serif;
+  --font-serif:
+   "Hiragino Mincho ProN", "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
+}
+
+/* Tranparency Theme */
+:root[data-theme="light"] {
+  color-scheme: light !important;
+  /* Forces light theme */
+  --text-color: #202020;
+  --subtext-color: #535353;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark !important;
+  /* Forces dark theme */
+  --text-color: #f2f2f2;
+  --subtext-color: #acacac;
+}
+
+body {
+  background: transparent !important;
+}
+
+/* glossary */
+.gloss-sc-thead,
+.gloss-sc-tfoot,
+.gloss-sc-th {
+  background-color: transparent !important;
+}
+
+/* Hide scrollbars but keep scrolling functional */
+.scrollbar {
+  scrollbar-color: transparent transparent !important;
+  /* Firefox */
+  scrollbar-width: none !important;
+  /* Firefox */
+}
+
+.scrollbar::-webkit-scrollbar {
+  display: none !important;
+  /* Chrome, Edge, Safari */
+}
+
+/* Base Typography & Layout */
+body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "palt" 1;
+}
+
+.content-body {
+  font-size: 18px;
+}
+
+.headword {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.headword-kanji-link {
+  text-decoration: none;
+}
+
+.headword-term ruby rt {
+  user-select: none;
+  /* Prevent selecting furigana */
+}
+
+.source-text rt {
+  font-family: var(--font-sans);
+  font-weight: normal;
+}
+
+ul,
+ol,
+li {
+  list-style: none !important;
+}
+
+ul,
+ol {
+  display: inline;
+}
+
+a {
+  color: var(--dict-color);
+}
+
+/* Header & Search */
+#search-textbox {
+  font-size: initial;
+}
+
+rt.query-parser-segment-reading {
+  display: none;
+}
+
+/* Hide unused action buttons */
+button.action-button[title="Add duplicate expression (Alt + E)"],
+button.action-button[title="Add reading (Alt + R)"] {
+  display: none;
+}
+
+/* Dictionary Entry Layout (Dual Pane) */
+.entry-body-section-content.pronunciation-group-list {
+  display: grid;
+  grid-gap: 5px;
+  margin-bottom: 5px;
+}
+
+.definition-list {
+  padding: 0;
+  margin-top: 0.5em;
+}
+
+.entry-body-section-content.definition-list {
+  display: grid;
+  grid-template-columns: calc(50% - 0.25em) calc(50% - 0.25em);
+  gap: 0.5em;
+  margin: 0 auto 1em auto;
+}
+
+.entry-body-section-content.definition-list[data-count="1"] {
+  grid-template-columns: 100%;
+}
+
+.entry-body-section-content.definition-list[data-count="1"] .definition-item {
+  margin: 0 1em;
+}
+
+.definition-item {
+  display: block;
+  list-style-type: none;
+  margin-bottom: 10px;
+  padding: 0.9em 0.95em;
+  border-radius: 0.65em;
+  border: 1px solid var(--entry-card-border);
+  border-left: 0.28em solid color-mix(in srgb, var(--dict-color) 82%, transparent);
+  box-shadow: var(--entry-card-shadow);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.12s ease;
+}
+
+
+.definition-item:hover {
+  box-shadow: var(--entry-card-shadow-hover);
+}
+
+[data-theme="dark"] .definition-item {
+  border-left: 0.28em solid color-mix(in srgb, var(--dict-color) 74%, transparent);
+}
+
+
+.tag-label-content {
+  letter-spacing: 0.015em;
+  font-weight: 600;
+}
+
+.gloss-content structured-content {
+  margin: 0;
+}
+
+.expansion-button {
+  position: absolute;
+  right: 0;
+  height: calc(100% - 1.6em);
+  width: 1.4em;
+  align-items: center;
+  z-index: 10;
+}
+
+.definition-item-inner.collapsible .definition-item-content {
+  padding-right: 1em;
+  box-sizing: border-box;
+}
+
+/* Pitch Accent Styling */
+.pronunciation-mora-line {
+  border-top-width: 0.15em !important;
+  border-right-width: 0.15em !important;
+}
+
+/* Pitch Accent: Show all pronunciations when pressed */
+li.pronunciation-group:first-child ~ * {
+  display: none;
+}
+
+ol.pronunciation-group-list:active
+  li.pronunciation-group:first-child
+  ~ li.pronunciation-group {
+  display: inline-block;
+}
+
+/* Downstep Position Number */
+.pronunciation-downstep-notation-number {
+  font-weight: bold;
+  font-family: var(--font-sans);
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: var(--pitch-background);
+  font-size: 0.8em;
+  text-align: center;
+}
+
+.pronunciation-downstep-notation-prefix,
+.pronunciation-downstep-notation-suffix {
+  display: none;
+}
+
+/* Pitch Type Colors */
+/* Heiban */
+html:has(
+  .entry-current
+    .headword[data-is-primary="true"][data-pronunciation-categories^="heiban"]
+) {
+  --accent-color: var(--pitch-blue);
+}
+
+.headword[data-pronunciation-categories^="heiban"],
+.headword[data-pronunciation-categories^="heiban"] rt {
+  color: var(--pitch-blue);
+  --headword-text-color: var(--pitch-blue);
+  --headword-current-kanji-border-color: var(--pitch-blue);
+  --headword-current-kanji-text-color: var(--pitch-blue);
+}
+
+.pronunciation:has(
+  .pronunciation-downstep-notation[data-downstep-position="0"]
+) {
+  --pronunciation-annotation-color: var(--pitch-blue);
+}
+
+.pronunciation:has(.pronunciation-downstep-notation[data-downstep-position="0"])
+  .pronunciation-downstep-notation-number {
+  color: var(--pitch-blue);
+}
+
+/* Atamadaka */
+html:has(
+  .entry-current
+    .headword[data-is-primary="true"][data-pronunciation-categories^="atamadaka"]
+) {
+  --accent-color: var(--pitch-red);
+}
+
+.headword[data-pronunciation-categories^="atamadaka"],
+.headword[data-pronunciation-categories^="atamadaka"] rt {
+  color: var(--pitch-red);
+  --headword-text-color: var(--pitch-red);
+  --headword-current-kanji-border-color: var(--pitch-red);
+  --headword-current-kanji-text-color: var(--pitch-red);
+}
+
+.pronunciation:has(
+  .pronunciation-downstep-notation[data-downstep-position="1"]
+) {
+  --pronunciation-annotation-color: var(--pitch-red);
+}
+
+.pronunciation:has(.pronunciation-downstep-notation[data-downstep-position="1"])
+  .pronunciation-downstep-notation-number {
+  color: var(--pitch-red);
+}
+
+/* Nakadaka */
+html:has(
+  .entry-current
+    .headword[data-is-primary="true"][data-pronunciation-categories^="nakadaka"]
+) {
+  --accent-color: var(--pitch-orange);
+}
+
+.headword[data-pronunciation-categories^="nakadaka"],
+.headword[data-pronunciation-categories^="nakadaka"] rt {
+  color: var(--pitch-orange);
+  --headword-text-color: var(--pitch-orange);
+  --headword-current-kanji-border-color: var(--pitch-orange);
+  --headword-current-kanji-text-color: var(--pitch-orange);
+}
+
+.pronunciation:has(
+    .pronunciation-mora:not(:last-child)[data-pitch-next="low"]
+  ):has(.pronunciation-downstep-notation:not([data-downstep-position="1"])) {
+  --pronunciation-annotation-color: var(--pitch-orange) !important;
+}
+
+.pronunciation:has(
+    .pronunciation-mora:not(:last-child)[data-pitch-next="low"]
+  ):has(.pronunciation-downstep-notation:not([data-downstep-position="1"]))
+  .pronunciation-downstep-notation-number {
+  color: var(--pitch-orange) !important;
+}
+
+/* Odaka */
+html:has(
+  .entry-current
+    .headword[data-is-primary="true"][data-pronunciation-categories^="odaka"]
+) {
+  --accent-color: var(--pitch-green);
+}
+
+.headword[data-pronunciation-categories^="odaka"],
+.headword[data-pronunciation-categories^="odaka"] rt {
+  color: var(--pitch-green);
+  --headword-text-color: var(--pitch-green);
+  --headword-current-kanji-border-color: var(--pitch-green);
+  --headword-current-kanji-text-color: var(--pitch-green);
+}
+
+.pronunciation:has(.pronunciation-mora:last-child[data-pitch-next="low"]):not(
+    :has(.pronunciation-downstep-notation[data-downstep-position="1"])
+  ) {
+  --pronunciation-annotation-color: var(--pitch-green);
+}
+
+.pronunciation:has(.pronunciation-mora:last-child[data-pitch-next="low"]):not(
+    :has(.pronunciation-downstep-notation[data-downstep-position="1"])
+  )
+  .pronunciation-downstep-notation-number {
+  color: var(--pitch-green);
+}
+
+/* Kifuku */
+html:has(
+  .entry-current
+    .headword[data-is-primary="true"][data-pronunciation-categories^="kifuku"]
+) {
+  --accent-color: var(--pitch-purple);
+}
+
+.headword[data-pronunciation-categories^="kifuku"],
+.headword[data-pronunciation-categories^="kifuku"] rt {
+  color: var(--pitch-purple);
+  --headword-text-color: var(--pitch-purple);
+  --headword-current-kanji-border-color: var(--pitch-purple);
+  --headword-current-kanji-text-color: var(--pitch-purple);
+}
+
+/* An explicit [1] downstep is Atamadaka and takes priority over a broader
+   Kifuku headword category elsewhere in the current entry. */
+html:has(
+  .entry-current
+    .pronunciation
+    .pronunciation-downstep-notation[data-downstep-position="1"]
+) {
+  --accent-color: var(--pitch-red);
+}
+
+.entry-current:has(
+    .pronunciation
+      .pronunciation-downstep-notation[data-downstep-position="1"]
+  )
+  .headword[data-is-primary="true"],
+.entry-current:has(
+    .pronunciation
+      .pronunciation-downstep-notation[data-downstep-position="1"]
+  )
+  .headword[data-is-primary="true"]
+  rt {
+  color: var(--pitch-red);
+  --headword-text-color: var(--pitch-red);
+  --headword-current-kanji-border-color: var(--pitch-red);
+  --headword-current-kanji-text-color: var(--pitch-red);
+}
+
+/* Nasal Mora */
+.pronunciation-nasal-indicator {
+  border: 0.1em solid var(--nasal-color);
+  width: 0.35em;
+  height: 0.35em;
+  right: -0.1em;
+  top: 0.225em;
+}
+
+/* Devoiced Mora */
+.pronunciation-devoice-indicator {
+  display: none;
+}
+
+.pronunciation-mora[data-devoice="true"] {
+  color: var(--devoiced-color);
+}
+
+
+/* Frequency Information */
+/* Frequency (average enabled): Show all frequencies when pressed */
+[data-average-frequency="true"]
+  [data-section-type="frequencies"]:active
+  .frequency-group-item:not([data-details="Average"]) {
+  display: inline-block;
+}
+
+[data-average-frequency="true"]
+  [data-section-type="frequencies"]:active
+  .frequency-group-item[data-details="Average"] {
+  display: none;
+}
+
+/* Frequency (average disabled): Show all frequencies when pressed */
+[data-average-frequency="false"] span.frequency-group-item:nth-child(n + 4) {
+  display: none;
+}
+
+[data-average-frequency="false"]
+  [data-section-type="frequencies"]:active
+  span.frequency-group-item:nth-child(n + 4):not([data-details="Average"]) {
+  display: inline-block;
+}
+
+/* Frequency Dictionary Colors */
+/* — Warm Browns & Tans — */
+.frequency-group-item[data-details^="JPDB"] {
+  --tag-frequency-background-color: #996633;
+}
+
+.frequency-group-item[data-details*="JPDBv2"] {
+  --tag-frequency-background-color: #a6933f;
+}
+
+.frequency-group-item[data-details="Youtube"] {
+  --tag-frequency-background-color: #8b6e50;
+}
+
+.frequency-group-item[data-details*="Netflix"] {
+  --tag-frequency-background-color: #6b5b45;
+}
+
+/* — Golden Tones — */
+.frequency-group-item[data-details*="Narou"] {
+  --tag-frequency-background-color: #c9a877;
+}
+
+/* — Reddish Browns — */
+.frequency-group-item[data-details*="Anime & J-drama"] {
+  --tag-frequency-background-color: #a6755c;
+}
+
+.frequency-group-item[data-details*="VN Freq"] {
+  --tag-frequency-background-color: #9b6b5c;
+}
+
+.frequency-group-item[data-details*="jpDicts"] {
+  --tag-frequency-background-color: #a6755c;
+}
+
+/* — Magentas to Warm Purples — */
+.frequency-group-item[data-details^="Innocent"] {
+  --tag-frequency-background-color: #996633;
+}
+
+.frequency-group-item[data-details*="Innocent Corpus Kanji"] {
+  --tag-frequency-background-color: #8b6e50;
+}
+
+.frequency-group-item[data-details="Novels"] {
+  --tag-frequency-background-color: #a6755c;
+}
+
+/* — Muted Purples — */
+.frequency-group-item[data-details*="NonFiction"] {
+  --tag-frequency-background-color: #8b6e50;
+}
+
+.frequency-group-item[data-details^="BCCWJ"] {
+  --tag-frequency-background-color: #7a6d5f;
+}
+
+.frequency-group-item[data-details*="BCCWJ-LUW"] {
+  --tag-frequency-background-color: #6b5b45;
+}
+
+.frequency-group-item[data-details*="BCCWJ2"] {
+  --tag-frequency-background-color: #5d4e3f;
+}
+
+/* — Muted Blues & Taupes — */
+.frequency-group-item[data-details="CC100"] {
+  --tag-frequency-background-color: #6b5b45;
+}
+
+.frequency-group-item[data-details="Conversation Corpus"] {
+  --tag-frequency-background-color: #5d4e3f;
+}
+
+.frequency-group-item[data-details^="Jiten"] {
+  --tag-frequency-background-color: #7a6d5f;
+}
+
+.frequency-group-item[data-details*="Jitendex"] {
+  --tag-frequency-background-color: #8b6e50;
+}
+
+.frequency-group-item[data-details^="Wikipedia"] {
+  --tag-frequency-background-color: #996633;
+}
+
+.frequency-group-item[data-details*="Wikipedia Kanji"] {
+  --tag-frequency-background-color: #a6933f;
+}
+
+/* — Light Taupes — */
+.frequency-group-item[data-details^="青空文庫"] {
+  --tag-frequency-background-color: #b8a090;
+}
+
+/* — Grays — */
+.frequency-group-item[data-details*="NieR"] {
+  --tag-frequency-background-color: #7a6d5f;
+}
+
+
+/* Inflections & Toggles */
+.toggle > input[type="checkbox"]:checked + .toggle-body > .toggle-track {
+  background: var(--toggle-track-color);
+}
+
+/* Inflections Hover */
+.inflection-rule-chains {
+  display: inline-block;
+  position: relative;
+}
+
+.inflection-source-icon,
+.inflection-rule-chains:not(:empty) li {
+  display: none;
+}
+
+.inflection-rule-chains:not(:empty)::before {
+  content: "🅸";
+  cursor: help;
+  color: gray;
+}
+
+.inflection-rule-chains:not(:empty):hover li {
+  display: block;
+}
+
+.inflection-rule-chain:nth-last-of-type(1) {
+  margin-bottom: 0.2em;
+}
+
+/* Hide popular/frequent tags */
+[data-category="popular"],
+[data-category="frequent"] {
+  display: none;
+}
+
+/* Jitendex Settings */
+[data-glossary-layout-mode="default"]
+  [data-sc-content="glossary"]
+  li:not(:last-child)::after {
+  color: var(--jitendex-separators) !important;
+}
+
+[data-dictionary*="Jitendex.org"] li[data-sc-content="sense-group"],
+[data-dictionary*="Jitendex.org"] li[data-sc-content="forms"],
+[data-dictionary*="Jitendex.org"] li[data-sc-content="sense"],
+[data-dictionary*="Jitendex.org"] ul[data-sc-content="glossary"] {
+  padding-left: 0 !important;
+}
+
+[data-dictionary*="Jitendex.org"] span[data-sc-class="tag"] {
+  margin-right: 0.25em !important;
+}
+
+.definition-item[data-dictionary*="Jitendex"]
+  *[data-sc-content="example-sentence-a"] {
+  font-size: 1em !important;
+}
+
+[data-glossary-layout-mode="default"] [data-sc-content="glossary"] {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+}
+
+[data-glossary-layout-mode="default"]
+  [data-sc-content="glossary"]
+  li:not(:last-child)::after {
+  content: "|";
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 8px;
+}
+
+/* Jitendex Example Sentences & Keywords */
+span[data-sc-content="example-keyword"] {
+  color: var(--example-keyword) !important;
+  text-decoration: none !important;
+}
+
+[data-sc-content|="example-sentence"] {
+  opacity: 0.5;
+  display: block;
+}
+
+[data-dictionary*="Jitendex.org"] [data-sc-content|="example-sentence"]:hover {
+  border-left-color: var(--dict-color);
+}
+
+[data-sc-content|="example-sentence"]:hover {
+  opacity: 1;
+  display: block;
+}
+
+[data-sc-content="example-sentence-a"] {
+  transition: opacity 0.12s ease;
+}
+
+[data-sc-content="example-sentence-b"] {
+  opacity: 0;
+  display: none;
+  transition: opacity 0.12s ease;
+  overflow: hidden;
+}
+
+[data-sc-content="example-sentence-a"]:hover
+  + [data-sc-content="example-sentence-b"] {
+  opacity: 1;
+  display: block;
+}
+
+[data-sc-content="example-sentence-b"]:hover
+  [data-sc-content|="example-sentence"] {
+  opacity: 1;
+}
+
+[data-sc-content="example-sentence"] rt {
+  opacity: 0;
+  transition: opacity ease 0.12s;
+}
+
+[data-sc-content="example-sentence"]:hover rt {
+  opacity: 1;
+}
+
+/* Jitendex Hidden & Faded Elements */
+[data-sc-content="forms"],
+div[data-sc-content="attribution"] {
+  display: none;
+}
+
+[data-sc-content="antonym"],
+[data-sc-content="sense-note"],
+[data-sc-content="xref"] {
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+
+[data-sc-content="antonym"]:hover,
+[data-sc-content="sense-note"]:hover,
+[data-sc-content="xref"]:hover {
+  opacity: 1;
+}
+
+/* Pixiv Settings */
+[data-sc-pixiv="children"],
+[data-sc-pixiv="related-tags"],
+[data-sc-pixiv="continue-reading"],
+[data-sc-pixiv="nav-header"] {
+  display: none;
+}
+
+/* Dictionary Colorizer */
+.definition-item {
+  background-color: color-mix(
+    in srgb,
+    var(--dict-color) calc(var(--dict-bg-opacity) * var(--dict-color-opacity)),
+    var(--background-color)
+  );
+  --tag-dictionary-background-color: var(--dict-color);
+}
+
+/* Hide dictionary version date */
+.tag[title^="Jitendex"] .tag-label-content {
+  font-size: 0;
+}
+
+.tag[title^="Jitendex"] .tag-label-content::after {
+  content: "Jitendex";
+  font-size: 0.885rem;
+}
+
+
+
+/* --- DICTIONARY THEMES --- */
+
+/* ── JMdict family · Dusty Slate Blue ── */
+.definition-item[data-dictionary^="JMdict"],
+.tag[data-category][data-details^="JMdict"] { --dict-color: #6d8494; --tag-color: #6d8494; }
+.definition-item[data-dictionary^="JMDict"],
+.tag[data-category][data-details^="JMDict"] { --dict-color: #5e7282; --tag-color: #5e7282; }
+.definition-item[data-dictionary^="JMdict Forms"],
+.tag[data-category][data-details^="JMdict Forms"] { --dict-color: #7a8fa0; --tag-color: #7a8fa0; }
+.definition-item[data-dictionary*="JMnedict"],
+.tag[data-category][data-details*="JMnedict"] { --dict-color: #5c7080; --tag-color: #5c7080; }
+
+/* ── Jitendex · Warm Ink Blue ── */
+.definition-item[data-dictionary*="Jitendex.org"],
+.definition-item[data-dictionary^="Jitendex"],
+.tag[data-category][data-details*="Jitendex"] { --dict-color: #647d8e; --tag-color: #647d8e; }
+
+/* ── NHK / Pitch ── */
+.definition-item[data-dictionary*="NHK"],
+.tag[data-category][data-details*="NHK"] { --dict-color: #5c7080; --tag-color: #5c7080; }
+.definition-item[data-dictionary*="Kansai Pitch Accent"],
+.tag[data-category][data-details*="Kansai Pitch Accent"] { --dict-color: #6b6b90; --tag-color: #6b6b90; }
+
+/* ── Large Monolingual · Terracotta / Brick ── */
+.definition-item[data-dictionary*="大辞泉"],
+.tag[data-category][data-details*="大辞泉"] { --dict-color: #a05848; --tag-color: #a05848; }
+.definition-item[data-dictionary*="デジタル大辞泉"],
+.tag[data-category][data-details*="デジタル大辞泉"] { --dict-color: #9b4e42; --tag-color: #9b4e42; }
+.definition-item[data-dictionary*="新明解国語辞典"],
+.definition-item[data-dictionary^="新明解"],
+.tag[data-category][data-details*="新明解国語辞典"] { --dict-color: #9b4e42; --tag-color: #9b4e42; }
+.definition-item[data-dictionary*="大辞林"],
+.tag[data-category][data-details*="大辞林"] { --dict-color: #966060; --tag-color: #966060; }
+.definition-item[data-dictionary*="広辞苑"],
+.tag[data-category][data-details*="広辞苑"] { --dict-color: #a67c2a; --tag-color: #a67c2a; }
+.definition-item[data-dictionary*="精選版　日本国語大辞典"],
+.tag[data-category][data-details*="精選版　日本国語大辞典"] { --dict-color: #7a7248; --tag-color: #7a7248; }
+.definition-item[data-dictionary*="ハイブリッド新辞林"],
+.tag[data-category][data-details*="ハイブリッド新辞林"] { --dict-color: #8b6860; --tag-color: #8b6860; }
+
+/* ── Mid Monolingual · Dusty Mauve / Rose ── */
+.definition-item[data-dictionary*="明鏡国語辞典　第二版"],
+.tag[data-category][data-details*="明鏡国語辞典　第二版"] { --dict-color: #8b7090; --tag-color: #8b7090; }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"],
+.tag[data-category][data-details*="明鏡国語辞典 第三版"] { --dict-color: #8b7090; --tag-color: #8b7090; }
+.definition-item[data-dictionary*="新選国語辞典"],
+.tag[data-category][data-details*="新選国語辞典"] { --dict-color: #9b6b72; --tag-color: #9b6b72; }
+.definition-item[data-dictionary*="旺文社国語辞典"],
+.tag[data-category][data-details*="旺文社国語辞典"] { --dict-color: #7a7090; --tag-color: #7a7090; }
+
+/* ── Sage Monolingual · Sage Green ── */
+.definition-item[data-dictionary*="岩波国語辞典"],
+.tag[data-category][data-details*="岩波国語辞典"] { --dict-color: #6b7c5a; --tag-color: #6b7c5a; }
+.definition-item[data-dictionary*="現代国語例解辞典"],
+.tag[data-category][data-details*="現代国語例解辞典"] { --dict-color: #6b7c5a; --tag-color: #6b7c5a; }
+.definition-item[data-dictionary*="現代新国語辞典 第七版"],
+.tag[data-category][data-details*="現代新国語辞典 第七版"] { --dict-color: #6b7c5a; --tag-color: #6b7c5a; --dict-bg-opacity: 0.06; }
+
+/* ── Warm Amber Monolingual ── */
+.definition-item[data-dictionary*="三省堂国語辞典"],
+.tag[data-category][data-details*="三省堂国語辞典"] { --dict-color: #a67c42; --tag-color: #a67c42; }
+.definition-item[data-dictionary*="例解学習国語辞典"],
+.tag[data-category][data-details*="例解学習国語辞典"] { --dict-color: #b09040; --tag-color: #b09040; }
+.definition-item[data-dictionary*="使い方の分かる 類語例解辞典"],
+.tag[data-category][data-details*="使い方の分かる 類語例解辞典"] { --dict-color: #a08040; --tag-color: #a08040; }
+.definition-item[data-dictionary*="実用日本語表現辞典"],
+.tag[data-category][data-details*="実用日本語表現辞典"] { --dict-color: #9b9060; --tag-color: #9b9060; }
+
+/* ── Grammar / JLPT · Warm Teal ── */
+.definition-item[data-dictionary="JLPT"],
+.definition-item[data-dictionary^="JLPT rev"],
+.tag[data-category][data-details="JLPT"],
+.tag[data-category][data-details^="JLPT rev"] { --dict-color: #5a7d78; --tag-color: #5a7d78; }
+.definition-item[data-dictionary*="JLPT文法解説まとめ"],
+.tag[data-category][data-details*="JLPT文法解説まとめ"] { --dict-color: #5a7d78; --tag-color: #5a7d78; }
+.definition-item[data-dictionary*="Bunpro Dictionary"],
+.tag[data-category][data-details*="Bunpro Dictionary"] { --dict-color: #5a7878; --tag-color: #5a7878; }
+.definition-item[data-dictionary*="どんなときどう使う 日本語表現文型辞典"],
+.tag[data-category][data-details*="どんなときどう使う 日本語表現文型辞典"] { --dict-color: #5a8078; --tag-color: #5a8078; }
+.definition-item[data-dictionary*="日本語文法辞典"],
+.tag[data-category][data-details*="日本語文法辞典"] { --dict-color: #607878; --tag-color: #607878; }
+.definition-item[data-dictionary*="日本語文型辞典"],
+.tag[data-category][data-details*="日本語文型辞典"] { --dict-color: #5a7070; --tag-color: #5a7070; }
+.definition-item[data-dictionary*="All About Particles"],
+.tag[data-category][data-details*="All About Particles"] { --dict-color: #6b8878; --tag-color: #6b8878; }
+
+/* ── Wikipedia / Reference · Cool Slate ── */
+.definition-item[data-dictionary*="Wikipedia Kanji"],
+.tag[data-category][data-details*="Wikipedia Kanji"] { --dict-color: #7a8fa0; --tag-color: #7a8fa0; }
+.definition-item[data-dictionary*="Wikipedia"],
+.tag[data-category][data-details*="Wikipedia"] { --dict-color: #7088a0; --tag-color: #7088a0; }
+.definition-item[data-dictionary*="Jiten"],
+.tag[data-category][data-details*="Jiten"] { --dict-color: #6b7890; --tag-color: #6b7890; }
+
+/* ── Frequency Corpora · Dusty Indigo ── */
+.definition-item[data-dictionary*="JPDBv2"],
+.tag[data-category][data-details*="JPDBv2"] { --dict-color: #7a6b90; --tag-color: #7a6b90; }
+.definition-item[data-dictionary*="NonFiction"],
+.tag[data-category][data-details*="NonFiction"] { --dict-color: #706888; --tag-color: #706888; }
+.definition-item[data-dictionary*="Novels"],
+.tag[data-category][data-details*="Novels"] { --dict-color: #806090; --tag-color: #806090; }
+.definition-item[data-dictionary*="BCCWJ-LUW"],
+.tag[data-category][data-details*="BCCWJ-LUW"] { --dict-color: #6b6880; --tag-color: #6b6880; }
+.definition-item[data-dictionary*="BCCWJ2"],
+.tag[data-category][data-details*="BCCWJ2"] { --dict-color: #626078; --tag-color: #626078; }
+.definition-item[data-dictionary*="CC100"],
+.tag[data-category][data-details*="CC100"] { --dict-color: #686890; --tag-color: #686890; }
+.definition-item[data-dictionary*="Narou"],
+.tag[data-category][data-details*="Narou"] { --dict-color: #9b7860; --tag-color: #9b7860; }
+.definition-item[data-dictionary*="Netflix"],
+.tag[data-category][data-details*="Netflix"] { --dict-color: #9b5050; --tag-color: #9b5050; }
+.definition-item[data-dictionary*="Youtube"],
+.tag[data-category][data-details*="Youtube"] { --dict-color: #9b5848; --tag-color: #9b5848; }
+.definition-item[data-dictionary*="VN Freq"],
+.tag[data-category][data-details*="VN Freq"] { --dict-color: #8b6880; --tag-color: #8b6880; }
+.definition-item[data-dictionary*="Anime & J-drama"],
+.tag[data-category][data-details*="Anime & J-drama"] { --dict-color: #906070; --tag-color: #906070; }
+.definition-item[data-dictionary*="NieR"],
+.tag[data-category][data-details*="NieR"] { --dict-color: #7a7880; --tag-color: #7a7880; }
+.definition-item[data-dictionary*="jpDicts"],
+.tag[data-category][data-details*="jpDicts"] { --dict-color: #906878; --tag-color: #906878; }
+
+/* ── Kanji Dicts · Warm Sienna ── */
+.definition-item[data-dictionary^="KANJIDIC"],
+.tag[data-category][data-details^="KANJIDIC"] { --dict-color: #8b6040; --tag-color: #8b6040; }
+.definition-item[data-dictionary="漢字源"],
+.tag[data-category][data-details="漢字源"] { --dict-color: #9b6840; --tag-color: #9b6840; }
+.definition-item[data-dictionary*="角川新字源"],
+.tag[data-category][data-details*="角川新字源"] { --dict-color: #8b5838; --tag-color: #8b5838; }
+.definition-item[data-dictionary*="漢検四字熟語辞典"],
+.definition-item[data-dictionary^="漢検漢字辞典"],
+.tag[data-category][data-details*="漢検四字熟語辞典"],
+.tag[data-category][data-details^="漢検漢字辞典"] { --dict-color: #a07038; --tag-color: #a07038; }
+.definition-item[data-dictionary*="JPDB Kanji"],
+.tag[data-category][data-details*="JPDB Kanji"] { --dict-color: #9b6048; --tag-color: #9b6048; }
+.definition-item[data-dictionary*="TheKanjiMap Kanji Radicals/Composition"],
+.tag[data-category][data-details*="TheKanjiMap Kanji Radicals/Composition"] { --dict-color: #7a7848; --tag-color: #7a7848; }
+.definition-item[data-dictionary*="Innocent Corpus Kanji"],
+.tag[data-category][data-details*="Innocent Corpus Kanji"] { --dict-color: #906040; --tag-color: #906040; }
+.definition-item[data-dictionary*="漢字ペディア同訓異義"],
+.tag[data-category][data-details*="漢字ペディア同訓異義"] { --dict-color: #7a7870; --tag-color: #7a7870; }
+.definition-item[data-dictionary*="漢字でGo"],
+.tag[data-category][data-details*="漢字でGo"] { --dict-color: #a07840; --tag-color: #a07840; }
+
+/* ── Proverb / Four-character ── */
+.definition-item[data-dictionary*="四字熟語の百科事典"],
+.tag[data-category][data-details*="四字熟語の百科事典"] { --dict-color: #8b7848; --tag-color: #8b7848; }
+.definition-item[data-dictionary*="ことわざ・慣用句の百科事典"],
+.tag[data-category][data-details*="ことわざ・慣用句の百科事典"] { --dict-color: #9b7858; --tag-color: #9b7858; }
+.definition-item[data-dictionary*="Proverb Encyclopedia"],
+.tag[data-category][data-details*="Proverb Encyclopedia"] { --dict-color: #9b8058; --tag-color: #9b8058; }
+.definition-item[data-dictionary*="新明解四字熟語辞典"],
+.tag[data-category][data-details*="新明解四字熟語辞典"] { --dict-color: #a07050; --tag-color: #a07050; }
+.definition-item[data-dictionary*="学研 四字熟語辞典"],
+.tag[data-category][data-details*="学研 四字熟語辞典"] { --dict-color: #8b8050; --tag-color: #8b8050; }
+.definition-item[data-dictionary*="四字熟語辞典オンライン"],
+.tag[data-category][data-details*="四字熟語辞典オンライン"] { --dict-color: #a09050; --tag-color: #a09050; }
+
+/* ── Online Dictionaries · Warm Gold ── */
+.definition-item[data-dictionary*="故事・ことわざ・慣用句オンライン"],
+.tag[data-category][data-details*="故事・ことわざ・慣用句オンライン"] { --dict-color: #a08850; --tag-color: #a08850; }
+.definition-item[data-dictionary*="類語辞典オンライン"],
+.tag[data-category][data-details*="類語辞典オンライン"] { --dict-color: #9b8848; --tag-color: #9b8848; }
+.definition-item[data-dictionary*="対義語辞典オンライン"],
+.tag[data-category][data-details*="対義語辞典オンライン"] { --dict-color: #9b8040; --tag-color: #9b8040; }
+.definition-item[data-dictionary*="国語辞典オンライン"],
+.tag[data-category][data-details*="国語辞典オンライン"] { --dict-color: #a09058; --tag-color: #a09058; }
+.definition-item[data-dictionary*="語源由来辞典"],
+.tag[data-category][data-details*="語源由来辞典"] { --dict-color: #a08038; --tag-color: #a08038; }
+.definition-item[data-dictionary*="違い・語源辞典オンライン"],
+.tag[data-category][data-details*="違い・語源辞典オンライン"] { --dict-color: #9b7840; --tag-color: #9b7840; }
+.definition-item[data-dictionary*="違いがわかる事典 (Chigai Dictionary)"],
+.tag[data-category][data-details*="違いがわかる事典 (Chigai Dictionary)"] { --dict-color: #9b7048; --tag-color: #9b7048; }
+.definition-item[data-dictionary*="違いがわかる事典 (chigai.site)"],
+.tag[data-category][data-details*="違いがわかる事典 (chigai.site)"] { --dict-color: #906848; --tag-color: #906848; }
+.definition-item[data-dictionary*="新語時事用語辞典"],
+.tag[data-category][data-details*="新語時事用語辞典"] { --dict-color: #7a8878; --tag-color: #7a8878; }
+
+/* ── Olive / Nature ── */
+.definition-item[data-dictionary*="Koohii Kanji Stories"],
+.tag[data-category][data-details*="Koohii Kanji Stories"] { --dict-color: #7a7040; --tag-color: #7a7040; }
+.definition-item[data-dictionary*="複合語起源"],
+.tag[data-category][data-details*="複合語起源"] { --dict-color: #8b8040; --tag-color: #8b8040; }
+.definition-item[data-dictionary*="青空文庫熟語"],
+.tag[data-category][data-details*="青空文庫熟語"] { --dict-color: #7a8860; --tag-color: #7a8860; }
+.definition-item[data-dictionary*="TMW Club v2"],
+.tag[data-category][data-details*="TMW Club v2"] { --dict-color: #6b8868; --tag-color: #6b8868; }
+.definition-item[data-dictionary*="津軽弁辞典"],
+.tag[data-category][data-details*="津軽弁辞典"] { --dict-color: #7a8068; --tag-color: #7a8068; }
+.definition-item[data-dictionary*="Namegen"],
+.tag[data-category][data-details*="Namegen"] { --dict-color: #7a7858; --tag-color: #7a7858; }
+.definition-item[data-dictionary*="全国方言辞典"],
+.tag[data-category][data-details*="全国方言辞典"] { --dict-color: #7a7858; --tag-color: #7a7858; }
+.definition-item[data-dictionary*="全市区町村辞典"],
+.tag[data-category][data-details*="全市区町村辞典"] { --dict-color: #6b8870; --tag-color: #6b8870; }
+.definition-item[data-dictionary*="用例.jp"],
+.tag[data-category][data-details*="用例.jp"] { --dict-color: #7a8060; --tag-color: #7a8060; }
+
+/* ── Onomatopoeia · Muted Teal ── */
+.definition-item[data-dictionary*="Onomatoproject"],
+.tag[data-category][data-details*="Onomatoproject"] { --dict-color: #5a7878; --tag-color: #5a7878; }
+.definition-item[data-dictionary*="surasura 擬声語"],
+.tag[data-category][data-details*="surasura 擬声語"] { --dict-color: #507070; --tag-color: #507070; }
+.definition-item[data-dictionary*="OnoMangaStrip"],
+.tag[data-category][data-details*="OnoMangaStrip"] { --dict-color: #906870; --tag-color: #906870; }
+
+/* ── Illustrated / Visual ── */
+.definition-item[data-dictionary*="絵でわかる日本語"],
+.tag[data-category][data-details*="絵でわかる日本語"] { --dict-color: #906878; --tag-color: #906878; }
+.definition-item[data-dictionary*="絵でわかる慣用句"],
+.tag[data-category][data-details*="絵でわかる慣用句"] { --dict-color: #886070; --tag-color: #886070; }
+.definition-item[data-dictionary*="形容詞・動詞図鑑"],
+.tag[data-category][data-details*="形容詞・動詞図鑑"] { --dict-color: #7a7090; --tag-color: #7a7090; }
+
+/* ── Bilingual / Waei ── */
+.definition-item[data-dictionary*="新和英大辞典"],
+.definition-item[data-dictionary="新和英"],
+.tag[data-category][data-details*="新和英"] { --dict-color: #6b8870; --tag-color: #6b8870; }
+.definition-item[data-dictionary*="Counters & Suffixes"],
+.tag[data-category][data-details*="Counters & Suffixes"] { --dict-color: #7a8870; --tag-color: #7a8870; }
+
+/* ── Slang / Modern ── */
+.definition-item[data-dictionary*="日本語俗語辞書"],
+.tag[data-category][data-details*="日本語俗語辞書"] { --dict-color: #906878; --tag-color: #906878; }
+.definition-item[data-dictionary*="ネット用語辞典"],
+.tag[data-category][data-details*="ネット用語辞典"] { --dict-color: #7a6880; --tag-color: #7a6880; }
+.definition-item[data-dictionary*="Living Japanese Slang Dictionary"],
+.tag[data-category][data-details*="Living Japanese Slang Dictionary"] { --dict-color: #886070; --tag-color: #886070; }
+.definition-item[data-dictionary*="毎日のんびり日本語教師"],
+.tag[data-category][data-details*="毎日のんびり日本語教師"] { --dict-color: #906870; --tag-color: #906870; }
+
+/* ── Pixiv / Web ── */
+.definition-item[data-dictionary*="Nico/Pixiv"],
+.tag[data-category][data-details*="Nico/Pixiv"] { --dict-color: #6b7890; --tag-color: #6b7890; }
+.definition-item[data-dictionary*="Pixiv"],
+.tag[data-category][data-details*="Pixiv"] { --dict-color: #7080a0; --tag-color: #7080a0; }
+.definition-item[data-dictionary*="Weblio大阪弁"],
+.tag[data-category][data-details*="Weblio大阪弁"] { --dict-color: #6b8090; --tag-color: #6b8090; }
+.definition-item[data-dictionary*="IMIDASの日本語辞典"],
+.tag[data-category][data-details*="IMIDASの日本語辞典"] { --dict-color: #6b7890; --tag-color: #6b7890; }
+
+/* ── Misc ── */
+.definition-item[data-dictionary*="TISMKANJI"],
+.tag[data-category][data-details*="TISMKANJI"] { --dict-color: #8b7848; --tag-color: #8b7848; }
+.definition-item[data-dictionary*="コツ"],
+.tag[data-category][data-details*="コツ"] { --dict-color: #a08858; --tag-color: #a08858; }
+
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] {
+  font-family: "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "HiraMinProN-W3", "MS Mincho", serif;
+  .gloss-sc-span[data-sc-class="gaiji"] .gloss-image { -webkit-filter: invert(90%); filter: invert(90%); }
+  .gloss-sc-span[data-sc-zoomkanji] { background-color: #533e48; }
+  .gloss-sc-div[data-sc-class="shikiri"] { background-color: rgb(155, 88, 86); }
+  .gloss-sc-span[data-sc-fbox][data-sc-class="使い方"] { background-color: rgb(204, 51, 51); border-color: rgb(182, 62, 56); }
+  .gloss-sc-span[data-sc-column], .gloss-sc-div[data-sc-column] { border-left: solid 5px rgb(79, 48, 46); border-right: solid 5px rgb(79, 48, 46); }
+  .gloss-sc-div[data-sc-class="hinkaku"] { background-color: rgb(155, 88, 86); }
+  .gloss-sc-span[data-sc-fbox][data-sc-class="品格"] { background-color: rgb(204, 51, 51); border-color: rgb(182, 62, 56); }
+}
+
+[data-dictionary="NEW斎藤和英大辞典"] ul.gloss-sc-ul > li:nth-child(n + 5) { display: none; }
+
+
+
+/* Format Buttons */
+.action-button-container
+  ~ .action-button-container
+  .action-button[data-action="view-note"] {
+  display: none;
+}
+
+.action-button-container[data-card-format-index="1"]
+  .action-icon[data-icon="overwrite-big-circle"] {
+  filter: hue-rotate(180deg);
+}
+
+/* Hide Tag List */
+.headword-list-tag-list.tag-list {
+  display: none !important;
+}
+
+
+.definition-item[data-dictionary='明鏡国語辞典 第三版'] {
+    /* Disable furigana */
+    .gloss-sc-ruby[data-sc-class="full"] .gloss-sc-rt[data-sc-rt] {
+        display: none;
+    }
+
+    /* Show the 類語 section */
+    div[data-sc-ruigo_items] {
+        display: block;
+    }
+
+    [data-sc-body],
+    span[data-sc-rect],
+    span[data-sc-katsuyo],
+    span[data-sc-headword][data-sc-class="旧かな"],
+    span[data-sc-fbox0],
+    span[data-sc-fbox],
+    span[data-sc-e-m],
+    span[data-sc-em],
+    div[data-sc-class="shikiri"] div[data-sc-meaning],
+    span[data-sc-meaning][data-sc-class="columntitle"],
+    div[data-sc-meaning][data-sc-class="columntitle"],
+    span[data-sc-b],
+    a,
+    span[data-sc-bc]  {
+        font-family: "Hiragino Mincho ProN";
+    }
+
+    div[data-sc-example],
+    span[data-sc-fbox][data-sc-class="品格"],
+    span[data-sc-headword][data-sc-class="表記"],
+    span[data-sc-headword][data-sc-class="原綴"],
+    span[data-sc-zoomkanji] {
+        font-family: "Hiragino Mincho ProN";
+    }
+
+    span[data-sc-pron] {
+        font-family: "Hiragino Mincho ProN";
+    }
+}
