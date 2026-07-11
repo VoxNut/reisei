@@ -30,7 +30,7 @@
   /* CARD SETTINGS - Default States (true/false)
   ============================================ */
   /* General */
-  --theme-mode: nord; /* "nord", "focus", or "cyberpunk" */
+  --theme-mode: nord; /* "nord" or "focus" */
   --enable-animations: false; /* Enable transition animations */
 
   /* Front
@@ -254,107 +254,106 @@
 
   /* COLOR PALETTE
   ============================================ */
-  /* Canonical editable palette for Nord (native light/dark) and Focus.
+  /* Canonical editable palette for Nord (native light/dark).
      Keep these as the first declarations of each setting variable: the
-     settings panel intentionally updates only this block. Cyberpunk owns its
-     separate data-senren-theme block below. */
+     settings panel intentionally updates only this block. */
   /* Light Theme
   -------------------------------------------- */
   /* Text Colors */
-  --text-light: #020202;
-  --light-devoiced-color: RoyalBlue;
-  --light-highlight: #E20033;
-  --freq-text-light: rgba(105, 105, 105, 0.3);
-  --freq-text-hover-light: rgba(0, 0, 0, 1);
-  --tag-color-light: rgba(105, 105, 105, 0.26);
-  --tag-color-hover-light: rgba(255, 255, 255, 1);
-  --misc-info-text-light: rgba(105, 105, 105, 0.26);
-  --misc-info-text-hover-light: rgba(255, 255, 255, 1);
+  --text-light: #2e3440;
+  --light-devoiced-color: #5e81ac;
+  --light-highlight: #5e81ac;
+  --freq-text-light: rgba(59, 66, 82, 0.55);
+  --freq-text-hover-light: #2e3440;
+  --tag-color-light: #4c566a;
+  --tag-color-hover-light: #2e3440;
+  --misc-info-text-light: #4c566a;
+  --misc-info-text-hover-light: #2e3440;
 
   /* Pitch Colors */
-  --pitch-red-light: #D62839;
-  --pitch-blue-light: #3474FF;
-  --pitch-orange-light: #FF6E03;
-  --pitch-green-light: #2BAF7E;
-  --pitch-purple-light: #8A5EDE;
+  --pitch-red-light: #bf616a;
+  --pitch-blue-light: #5e81ac;
+  --pitch-orange-light: #d08770;
+  --pitch-green-light: #a3be8c;
+  --pitch-purple-light: #b48ead;
 
   /* Icon Colors */
-  --svg-color-light: rgba(105, 105, 105, 0.3);
-  --svg-hover-light: rgba(255, 255, 255, 1);
+  --svg-color-light: #4c566a;
+  --svg-hover-light: #2e3440;
 
   /* Background Colors */
-  --background-light: #f5f5f5;
-  --card-bg-light: rgba(255, 255, 255, 0.4);
-  --card-shadow-light: rgba(0, 0, 0, 0.05);
-  --word-bg-light: rgba(0, 0, 0, 0.03);
-  --pitch-position-bg-light: rgba(255, 255, 255, 0.8);
-  --picture-bg-light: rgba(0, 0, 0, 0.03);
-  --notes-bg-light: rgba(0, 0, 0, 0.03);
-  --definition-bg-light: rgba(0, 0, 0, 0.03);
+  --background-light: #eceff4;
+  --card-bg-light: #e5e9f0;
+  --card-shadow-light: rgba(46, 52, 64, 0.18);
+  --word-bg-light: #e5e9f0;
+  --pitch-position-bg-light: #d8dee9;
+  --picture-bg-light: #e5e9f0;
+  --notes-bg-light: #e5e9f0;
+  --definition-bg-light: #e5e9f0;
   --dictionary-collapse-fade-light: linear-gradient(
     to bottom,
-    rgba(245, 245, 245, 0),
-    rgba(245, 245, 245, 0.9)
+    rgba(229, 233, 240, 0),
+    rgba(229, 233, 240, 0.96)
   );
-  --buttons-bg-light: rgba(0, 0, 0, 0.03);
-  --buttons-bg-hover-light: rgba(0, 0, 0, 0.63);
-  --lightbox-bg-light: rgba(0, 0, 0, 0.8);
-  --frequency-bg-light: rgba(255, 255, 255, 0.8);
-  --tag-bg-light: rgba(0, 0, 0, 0.03);
-  --tag-bg-hover-light: rgba(0, 0, 0, 0.63);
-  --external-links-bg-light: rgba(0, 0, 0, 0.1);
-  --external-links-bg-hover-light: rgba(255, 255, 255, 0.4);
-  --misc-info-bg-light: rgba(0, 0, 0, 0.03);
-  --misc-info-bg-hover-light: rgba(0, 0, 0, 0.63);
+  --buttons-bg-light: #e5e9f0;
+  --buttons-bg-hover-light: #d8dee9;
+  --lightbox-bg-light: rgba(46, 52, 64, 0.92);
+  --frequency-bg-light: #e5e9f0;
+  --tag-bg-light: #d8dee9;
+  --tag-bg-hover-light: #e5e9f0;
+  --external-links-bg-light: #d8dee9;
+  --external-links-bg-hover-light: #e5e9f0;
+  --misc-info-bg-light: #e5e9f0;
+  --misc-info-bg-hover-light: #d8dee9;
 
   /* Dark Theme
   -------------------------------------------- */
   /* Text Colors */
-  --text: #fcfcfc;
-  --dark-devoiced-color: cornflowerBlue;
-  --dark-highlight: #fcff61;
-  --freq-text: rgba(255, 255, 255, 0.2);
-  --freq-text-hover: rgba(255, 255, 255, 1);
-  --tag-color: rgba(255, 255, 255, 0.21);
-  --tag-color-hover: rgba(255, 255, 255, 1);
-  --misc-info-text: rgba(255, 255, 255, 0.21);
-  --misc-info-text-hover: rgba(255, 255, 255, 1);
+  --text: #eceff4;
+  --dark-devoiced-color: #81a1c1;
+  --dark-highlight: #88c0d0;
+  --freq-text: rgba(216, 222, 233, 0.55);
+  --freq-text-hover: #eceff4;
+  --tag-color: #d8dee9;
+  --tag-color-hover: #eceff4;
+  --misc-info-text: #d8dee9;
+  --misc-info-text-hover: #eceff4;
 
   /* Pitch Colors */
-  --pitch-red: #f5436d;
-  --pitch-blue: #39c1ff;
-  --pitch-orange: #fca311;
-  --pitch-green: #40d4a6;
-  --pitch-purple: #afa2ff;
+  --pitch-red: #bf616a;
+  --pitch-blue: #81a1c1;
+  --pitch-orange: #d08770;
+  --pitch-green: #a3be8c;
+  --pitch-purple: #b48ead;
 
   /* Icon Colors */
-  --svg-color: rgba(255, 255, 255, 0.2);
-  --svg-hover: rgba(255, 255, 255, 1);
+  --svg-color: #d8dee9;
+  --svg-hover: #eceff4;
 
   /* Background Colors */
-  --background: #2c2c2c;
-  --card-bg: rgba(0, 0, 0, 0.4);
-  --card-shadow: rgba(0, 0, 0, 0.3);
-  --word-bg: rgba(0, 0, 0, 0.3);
-  --pitch-position-bg: rgba(0, 0, 0, 0.2);
-  --picture-bg: rgba(0, 0, 0, 0.3);
-  --notes-bg: rgba(0, 0, 0, 0.3);
-  --definition-bg: rgba(0, 0, 0, 0.3);
+  --background: #2e3440;
+  --card-bg: #3b4252;
+  --card-shadow: rgba(46, 52, 64, 0.55);
+  --word-bg: #2e3440;
+  --pitch-position-bg: #434c5e;
+  --picture-bg: #2e3440;
+  --notes-bg: #3b4252;
+  --definition-bg: #3b4252;
   --dictionary-collapse-fade: linear-gradient(
     to bottom,
-    rgba(44, 44, 44, 0),
-    rgba(26, 26, 26, 9)
+    rgba(59, 66, 82, 0),
+    rgba(59, 66, 82, 0.96)
   );
-  --buttons-bg: rgba(0, 0, 0, 0.1);
-  --buttons-bg-hover: rgba(0, 0, 0, 0.63);
-  --lightbox-bg: rgba(0, 0, 0, 0.8);
-  --frequency-bg: rgba(0, 0, 0, 0.63);
-  --tag-bg: rgba(0, 0, 0, 0.1);
-  --tag-bg-hover: rgba(0, 0, 0, 0.3);
-  --external-links-bg: rgba(0, 0, 0, 0.4);
-  --external-links-bg-hover: rgba(0, 0, 0, 0.63);
-  --misc-info-bg: rgba(0, 0, 0, 0.1);
-  --misc-info-bg-hover: rgba(0, 0, 0, 0.3);
+  --buttons-bg: #3b4252;
+  --buttons-bg-hover: #434c5e;
+  --lightbox-bg: rgba(46, 52, 64, 0.94);
+  --frequency-bg: #3b4252;
+  --tag-bg: #434c5e;
+  --tag-bg-hover: #4c566a;
+  --external-links-bg: #3b4252;
+  --external-links-bg-hover: #434c5e;
+  --misc-info-bg: #3b4252;
+  --misc-info-bg-hover: #434c5e;
 
   /* DIMENSIONS & SPACING
   ============================================ */
@@ -711,51 +710,52 @@ b {
   list-style: none !important;
 }
 
-/* Focus Theme: muted near-black interface with restrained cool accents. */
+/* Focus Theme: strict monochrome interface. */
 html[data-senren-theme="focus"] {
-  --text: #e5e7eb;
-  --dark-devoiced-color: #64748b;
-  --dark-highlight: #60a5fa;
-  --freq-text: rgba(226, 232, 240, 0.42);
-  --freq-text-hover: #f8fafc;
-  --tag-color: rgba(226, 232, 240, 0.68);
-  --tag-color-hover: #f8fafc;
-  --misc-info-text: rgba(226, 232, 240, 0.62);
-  --misc-info-text-hover: #f8fafc;
+  color-scheme: dark;
+  --text: #ffffff;
+  --dark-devoiced-color: #ffffff;
+  --dark-highlight: #ffffff;
+  --freq-text: rgba(255, 255, 255, 0.55);
+  --freq-text-hover: #ffffff;
+  --tag-color: #ffffff;
+  --tag-color-hover: #ffffff;
+  --misc-info-text: #ffffff;
+  --misc-info-text-hover: #ffffff;
 
-  --pitch-red: #fb7185;
-  --pitch-blue: #38bdf8;
-  --pitch-orange: #fb923c;
-  --pitch-green: #34d399;
-  --pitch-purple: #c084fc;
+  --pitch-red: #ffffff;
+  --pitch-blue: #ffffff;
+  --pitch-orange: #ffffff;
+  --pitch-green: #ffffff;
+  --pitch-purple: #ffffff;
 
-  --svg-color: rgba(226, 232, 240, 0.48);
-  --svg-hover: #f8fafc;
+  --svg-color: #ffffff;
+  --svg-hover: #ffffff;
 
-  --background: #0b0d10;
-  --card-bg: #15191f;
-  --card-shadow: rgba(0, 0, 0, 0.48);
-  --word-bg: #0f1318;
-  --pitch-position-bg: #1b2430;
-  --picture-bg: #0f1318;
-  --notes-bg: #11151b;
-  --definition-bg: #11151b;
+  --background: #000000;
+  --card-bg: #000000;
+  --card-shadow: rgba(255, 255, 255, 0.18);
+  --word-bg: #000000;
+  --pitch-position-bg: #000000;
+  --picture-bg: #000000;
+  --notes-bg: #000000;
+  --definition-bg: #000000;
   --dictionary-collapse-fade: linear-gradient(
     to bottom,
-    rgba(17, 21, 27, 0),
-    rgba(17, 21, 27, 0.96)
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 1)
   );
-  --buttons-bg: #11161d;
-  --buttons-bg-hover: #1f2937;
-  --lightbox-bg: rgba(3, 5, 8, 0.92);
-  --frequency-bg: #151b24;
-  --tag-bg: #151b24;
-  --tag-bg-hover: #263244;
-  --external-links-bg: #11161d;
-  --external-links-bg-hover: #1f2937;
-  --misc-info-bg: #11161d;
-  --misc-info-bg-hover: #1f2937;
-  --button-shadow-dark: 0 3px 12px rgba(0, 0, 0, 0.34);
+  --buttons-bg: #000000;
+  --buttons-bg-hover: #000000;
+  --lightbox-bg: #000000;
+  --frequency-bg: #000000;
+  --tag-bg: #000000;
+  --tag-bg-hover: #000000;
+  --external-links-bg: #000000;
+  --external-links-bg-hover: #000000;
+  --misc-info-bg: #000000;
+  --misc-info-bg-hover: #000000;
+  --button-shadow-dark: 0 0 0 1px #ffffff;
 }
 
 html[data-senren-theme="focus"] body {
@@ -763,128 +763,18 @@ html[data-senren-theme="focus"] body {
   color: var(--text) !important;
 }
 
-/* Cyberpunk Theme */
-html[data-senren-theme="cyberpunk"] {
-  --text: #f1f1f1;
-  --dark-devoiced-color: #00f0ff;
-  --dark-highlight: #fcee0a;            /* Cyberpunk yellow as highlight */
-  --freq-text: #8f8f8f;
-  --freq-text-hover: #fcee0a !important;
-  --tag-color: #d6d6d6;
-  --tag-color-hover: #ffffff;
-  --misc-info-text: #d0d0d0;
-  --misc-info-text-hover: #ffffff;
-
-  --pitch-red: #ff0055;
-  --pitch-blue: #00f0ff;
-  --pitch-orange: #ff9f1c;
-  --pitch-green: #39ff14;
-  --pitch-purple: #bd00ff;
-
-  --svg-color: #00f0ff;
-  --svg-hover: #fcee0a;
-
-  --background: #040405;
-  --card-bg: #09090c;
-  --card-shadow: rgba(255, 0, 85, 0.22);
-  --word-bg: #11131a;
-  --pitch-position-bg: #35003b;
-  --picture-bg: #11131a;
-  --notes-bg: #14161d;
-  --definition-bg: #14161d;
-  --dictionary-collapse-fade: #11131a !important;
-  --buttons-bg: #10141b;
-  --buttons-bg-hover: #fcee0a;
-  --lightbox-bg: #040405;
-  --frequency-bg: #2a0b35;
-  --tag-bg: #2a0b35;
-  --tag-bg-hover: #ff0055 !important;
-  --external-links-bg: #10141b;
-  --external-links-bg-hover: #fcee0a !important;
-  --misc-info-bg: #10141b;
-  --misc-info-bg-hover: #ff0055;
-
-  --button-shadow-dark:
-    0 0 6px rgba(0, 240, 255, 0.24),
-    0 0 12px rgba(255, 0, 85, 0.18) !important;
-  --lightbox-shadow: 0 0 14px rgba(0, 240, 255, 0.24) !important;
+html[data-senren-theme="focus"] :is(.front, .back)::before,
+html[data-senren-theme="focus"]
+  :is(.background-box, .picture-container, .notes-card, .definition-box, .glossary-box) {
+  border-color: #ffffff !important;
+  box-shadow: none !important;
 }
 
-html[data-senren-theme="cyberpunk"] body {
-  color: var(--text) !important;
-  background-color: #040405 !important;
-  background-image: none !important;
-}
-
-html[data-senren-theme="cyberpunk"] :is(.front, .back)::before {
-  border: 1px solid rgba(0, 240, 255, 0.4) !important;
-  border-left: 5px solid #00f0ff !important;
-  border-top: 4px solid #fcee0a !important;
-  box-shadow:
-    0 0 0 1px rgba(252, 238, 10, 0.16),
-    0 0 22px rgba(0, 240, 255, 0.22),
-    -5px -5px 0 #ff0055,
-    5px 5px 0 rgba(252, 238, 10, 0.85),
-    0 22px 44px rgba(0, 0, 0, 0.7) !important;
-  border-radius: 2px !important;
-}
-
-/* Slanted Cyberpunk HUD indicator tab */
-html[data-senren-theme="cyberpunk"] :is(.front, .back)::after {
-  content: "DECK_SYS // N.C.PD_SECURE_LINK" !important;
-  position: absolute !important;
-  top: -12px !important;
-  left: 20px !important;
-  background: #fcee0a !important;
-  color: #000000 !important;
-  font-family: monospace !important;
-  font-weight: 900 !important;
-  font-size: 10px !important;
-  letter-spacing: 1px !important;
-  padding: 2px 8px !important;
-  clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%) !important;
-  z-index: 10 !important;
-  box-shadow: 2px 2px 0px #ff0055 !important;
-}
-
-html[data-senren-theme="cyberpunk"] :is(#word, .highlight, b) {
-  color: #fcee0a !important;
-  text-shadow:
-    0 0 4px rgba(252, 238, 10, 0.4),
-    0 0 12px rgba(0, 240, 255, 0.3) !important;
-}
-
-
-html[data-senren-theme="cyberpunk"] :is(.background-box, .picture-container, .notes-card, .misc-info) {
-  border-color: rgba(0, 240, 255, 0.32) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(252, 238, 10, 0.05),
-    3px 3px 0 rgba(255, 0, 85, 0.16) !important;
-}
-
-html[data-senren-theme="cyberpunk"] :is(.tags, .frequency-box, .pitch-position, .external-links a) {
-  border-radius: 2px !important;
-  box-shadow: 2px 2px 0 rgba(255, 0, 85, 0.22) !important;
-}
-
-html[data-senren-theme="cyberpunk"] .toggle-custom-dark-mode.cyberpunk-mode {
-  color: #ff0055;
-  text-shadow: 0 0 8px rgba(255, 0, 85, 0.55);
-}
-
-html[data-senren-theme="cyberpunk"]
-  .card
-  :is(#wordAudio, #sentenceAudio):hover {
-  background: #00f0ff !important;
-  box-shadow: 0 0 8px #00f0ff !important;
-}
-
-html[data-senren-theme="cyberpunk"]
-  .card
-  :is(#wordAudio, #sentenceAudio):hover
-  .playImage
-  path {
-  fill: #000000 !important;
+html[data-senren-theme="focus"]
+  :is(.definition-box, .glossary-box, .yomitan-glossary)
+  :is(span, div, li, p, a, i, b, em, strong, th, td) {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
 }
 
 /* Audio Hint Toggle */
@@ -5796,176 +5686,90 @@ html[data-senren-theme="nord"] .card.nightMode {
   --weblio-kogo-jiten-color-rgb: var(--weblio-kogo-jiten-color-dark-rgb);
 }
 
-/* 3. Cyberpunk Theme Colors (Vibrant Neon) */
-html[data-senren-theme="cyberpunk"] .card {
-  --selection-text-color: #fcee0a !important;
-  --selection-text-color-rgb: 252, 238, 10 !important;
-  --jmdict-color: #00f0ff !important;
-  --jmdict-color-rgb: 0, 240, 255 !important;
-  --shinmeikai-color: #ff0055 !important;
-  --shinmeikai-color-rgb: 255, 0, 85 !important;
-  --daijirin-color: #ff9f1c !important;
-  --daijirin-color-rgb: 255, 159, 28 !important;
-  --digital-daijisen-color: #ff9f1c !important;
-  --digital-daijisen-color-rgb: 255, 159, 28 !important;
-  --gendai-kokugo-reikai-color: #39ff14 !important;
-  --gendai-kokugo-reikai-color-rgb: 57, 255, 20 !important;
-  --iwanami-kokugo-jiten-color: #39ff14 !important;
-  --iwanami-kokugo-jiten-color-rgb: 57, 255, 20 !important;
-  --koujien-color: #fcee0a !important;
-  --koujien-color-rgb: 252, 238, 10 !important;
-  --meikyo-kokugo-jiten-color: #bd00ff !important;
-  --meikyo-kokugo-jiten-color-rgb: 189, 0, 255 !important;
-  --obunsha-kokugo-jiten-color: #fcee0a !important;
-  --obunsha-kokugo-jiten-color-rgb: 252, 238, 10 !important;
-  --sanseido-kokugo-jiten-color: #bd00ff !important;
-  --sanseido-kokugo-jiten-color-rgb: 189, 0, 255 !important;
-  --shinsen-kokugo-color: #ff0055 !important;
-  --shinsen-kokugo-color-rgb: 255, 0, 85 !important;
-  --seisenban-color: #ff9f1c !important;
-  --seisenban-color-rgb: 255, 159, 28 !important;
-  --hybrid-shin-jirin-color: #ff9f1c !important;
-  --hybrid-shin-jirin-color-rgb: 255, 159, 28 !important;
-  --new-saitou-waei-color: #00f0ff !important;
-  --new-saitou-waei-color-rgb: 0, 240, 255 !important;
-  --shin-waei-color: #00f0ff !important;
-  --shin-waei-color-rgb: 0, 240, 255 !important;
-  --kanjigen-color: #ff9f1c !important;
-  --kanjigen-color-rgb: 255, 159, 28 !important;
-  --kanjipedia-doukun-igi-color: #39ff14 !important;
-  --kanjipedia-doukun-igi-color-rgb: 57, 255, 20 !important;
-  --kanken-kanji-jiten-color: #fcee0a !important;
-  --kanken-kanji-jiten-color-rgb: 252, 238, 10 !important;
-  --gakken-yojijukugo-color: #ff9f1c !important;
-  --gakken-yojijukugo-color-rgb: 255, 159, 28 !important;
-  --gogen-yurai-jiten-color: #fcee0a !important;
-  --gogen-yurai-jiten-color-rgb: 252, 238, 10 !important;
-  --koji-kotowaza-no-jiten-color: #fcee0a !important;
-  --koji-kotowaza-no-jiten-color-rgb: 252, 238, 10 !important;
-  --nihongo-zokugo-jisho-color: #ff0055 !important;
-  --nihongo-zokugo-jisho-color-rgb: 255, 0, 85 !important;
-  --ruigo-jiten-online-color: #bd00ff !important;
-  --ruigo-jiten-online-color-rgb: 189, 0, 255 !important;
-  --shingo-jiji-yougo-color: #ff0055 !important;
-  --shingo-jiji-yougo-color-rgb: 255, 0, 85 !important;
-  --donna-toki-dou-tsukau-color: #bd00ff !important;
-  --donna-toki-dou-tsukau-color-rgb: 189, 0, 255 !important;
-  --e-de-wakaru-nihongo-color: #39ff14 !important;
-  --e-de-wakaru-nihongo-color-rgb: 57, 255, 20 !important;
-  --jlpt-bunpou-kaisetsu-color: #39ff14 !important;
-  --jlpt-bunpou-kaisetsu-color-rgb: 57, 255, 20 !important;
-  --mainichi-nonbiri-color: #bd00ff !important;
-  --mainichi-nonbiri-color-rgb: 189, 0, 255 !important;
-  --nihongo-bunpou-jiten-color: #39ff14 !important;
-  --nihongo-bunpou-jiten-color-rgb: 57, 255, 20 !important;
-  --reikai-gakushuu-kokugo-color: #39ff14 !important;
-  --reikai-gakushuu-kokugo-color-rgb: 57, 255, 20 !important;
-  --tsukaikata-no-wakaru-color: #39ff14 !important;
-  --tsukaikata-no-wakaru-color-rgb: 57, 255, 20 !important;
-  --kids-japonica-color: #ff9f1c !important;
-  --kids-japonica-color-rgb: 255, 159, 28 !important;
-  --jiten-online-color: #fcee0a !important;
-  --jiten-online-color-rgb: 252, 238, 10 !important;
-  --jitsuyou-nihongo-color: #00f0ff !important;
-  --jitsuyou-nihongo-color-rgb: 0, 240, 255 !important;
-  --pixiv-color: #ff0055 !important;
-  --pixiv-color-rgb: 255, 0, 85 !important;
-  --sozai-jiten-color: #ff9f1c !important;
-  --sozai-jiten-color-rgb: 255, 159, 28 !important;
-  --wikipedia-color: #00f0ff !important;
-  --wikipedia-color-rgb: 0, 240, 255 !important;
-  --goiryoku-nijijukugo-color: #fcee0a !important;
-  --goiryoku-nijijukugo-color-rgb: 252, 238, 10 !important;
-  --shogakukan-reikai-12-color: #ff9f1c !important;
-  --shogakukan-reikai-12-color-rgb: 255, 159, 28 !important;
-  --weblio-kogo-jiten-color: #00f0ff !important;
-  --weblio-kogo-jiten-color-rgb: 0, 240, 255 !important;
-}
-
-/* 4. Focus Theme Colors (Muted High-Contrast Modern Dark) */
+/* Focus Dictionary Colors (Strict Monochrome) */
 html[data-senren-theme="focus"] .card {
-  --selection-text-color: #e2e8f0 !important;
-  --selection-text-color-rgb: 226, 232, 240 !important;
-  --jmdict-color: #38bdf8 !important;
-  --jmdict-color-rgb: 56, 189, 248 !important;
-  --shinmeikai-color: #fb7185 !important;
-  --shinmeikai-color-rgb: 251, 113, 133 !important;
-  --daijirin-color: #fb923c !important;
-  --daijirin-color-rgb: 251, 146, 60 !important;
-  --digital-daijisen-color: #fb923c !important;
-  --digital-daijisen-color-rgb: 251, 146, 60 !important;
-  --gendai-kokugo-reikai-color: #34d399 !important;
-  --gendai-kokugo-reikai-color-rgb: 52, 211, 153 !important;
-  --iwanami-kokugo-jiten-color: #34d399 !important;
-  --iwanami-kokugo-jiten-color-rgb: 52, 211, 153 !important;
-  --koujien-color: #e2e8f0 !important;
-  --koujien-color-rgb: 226, 232, 240 !important;
-  --meikyo-kokugo-jiten-color: #c084fc !important;
-  --meikyo-kokugo-jiten-color-rgb: 192, 132, 252 !important;
-  --obunsha-kokugo-jiten-color: #e2e8f0 !important;
-  --obunsha-kokugo-jiten-color-rgb: 226, 232, 240 !important;
-  --sanseido-kokugo-jiten-color: #c084fc !important;
-  --sanseido-kokugo-jiten-color-rgb: 192, 132, 252 !important;
-  --shinsen-kokugo-color: #fb7185 !important;
-  --shinsen-kokugo-color-rgb: 251, 113, 133 !important;
-  --seisenban-color: #fb923c !important;
-  --seisenban-color-rgb: 251, 146, 60 !important;
-  --hybrid-shin-jirin-color: #fb923c !important;
-  --hybrid-shin-jirin-color-rgb: 251, 146, 60 !important;
-  --new-saitou-waei-color: #38bdf8 !important;
-  --new-saitou-waei-color-rgb: 56, 189, 248 !important;
-  --shin-waei-color: #38bdf8 !important;
-  --shin-waei-color-rgb: 56, 189, 248 !important;
-  --kanjigen-color: #fb923c !important;
-  --kanjigen-color-rgb: 251, 146, 60 !important;
-  --kanjipedia-doukun-igi-color: #34d399 !important;
-  --kanjipedia-doukun-igi-color-rgb: 52, 211, 153 !important;
-  --kanken-kanji-jiten-color: #e2e8f0 !important;
-  --kanken-kanji-jiten-color-rgb: 226, 232, 240 !important;
-  --gakken-yojijukugo-color: #fb923c !important;
-  --gakken-yojijukugo-color-rgb: 251, 146, 60 !important;
-  --gogen-yurai-jiten-color: #e2e8f0 !important;
-  --gogen-yurai-jiten-color-rgb: 226, 232, 240 !important;
-  --koji-kotowaza-no-jiten-color: #e2e8f0 !important;
-  --koji-kotowaza-no-jiten-color-rgb: 226, 232, 240 !important;
-  --nihongo-zokugo-jisho-color: #fb7185 !important;
-  --nihongo-zokugo-jisho-color-rgb: 251, 113, 133 !important;
-  --ruigo-jiten-online-color: #c084fc !important;
-  --ruigo-jiten-online-color-rgb: 192, 132, 252 !important;
-  --shingo-jiji-yougo-color: #fb7185 !important;
-  --shingo-jiji-yougo-color-rgb: 251, 113, 133 !important;
-  --donna-toki-dou-tsukau-color: #c084fc !important;
-  --donna-toki-dou-tsukau-color-rgb: 192, 132, 252 !important;
-  --e-de-wakaru-nihongo-color: #34d399 !important;
-  --e-de-wakaru-nihongo-color-rgb: 52, 211, 153 !important;
-  --jlpt-bunpou-kaisetsu-color: #34d399 !important;
-  --jlpt-bunpou-kaisetsu-color-rgb: 52, 211, 153 !important;
-  --mainichi-nonbiri-color: #c084fc !important;
-  --mainichi-nonbiri-color-rgb: 192, 132, 252 !important;
-  --nihongo-bunpou-jiten-color: #34d399 !important;
-  --nihongo-bunpou-jiten-color-rgb: 52, 211, 153 !important;
-  --reikai-gakushuu-kokugo-color: #34d399 !important;
-  --reikai-gakushuu-kokugo-color-rgb: 52, 211, 153 !important;
-  --tsukaikata-no-wakaru-color: #34d399 !important;
-  --tsukaikata-no-wakaru-color-rgb: 52, 211, 153 !important;
-  --kids-japonica-color: #fb923c !important;
-  --kids-japonica-color-rgb: 251, 146, 60 !important;
-  --jiten-online-color: #e2e8f0 !important;
-  --jiten-online-color-rgb: 226, 232, 240 !important;
-  --jitsuyou-nihongo-color: #38bdf8 !important;
-  --jitsuyou-nihongo-color-rgb: 56, 189, 248 !important;
-  --pixiv-color: #fb7185 !important;
-  --pixiv-color-rgb: 251, 113, 133 !important;
-  --sozai-jiten-color: #fb923c !important;
-  --sozai-jiten-color-rgb: 251, 146, 60 !important;
-  --wikipedia-color: #38bdf8 !important;
-  --wikipedia-color-rgb: 56, 189, 248 !important;
-  --goiryoku-nijijukugo-color: #e2e8f0 !important;
-  --goiryoku-nijijukugo-color-rgb: 226, 232, 240 !important;
-  --shogakukan-reikai-12-color: #fb923c !important;
-  --shogakukan-reikai-12-color-rgb: 251, 146, 60 !important;
-  --weblio-kogo-jiten-color: #38bdf8 !important;
-  --weblio-kogo-jiten-color-rgb: 56, 189, 248 !important;
+  --selection-text-color: #ffffff !important;
+  --selection-text-color-rgb: 255, 255, 255 !important;
+  --jmdict-color: #ffffff !important;
+  --jmdict-color-rgb: 255, 255, 255 !important;
+  --shinmeikai-color: #ffffff !important;
+  --shinmeikai-color-rgb: 255, 255, 255 !important;
+  --daijirin-color: #ffffff !important;
+  --daijirin-color-rgb: 255, 255, 255 !important;
+  --digital-daijisen-color: #ffffff !important;
+  --digital-daijisen-color-rgb: 255, 255, 255 !important;
+  --gendai-kokugo-reikai-color: #ffffff !important;
+  --gendai-kokugo-reikai-color-rgb: 255, 255, 255 !important;
+  --iwanami-kokugo-jiten-color: #ffffff !important;
+  --iwanami-kokugo-jiten-color-rgb: 255, 255, 255 !important;
+  --koujien-color: #ffffff !important;
+  --koujien-color-rgb: 255, 255, 255 !important;
+  --meikyo-kokugo-jiten-color: #ffffff !important;
+  --meikyo-kokugo-jiten-color-rgb: 255, 255, 255 !important;
+  --obunsha-kokugo-jiten-color: #ffffff !important;
+  --obunsha-kokugo-jiten-color-rgb: 255, 255, 255 !important;
+  --sanseido-kokugo-jiten-color: #ffffff !important;
+  --sanseido-kokugo-jiten-color-rgb: 255, 255, 255 !important;
+  --shinsen-kokugo-color: #ffffff !important;
+  --shinsen-kokugo-color-rgb: 255, 255, 255 !important;
+  --seisenban-color: #ffffff !important;
+  --seisenban-color-rgb: 255, 255, 255 !important;
+  --hybrid-shin-jirin-color: #ffffff !important;
+  --hybrid-shin-jirin-color-rgb: 255, 255, 255 !important;
+  --new-saitou-waei-color: #ffffff !important;
+  --new-saitou-waei-color-rgb: 255, 255, 255 !important;
+  --shin-waei-color: #ffffff !important;
+  --shin-waei-color-rgb: 255, 255, 255 !important;
+  --kanjigen-color: #ffffff !important;
+  --kanjigen-color-rgb: 255, 255, 255 !important;
+  --kanjipedia-doukun-igi-color: #ffffff !important;
+  --kanjipedia-doukun-igi-color-rgb: 255, 255, 255 !important;
+  --kanken-kanji-jiten-color: #ffffff !important;
+  --kanken-kanji-jiten-color-rgb: 255, 255, 255 !important;
+  --gakken-yojijukugo-color: #ffffff !important;
+  --gakken-yojijukugo-color-rgb: 255, 255, 255 !important;
+  --gogen-yurai-jiten-color: #ffffff !important;
+  --gogen-yurai-jiten-color-rgb: 255, 255, 255 !important;
+  --koji-kotowaza-no-jiten-color: #ffffff !important;
+  --koji-kotowaza-no-jiten-color-rgb: 255, 255, 255 !important;
+  --nihongo-zokugo-jisho-color: #ffffff !important;
+  --nihongo-zokugo-jisho-color-rgb: 255, 255, 255 !important;
+  --ruigo-jiten-online-color: #ffffff !important;
+  --ruigo-jiten-online-color-rgb: 255, 255, 255 !important;
+  --shingo-jiji-yougo-color: #ffffff !important;
+  --shingo-jiji-yougo-color-rgb: 255, 255, 255 !important;
+  --donna-toki-dou-tsukau-color: #ffffff !important;
+  --donna-toki-dou-tsukau-color-rgb: 255, 255, 255 !important;
+  --e-de-wakaru-nihongo-color: #ffffff !important;
+  --e-de-wakaru-nihongo-color-rgb: 255, 255, 255 !important;
+  --jlpt-bunpou-kaisetsu-color: #ffffff !important;
+  --jlpt-bunpou-kaisetsu-color-rgb: 255, 255, 255 !important;
+  --mainichi-nonbiri-color: #ffffff !important;
+  --mainichi-nonbiri-color-rgb: 255, 255, 255 !important;
+  --nihongo-bunpou-jiten-color: #ffffff !important;
+  --nihongo-bunpou-jiten-color-rgb: 255, 255, 255 !important;
+  --reikai-gakushuu-kokugo-color: #ffffff !important;
+  --reikai-gakushuu-kokugo-color-rgb: 255, 255, 255 !important;
+  --tsukaikata-no-wakaru-color: #ffffff !important;
+  --tsukaikata-no-wakaru-color-rgb: 255, 255, 255 !important;
+  --kids-japonica-color: #ffffff !important;
+  --kids-japonica-color-rgb: 255, 255, 255 !important;
+  --jiten-online-color: #ffffff !important;
+  --jiten-online-color-rgb: 255, 255, 255 !important;
+  --jitsuyou-nihongo-color: #ffffff !important;
+  --jitsuyou-nihongo-color-rgb: 255, 255, 255 !important;
+  --pixiv-color: #ffffff !important;
+  --pixiv-color-rgb: 255, 255, 255 !important;
+  --sozai-jiten-color: #ffffff !important;
+  --sozai-jiten-color-rgb: 255, 255, 255 !important;
+  --wikipedia-color: #ffffff !important;
+  --wikipedia-color-rgb: 255, 255, 255 !important;
+  --goiryoku-nijijukugo-color: #ffffff !important;
+  --goiryoku-nijijukugo-color-rgb: 255, 255, 255 !important;
+  --shogakukan-reikai-12-color: #ffffff !important;
+  --shogakukan-reikai-12-color-rgb: 255, 255, 255 !important;
+  --weblio-kogo-jiten-color: #ffffff !important;
+  --weblio-kogo-jiten-color-rgb: 255, 255, 255 !important;
 }
 
 /* Specific Color Definitions for Each Dictionary */
@@ -6194,509 +5998,532 @@ html[data-senren-theme="focus"] .card {
   --dict-color-rgb: var(--shogakukan-reikai-12-color-rgb);
 }
 
-/* Yomitan pastel dictionary palette: BEGIN */
+/* Nord Dictionary Palette: BEGIN */
 /* Generated from pop-up.css dictionary colors. Keep after the built-in dictionary mappings. */
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary^="JMdict"] {
-  --dict-color: #6d8494 !important;
-  --dict-color-rgb: 109, 132, 148 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="JMdict"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary^="JMDict"] {
-  --dict-color: #5e7282 !important;
-  --dict-color-rgb: 94, 114, 130 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="JMDict"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary^="JMdict Forms"] {
-  --dict-color: #7a8fa0 !important;
-  --dict-color-rgb: 122, 143, 160 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="JMdict Forms"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="JMnedict"] {
-  --dict-color: #5c7080 !important;
-  --dict-color-rgb: 92, 112, 128 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="JMnedict"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Jitendex.org"],
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary^="Jitendex"] {
-  --dict-color: #647d8e !important;
-  --dict-color-rgb: 100, 125, 142 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Jitendex.org"],
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="Jitendex"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="NHK"] {
-  --dict-color: #5c7080 !important;
-  --dict-color-rgb: 92, 112, 128 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="NHK"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Kansai Pitch Accent"] {
-  --dict-color: #6b6b90 !important;
-  --dict-color-rgb: 107, 107, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Kansai Pitch Accent"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="大辞泉"] {
-  --dict-color: #a05848 !important;
-  --dict-color-rgb: 160, 88, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="大辞泉"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="デジタル大辞泉"] {
-  --dict-color: #9b4e42 !important;
-  --dict-color-rgb: 155, 78, 66 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="デジタル大辞泉"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="新明解国語辞典"],
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary^="新明解"] {
-  --dict-color: #9b4e42 !important;
-  --dict-color-rgb: 155, 78, 66 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新明解国語辞典"],
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="新明解"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="大辞林"] {
-  --dict-color: #966060 !important;
-  --dict-color-rgb: 150, 96, 96 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="大辞林"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="広辞苑"] {
-  --dict-color: #a67c2a !important;
-  --dict-color-rgb: 166, 124, 42 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="広辞苑"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="精選版　日本国語大辞典"] {
-  --dict-color: #7a7248 !important;
-  --dict-color-rgb: 122, 114, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="精選版　日本国語大辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="ハイブリッド新辞林"] {
-  --dict-color: #8b6860 !important;
-  --dict-color-rgb: 139, 104, 96 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="ハイブリッド新辞林"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="明鏡国語辞典　第二版"] {
-  --dict-color: #8b7090 !important;
-  --dict-color-rgb: 139, 112, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="明鏡国語辞典　第二版"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary="明鏡国語辞典 第三版"] {
-  --dict-color: #8b7090 !important;
-  --dict-color-rgb: 139, 112, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary="明鏡国語辞典 第三版"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="新選国語辞典"] {
-  --dict-color: #9b6b72 !important;
-  --dict-color-rgb: 155, 107, 114 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新選国語辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="旺文社国語辞典"] {
-  --dict-color: #7a7090 !important;
-  --dict-color-rgb: 122, 112, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="旺文社国語辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="岩波国語辞典"] {
-  --dict-color: #6b7c5a !important;
-  --dict-color-rgb: 107, 124, 90 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="岩波国語辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="現代国語例解辞典"] {
-  --dict-color: #6b7c5a !important;
-  --dict-color-rgb: 107, 124, 90 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="現代国語例解辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="現代新国語辞典 第七版"] {
-  --dict-color: #6b7c5a !important;
-  --dict-color-rgb: 107, 124, 90 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="現代新国語辞典 第七版"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="三省堂国語辞典"] {
-  --dict-color: #a67c42 !important;
-  --dict-color-rgb: 166, 124, 66 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="三省堂国語辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="例解学習国語辞典"] {
-  --dict-color: #b09040 !important;
-  --dict-color-rgb: 176, 144, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="例解学習国語辞典"] {
+  --dict-color: #d08770 !important;
+  --dict-color-rgb: 208, 135, 112 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="使い方の分かる 類語例解辞典"] {
-  --dict-color: #a08040 !important;
-  --dict-color-rgb: 160, 128, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="使い方の分かる 類語例解辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="実用日本語表現辞典"] {
-  --dict-color: #9b9060 !important;
-  --dict-color-rgb: 155, 144, 96 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="実用日本語表現辞典"] {
+  --dict-color: #d08770 !important;
+  --dict-color-rgb: 208, 135, 112 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary="JLPT"],
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary^="JLPT rev"] {
-  --dict-color: #5a7d78 !important;
-  --dict-color-rgb: 90, 125, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary="JLPT"],
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="JLPT rev"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="JLPT文法解説まとめ"] {
-  --dict-color: #5a7d78 !important;
-  --dict-color-rgb: 90, 125, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="JLPT文法解説まとめ"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Bunpro Dictionary"] {
-  --dict-color: #5a7878 !important;
-  --dict-color-rgb: 90, 120, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Bunpro Dictionary"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="どんなときどう使う 日本語表現文型辞典"] {
-  --dict-color: #5a8078 !important;
-  --dict-color-rgb: 90, 128, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="どんなときどう使う 日本語表現文型辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="日本語文法辞典"] {
-  --dict-color: #607878 !important;
-  --dict-color-rgb: 96, 120, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="日本語文法辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="日本語文型辞典"] {
-  --dict-color: #5a7070 !important;
-  --dict-color-rgb: 90, 112, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="日本語文型辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="All About Particles"] {
-  --dict-color: #6b8878 !important;
-  --dict-color-rgb: 107, 136, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="All About Particles"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Wikipedia Kanji"] {
-  --dict-color: #7a8fa0 !important;
-  --dict-color-rgb: 122, 143, 160 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Wikipedia Kanji"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Wikipedia"] {
-  --dict-color: #7088a0 !important;
-  --dict-color-rgb: 112, 136, 160 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Wikipedia"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Jiten"] {
-  --dict-color: #6b7890 !important;
-  --dict-color-rgb: 107, 120, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Jiten"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="JPDBv2"] {
-  --dict-color: #7a6b90 !important;
-  --dict-color-rgb: 122, 107, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="JPDBv2"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="NonFiction"] {
-  --dict-color: #706888 !important;
-  --dict-color-rgb: 112, 104, 136 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="NonFiction"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Novels"] {
-  --dict-color: #806090 !important;
-  --dict-color-rgb: 128, 96, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Novels"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="BCCWJ-LUW"] {
-  --dict-color: #6b6880 !important;
-  --dict-color-rgb: 107, 104, 128 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="BCCWJ-LUW"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="BCCWJ2"] {
-  --dict-color: #626078 !important;
-  --dict-color-rgb: 98, 96, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="BCCWJ2"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="CC100"] {
-  --dict-color: #686890 !important;
-  --dict-color-rgb: 104, 104, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="CC100"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Narou"] {
-  --dict-color: #9b7860 !important;
-  --dict-color-rgb: 155, 120, 96 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Narou"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Netflix"] {
-  --dict-color: #9b5050 !important;
-  --dict-color-rgb: 155, 80, 80 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Netflix"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Youtube"] {
-  --dict-color: #9b5848 !important;
-  --dict-color-rgb: 155, 88, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Youtube"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="VN Freq"] {
-  --dict-color: #8b6880 !important;
-  --dict-color-rgb: 139, 104, 128 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="VN Freq"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Anime & J-drama"] {
-  --dict-color: #906070 !important;
-  --dict-color-rgb: 144, 96, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Anime & J-drama"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="NieR"] {
-  --dict-color: #7a7880 !important;
-  --dict-color-rgb: 122, 120, 128 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="NieR"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="jpDicts"] {
-  --dict-color: #906878 !important;
-  --dict-color-rgb: 144, 104, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="jpDicts"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary^="KANJIDIC"] {
-  --dict-color: #8b6040 !important;
-  --dict-color-rgb: 139, 96, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="KANJIDIC"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary="漢字源"] {
-  --dict-color: #9b6840 !important;
-  --dict-color-rgb: 155, 104, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary="漢字源"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="角川新字源"] {
-  --dict-color: #8b5838 !important;
-  --dict-color-rgb: 139, 88, 56 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="角川新字源"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="漢検四字熟語辞典"],
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary^="漢検漢字辞典"] {
-  --dict-color: #a07038 !important;
-  --dict-color-rgb: 160, 112, 56 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="漢検四字熟語辞典"],
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary^="漢検漢字辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="JPDB Kanji"] {
-  --dict-color: #9b6048 !important;
-  --dict-color-rgb: 155, 96, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="JPDB Kanji"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="TheKanjiMap Kanji Radicals/Composition"] {
-  --dict-color: #7a7848 !important;
-  --dict-color-rgb: 122, 120, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="TheKanjiMap Kanji Radicals/Composition"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Innocent Corpus Kanji"] {
-  --dict-color: #906040 !important;
-  --dict-color-rgb: 144, 96, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Innocent Corpus Kanji"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="漢字ペディア同訓異義"] {
-  --dict-color: #7a7870 !important;
-  --dict-color-rgb: 122, 120, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="漢字ペディア同訓異義"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="漢字でGo"] {
-  --dict-color: #a07840 !important;
-  --dict-color-rgb: 160, 120, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="漢字でGo"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="四字熟語の百科事典"] {
-  --dict-color: #8b7848 !important;
-  --dict-color-rgb: 139, 120, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="四字熟語の百科事典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="ことわざ・慣用句の百科事典"] {
-  --dict-color: #9b7858 !important;
-  --dict-color-rgb: 155, 120, 88 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="ことわざ・慣用句の百科事典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Proverb Encyclopedia"] {
-  --dict-color: #9b8058 !important;
-  --dict-color-rgb: 155, 128, 88 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Proverb Encyclopedia"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="新明解四字熟語辞典"] {
-  --dict-color: #a07050 !important;
-  --dict-color-rgb: 160, 112, 80 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新明解四字熟語辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="学研 四字熟語辞典"] {
-  --dict-color: #8b8050 !important;
-  --dict-color-rgb: 139, 128, 80 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="学研 四字熟語辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="四字熟語辞典オンライン"] {
-  --dict-color: #a09050 !important;
-  --dict-color-rgb: 160, 144, 80 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="四字熟語辞典オンライン"] {
+  --dict-color: #d08770 !important;
+  --dict-color-rgb: 208, 135, 112 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="故事・ことわざ・慣用句オンライン"] {
-  --dict-color: #a08850 !important;
-  --dict-color-rgb: 160, 136, 80 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="故事・ことわざ・慣用句オンライン"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="類語辞典オンライン"] {
-  --dict-color: #9b8848 !important;
-  --dict-color-rgb: 155, 136, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="類語辞典オンライン"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="対義語辞典オンライン"] {
-  --dict-color: #9b8040 !important;
-  --dict-color-rgb: 155, 128, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="対義語辞典オンライン"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="国語辞典オンライン"] {
-  --dict-color: #a09058 !important;
-  --dict-color-rgb: 160, 144, 88 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="国語辞典オンライン"] {
+  --dict-color: #d08770 !important;
+  --dict-color-rgb: 208, 135, 112 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="語源由来辞典"] {
-  --dict-color: #a08038 !important;
-  --dict-color-rgb: 160, 128, 56 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="語源由来辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="違い・語源辞典オンライン"] {
-  --dict-color: #9b7840 !important;
-  --dict-color-rgb: 155, 120, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="違い・語源辞典オンライン"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="違いがわかる事典 (Chigai Dictionary)"] {
-  --dict-color: #9b7048 !important;
-  --dict-color-rgb: 155, 112, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="違いがわかる事典 (Chigai Dictionary)"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="違いがわかる事典 (chigai.site)"] {
-  --dict-color: #906848 !important;
-  --dict-color-rgb: 144, 104, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="違いがわかる事典 (chigai.site)"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="新語時事用語辞典"] {
-  --dict-color: #7a8878 !important;
-  --dict-color-rgb: 122, 136, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新語時事用語辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Koohii Kanji Stories"] {
-  --dict-color: #7a7040 !important;
-  --dict-color-rgb: 122, 112, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Koohii Kanji Stories"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="複合語起源"] {
-  --dict-color: #8b8040 !important;
-  --dict-color-rgb: 139, 128, 64 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="複合語起源"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="青空文庫熟語"] {
-  --dict-color: #7a8860 !important;
-  --dict-color-rgb: 122, 136, 96 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="青空文庫熟語"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="TMW Club v2"] {
-  --dict-color: #6b8868 !important;
-  --dict-color-rgb: 107, 136, 104 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="TMW Club v2"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="津軽弁辞典"] {
-  --dict-color: #7a8068 !important;
-  --dict-color-rgb: 122, 128, 104 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="津軽弁辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Namegen"] {
-  --dict-color: #7a7858 !important;
-  --dict-color-rgb: 122, 120, 88 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Namegen"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="全国方言辞典"] {
-  --dict-color: #7a7858 !important;
-  --dict-color-rgb: 122, 120, 88 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="全国方言辞典"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="全市区町村辞典"] {
-  --dict-color: #6b8870 !important;
-  --dict-color-rgb: 107, 136, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="全市区町村辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="用例.jp"] {
-  --dict-color: #7a8060 !important;
-  --dict-color-rgb: 122, 128, 96 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="用例.jp"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Onomatoproject"] {
-  --dict-color: #5a7878 !important;
-  --dict-color-rgb: 90, 120, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Onomatoproject"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="surasura 擬声語"] {
-  --dict-color: #507070 !important;
-  --dict-color-rgb: 80, 112, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="surasura 擬声語"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="OnoMangaStrip"] {
-  --dict-color: #906870 !important;
-  --dict-color-rgb: 144, 104, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="OnoMangaStrip"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="絵でわかる日本語"] {
-  --dict-color: #906878 !important;
-  --dict-color-rgb: 144, 104, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="絵でわかる日本語"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="絵でわかる慣用句"] {
-  --dict-color: #886070 !important;
-  --dict-color-rgb: 136, 96, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="絵でわかる慣用句"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="形容詞・動詞図鑑"] {
-  --dict-color: #7a7090 !important;
-  --dict-color-rgb: 122, 112, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="形容詞・動詞図鑑"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="新和英大辞典"],
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary="新和英"] {
-  --dict-color: #6b8870 !important;
-  --dict-color-rgb: 107, 136, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="新和英大辞典"],
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary="新和英"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Counters & Suffixes"] {
-  --dict-color: #7a8870 !important;
-  --dict-color-rgb: 122, 136, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Counters & Suffixes"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="日本語俗語辞書"] {
-  --dict-color: #906878 !important;
-  --dict-color-rgb: 144, 104, 120 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="日本語俗語辞書"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="ネット用語辞典"] {
-  --dict-color: #7a6880 !important;
-  --dict-color-rgb: 122, 104, 128 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="ネット用語辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Living Japanese Slang Dictionary"] {
-  --dict-color: #886070 !important;
-  --dict-color-rgb: 136, 96, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Living Japanese Slang Dictionary"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="毎日のんびり日本語教師"] {
-  --dict-color: #906870 !important;
-  --dict-color-rgb: 144, 104, 112 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="毎日のんびり日本語教師"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Nico/Pixiv"] {
-  --dict-color: #6b7890 !important;
-  --dict-color-rgb: 107, 120, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Nico/Pixiv"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Pixiv"] {
-  --dict-color: #7080a0 !important;
-  --dict-color-rgb: 112, 128, 160 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Pixiv"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="Weblio大阪弁"] {
-  --dict-color: #6b8090 !important;
-  --dict-color-rgb: 107, 128, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="Weblio大阪弁"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="IMIDASの日本語辞典"] {
-  --dict-color: #6b7890 !important;
-  --dict-color-rgb: 107, 120, 144 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="IMIDASの日本語辞典"] {
+  --dict-color: #5e81ac !important;
+  --dict-color-rgb: 94, 129, 172 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="TISMKANJI"] {
-  --dict-color: #8b7848 !important;
-  --dict-color-rgb: 139, 120, 72 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="TISMKANJI"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.definition-box, .glossary-box) li[data-dictionary*="コツ"] {
-  --dict-color: #a08858 !important;
-  --dict-color-rgb: 160, 136, 88 !important;
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary*="コツ"] {
+  --dict-color: #bf616a !important;
+  --dict-color-rgb: 191, 97, 106 !important;
 }
 
-/* Yomitan pastel dictionary palette: END */
+/* Nord Dictionary Palette: END */
+
+/* Final Focus guard: dictionary HTML often ships its own inline colors. Keep
+   every card surface and text treatment monochrome without altering media. */
+html[data-senren-theme="focus"] .card,
+html[data-senren-theme="focus"] .card *:not(img):not(video) {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  outline-color: #ffffff !important;
+  text-decoration-color: #ffffff !important;
+  background-color: #000000 !important;
+  box-shadow: none !important;
+}
+
+html[data-senren-theme="focus"] .card :is(svg, svg *) {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+html[data-senren-theme="focus"] .card ::selection {
+  color: #000000 !important;
+  background: #ffffff !important;
+}
+
 /* Dictionary Collapse */
 .definition-box.is-collapsed,
 .glossary-box.is-collapsed {

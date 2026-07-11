@@ -223,103 +223,105 @@
 
   /* COLOR PALETTE
   ============================================ */
+  /* Canonical Nord defaults. Keep synchronized with the editable palette in
+     style.css so Reset never switches the card back to a generic palette. */
   /* Light Theme
   -------------------------------------------- */
   /* Text Colors */
-  --text-light: #020202;
-  --light-devoiced-color: RoyalBlue;
-  --light-highlight: #e20033;
-  --freq-text-light: rgba(105, 105, 105, 0.3);
-  --freq-text-hover-light: rgba(0, 0, 0, 1);
-  --tag-color-light: rgba(105, 105, 105, 0.26);
-  --tag-color-hover-light: rgba(255, 255, 255, 1);
-  --misc-info-text-light: rgba(105, 105, 105, 0.26);
-  --misc-info-text-hover-light: rgba(255, 255, 255, 1);
+  --text-light: #2e3440;
+  --light-devoiced-color: #5e81ac;
+  --light-highlight: #5e81ac;
+  --freq-text-light: rgba(59, 66, 82, 0.55);
+  --freq-text-hover-light: #2e3440;
+  --tag-color-light: #4c566a;
+  --tag-color-hover-light: #2e3440;
+  --misc-info-text-light: #4c566a;
+  --misc-info-text-hover-light: #2e3440;
 
   /* Pitch Colors */
-  --pitch-red-light: #d62839;
-  --pitch-blue-light: #3474ff;
-  --pitch-orange-light: #ff6e03;
-  --pitch-green-light: #2baf7e;
-  --pitch-purple-light: #8a5ede;
+  --pitch-red-light: #bf616a;
+  --pitch-blue-light: #5e81ac;
+  --pitch-orange-light: #d08770;
+  --pitch-green-light: #a3be8c;
+  --pitch-purple-light: #b48ead;
 
   /* Icon Colors */
-  --svg-color-light: rgba(105, 105, 105, 0.3);
-  --svg-hover-light: rgba(255, 255, 255, 1);
+  --svg-color-light: #4c566a;
+  --svg-hover-light: #2e3440;
 
   /* Background Colors */
-  --background-light: #f5f5f5;
-  --card-bg-light: rgba(255, 255, 255, 0.4);
-  --card-shadow-light: rgba(0, 0, 0, 0.05);
-  --word-bg-light: rgba(0, 0, 0, 0.03);
-  --pitch-position-bg-light: rgba(255, 255, 255, 0.8);
-  --picture-bg-light: rgba(0, 0, 0, 0.03);
-  --notes-bg-light: rgba(0, 0, 0, 0.03);
-  --definition-bg-light: rgba(0, 0, 0, 0.03);
+  --background-light: #eceff4;
+  --card-bg-light: #e5e9f0;
+  --card-shadow-light: rgba(46, 52, 64, 0.18);
+  --word-bg-light: #e5e9f0;
+  --pitch-position-bg-light: #d8dee9;
+  --picture-bg-light: #e5e9f0;
+  --notes-bg-light: #e5e9f0;
+  --definition-bg-light: #e5e9f0;
   --dictionary-collapse-fade-light: linear-gradient(
     to bottom,
-    rgba(245, 245, 245, 0),
-    rgba(245, 245, 245, 0.9)
+    rgba(229, 233, 240, 0),
+    rgba(229, 233, 240, 0.96)
   );
-  --buttons-bg-light: rgba(0, 0, 0, 0.03);
-  --buttons-bg-hover-light: rgba(0, 0, 0, 0.63);
-  --lightbox-bg-light: rgba(0, 0, 0, 0.8);
-  --frequency-bg-light: rgba(255, 255, 255, 0.8);
-  --tag-bg-light: rgba(0, 0, 0, 0.03);
-  --tag-bg-hover-light: rgba(0, 0, 0, 0.63);
-  --external-links-bg-light: rgba(0, 0, 0, 0.1);
-  --external-links-bg-hover-light: rgba(255, 255, 255, 0.4);
-  --misc-info-bg-light: rgba(0, 0, 0, 0.03);
-  --misc-info-bg-hover-light: rgba(0, 0, 0, 0.63);
+  --buttons-bg-light: #e5e9f0;
+  --buttons-bg-hover-light: #d8dee9;
+  --lightbox-bg-light: rgba(46, 52, 64, 0.92);
+  --frequency-bg-light: #e5e9f0;
+  --tag-bg-light: #d8dee9;
+  --tag-bg-hover-light: #e5e9f0;
+  --external-links-bg-light: #d8dee9;
+  --external-links-bg-hover-light: #e5e9f0;
+  --misc-info-bg-light: #e5e9f0;
+  --misc-info-bg-hover-light: #d8dee9;
 
   /* Dark Theme
   -------------------------------------------- */
   /* Text Colors */
-  --text: #fcfcfc;
-  --dark-devoiced-color: cornflowerBlue;
-  --dark-highlight: #fcff61;
-  --freq-text: rgba(255, 255, 255, 0.2);
-  --freq-text-hover: rgba(255, 255, 255, 1);
-  --tag-color: rgba(255, 255, 255, 0.21);
-  --tag-color-hover: rgba(255, 255, 255, 1);
-  --misc-info-text: rgba(255, 255, 255, 0.21);
-  --misc-info-text-hover: rgba(255, 255, 255, 1);
+  --text: #eceff4;
+  --dark-devoiced-color: #81a1c1;
+  --dark-highlight: #88c0d0;
+  --freq-text: rgba(216, 222, 233, 0.55);
+  --freq-text-hover: #eceff4;
+  --tag-color: #d8dee9;
+  --tag-color-hover: #eceff4;
+  --misc-info-text: #d8dee9;
+  --misc-info-text-hover: #eceff4;
 
   /* Pitch Colors */
-  --pitch-red: #f5436d;
-  --pitch-blue: #39c1ff;
-  --pitch-orange: #fca311;
-  --pitch-green: #40d4a6;
-  --pitch-purple: #afa2ff;
+  --pitch-red: #bf616a;
+  --pitch-blue: #81a1c1;
+  --pitch-orange: #d08770;
+  --pitch-green: #a3be8c;
+  --pitch-purple: #b48ead;
 
   /* Icon Colors */
-  --svg-color: rgba(255, 255, 255, 0.2);
-  --svg-hover: rgba(255, 255, 255, 1);
+  --svg-color: #d8dee9;
+  --svg-hover: #eceff4;
 
   /* Background Colors */
-  --background: #2c2c2c;
-  --card-bg: rgba(0, 0, 0, 0.4);
-  --card-shadow: rgba(0, 0, 0, 0.3);
-  --word-bg: rgba(0, 0, 0, 0.3);
-  --pitch-position-bg: rgba(0, 0, 0, 0.2);
-  --picture-bg: rgba(0, 0, 0, 0.3);
-  --notes-bg: rgba(0, 0, 0, 0.3);
-  --definition-bg: rgba(0, 0, 0, 0.3);
+  --background: #2e3440;
+  --card-bg: #3b4252;
+  --card-shadow: rgba(46, 52, 64, 0.55);
+  --word-bg: #2e3440;
+  --pitch-position-bg: #434c5e;
+  --picture-bg: #2e3440;
+  --notes-bg: #3b4252;
+  --definition-bg: #3b4252;
   --dictionary-collapse-fade: linear-gradient(
     to bottom,
-    rgba(44, 44, 44, 0),
-    rgba(26, 26, 26, 9)
+    rgba(59, 66, 82, 0),
+    rgba(59, 66, 82, 0.96)
   );
-  --buttons-bg: rgba(0, 0, 0, 0.1);
-  --buttons-bg-hover: rgba(0, 0, 0, 0.63);
-  --lightbox-bg: rgba(0, 0, 0, 0.8);
-  --frequency-bg: rgba(0, 0, 0, 0.63);
-  --tag-bg: rgba(0, 0, 0, 0.1);
-  --tag-bg-hover: rgba(0, 0, 0, 0.3);
-  --external-links-bg: rgba(0, 0, 0, 0.4);
-  --external-links-bg-hover: rgba(0, 0, 0, 0.63);
-  --misc-info-bg: rgba(0, 0, 0, 0.1);
-  --misc-info-bg-hover: rgba(0, 0, 0, 0.3);
+  --buttons-bg: #3b4252;
+  --buttons-bg-hover: #434c5e;
+  --lightbox-bg: rgba(46, 52, 64, 0.94);
+  --frequency-bg: #3b4252;
+  --tag-bg: #434c5e;
+  --tag-bg-hover: #4c566a;
+  --external-links-bg: #3b4252;
+  --external-links-bg-hover: #434c5e;
+  --misc-info-bg: #3b4252;
+  --misc-info-bg-hover: #434c5e;
 
   /* DIMENSIONS & SPACING
   ============================================ */

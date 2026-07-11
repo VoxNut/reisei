@@ -12,7 +12,7 @@
       { label: "Settings Toggle", var: "--settings-visibility", type: "switch-int", desc: "Show the gear icon to open the settings.", mobileHidden: true },
       { label: "Main Card Background", var: "--main-bg-visibility", type: "switch-int", desc: "Show the main card background.", mobileHidden: true },
       { label: "Card Shadow", var: "--main-bg-shadow-visibility", type: "switch-int", desc: "Show a drop shadow around the main card background.", mobileHidden: true },
-      { label: "Theme Toggle", var: "--custom-dark-mode-visibility", type: "switch-int", desc: "Show the theme icon to cycle Nord, Focus, and Cyberpunk.", mobileHidden: true },
+      { label: "Theme Toggle", var: "--custom-dark-mode-visibility", type: "switch-int", desc: "Show the theme icon to switch between Nord and Focus.", mobileHidden: true },
       { label: "Audio Buttons", var: "--audio-visibility", type: "switch-int", desc: "Show replay buttons for Word/Sentence audio.", mobileHidden: true },
       { label: "Frequency", var: "--freq-visibility", type: "switch-int", desc: "Show the frequency rank indicator.", mobileHidden: true },
       { label: "Tags", var: "--tag-visibility", type: "switch-int", desc: "Show tags in the bottom-left area of the card footer." },
@@ -259,7 +259,7 @@
       items: [
         { label: "Toggle Settings", var: "--toggle-settings-key", type: "keybind", desc: "Key to open the settings." },
         { label: "Replay Scene", var: "--scene-replay-shortcut-key", type: "keybind", desc: "Key to replay the active scene (only for cards with multiple scenes)." },
-        { label: "Cycle Theme", var: "--toggle-custom-dark-mode-key", type: "keybind", desc: "Key to cycle Nord, Focus, and Cyberpunk." },
+        { label: "Cycle Theme", var: "--toggle-custom-dark-mode-key", type: "keybind", desc: "Key to switch between Nord and Focus." },
         { label: "Toggle Lightbox", var: "--toggle-picture-lightbox-key", type: "keybind", desc: "Key to open the image viewer." },
         { label: "Toggle Grid", var: "--toggle-picture-lightbox-grid-key", type: "keybind", desc: "Key to toggle the image grid view." },
         { label: "Toggle Image", var: "--toggle-image-key", type: "keybind", desc: "key to show or hide the image." }
@@ -267,7 +267,7 @@
     },
     "Theme": [
       { type: "header", label: "General Colors" },
-      { label: "Theme Mode", var: "--theme-mode", type: "segment", options: [{ val: "nord", label: "Nord" }, { val: "focus", label: "Focus" }, { val: "cyberpunk", label: "Cyberpunk" }], desc: "Selects the active card theme." },
+      { label: "Theme Mode", var: "--theme-mode", type: "segment", options: [{ val: "nord", label: "Nord" }, { val: "focus", label: "Focus" }], desc: "Selects the active card theme." },
       { label: "Main Text", var: "--text-light", type: "color", theme: "light" },
       { label: "Main Text", var: "--text", type: "color", theme: "dark" },
       { label: "Highlight", var: "--light-highlight", type: "color", theme: "light" },
@@ -399,13 +399,12 @@
     return window.btoa(unescape(encodeURIComponent(str)));
   }
 
-  const SENREN_THEME_MODES = ["nord", "focus", "cyberpunk"];
+  const SENREN_THEME_MODES = ["nord", "focus"];
   const THEME_MODE_VAR = "--theme-mode";
 
   function normalizeThemeMode(value) {
     if (window.SenrenTheme) return window.SenrenTheme.normalize(value);
     const mode = String(value || "").trim().toLowerCase();
-    if (mode === "cyber") return "cyberpunk";
     return SENREN_THEME_MODES.includes(mode) ? mode : "";
   }
 
@@ -430,7 +429,6 @@
     const root = document.documentElement;
     const dataMode = normalizeThemeMode(root.dataset.senrenTheme);
     if (dataMode) return dataMode;
-    if (root.classList.contains("cyberpunk-theme")) return "cyberpunk";
     if (
       root.classList.contains("focus-theme") ||
       root.classList.contains("custom-dark-mode")
@@ -448,11 +446,9 @@
     root.classList.remove(
       "custom-dark-mode",
       "focus-theme",
-      "cyberpunk-theme",
     );
     if (mode !== "nord") root.classList.add("custom-dark-mode");
     if (mode === "focus") root.classList.add("focus-theme");
-    if (mode === "cyberpunk") root.classList.add("cyberpunk-theme");
     root.dataset.senrenTheme = mode;
     root.style.setProperty(THEME_MODE_VAR, mode);
     localStorage.setItem("senren_" + THEME_MODE_VAR, mode);
@@ -592,8 +588,8 @@
         if (item.var === THEME_MODE_VAR) {
           newVal = "nord";
         } else if (activeThemeMode !== "nord" && item.theme) {
-          // Focus and Cyberpunk own dedicated palettes. Do not rewrite the
-          // canonical Nord values while either dedicated theme is active.
+          // Focus owns a dedicated monochrome palette. Do not rewrite the
+          // canonical Nord values while Focus is active.
           return;
         }
 

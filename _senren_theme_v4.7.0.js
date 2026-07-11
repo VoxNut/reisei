@@ -3,14 +3,13 @@
 
   if (window.SenrenTheme) return;
 
-  const modes = Object.freeze(["nord", "focus", "cyberpunk"]);
+  const modes = Object.freeze(["nord", "focus"]);
   const storageKey = "senren_--theme-mode";
   const legacyStorageKey = "senrenTheme";
   const legacyDarkModeKey = "darkMode";
   const themeClasses = [
     "custom-dark-mode",
     "focus-theme",
-    "cyberpunk-theme",
   ];
   const themeScopedVariables = Object.freeze([
     "--bd-text-shadow-color-light",
@@ -85,16 +84,16 @@
 
   function normalize(value) {
     const mode = String(value || "").trim().toLowerCase();
-    if (mode === "cyber") return "cyberpunk";
     return modes.includes(mode) ? mode : "";
   }
 
   function getStored() {
-    const stored = normalize(
+    const rawStored =
       localStorage.getItem(storageKey) ||
-        localStorage.getItem(legacyStorageKey),
-    );
+      localStorage.getItem(legacyStorageKey);
+    const stored = normalize(rawStored);
     if (stored) return stored;
+    if (rawStored) return "nord";
 
     return localStorage.getItem(legacyDarkModeKey) === "enabled"
       ? "focus"
@@ -113,10 +112,9 @@
   function syncControls(mode) {
     document.querySelectorAll(".toggle-custom-dark-mode").forEach((button) => {
       button.classList.toggle("dark-mode", mode !== "nord");
-      button.classList.toggle("cyberpunk-mode", mode === "cyberpunk");
       button.setAttribute(
         "title",
-        `Theme: ${mode === "nord" ? "Nord" : mode === "focus" ? "Focus" : "Cyberpunk"}`,
+        `Theme: ${mode === "nord" ? "Nord" : "Focus"}`,
       );
     });
 
@@ -144,8 +142,8 @@
 
     themeScopedVariables.forEach((variable) => {
       if (mode !== "nord") {
-        // Focus and Cyberpunk own complete palettes in style.css. Removing
-        // inline settings prevents an older Nord preset from leaking into them.
+        // Focus owns a complete monochrome palette in style.css. Removing
+        // inline settings prevents an older Nord preset from leaking into it.
         root.style.removeProperty(variable);
         return;
       }
@@ -164,7 +162,6 @@
     root.classList.remove(...themeClasses);
     if (mode !== "nord") root.classList.add("custom-dark-mode");
     if (mode === "focus") root.classList.add("focus-theme");
-    if (mode === "cyberpunk") root.classList.add("cyberpunk-theme");
 
     root.dataset.senrenTheme = mode;
     root.style.setProperty("--theme-mode", mode);
