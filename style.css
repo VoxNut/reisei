@@ -710,7 +710,8 @@ b {
   list-style: none !important;
 }
 
-/* Focus Theme: strict monochrome interface. */
+/* Focus Theme: simple black canvas with white interface text.
+   Dictionary accents intentionally keep their own colors. */
 html[data-senren-theme="focus"] {
   color-scheme: dark;
   --text: #ffffff;
@@ -734,7 +735,7 @@ html[data-senren-theme="focus"] {
 
   --background: #000000;
   --card-bg: #000000;
-  --card-shadow: rgba(255, 255, 255, 0.18);
+  --card-shadow: transparent;
   --word-bg: #000000;
   --pitch-position-bg: #000000;
   --picture-bg: #000000;
@@ -755,26 +756,12 @@ html[data-senren-theme="focus"] {
   --external-links-bg-hover: #000000;
   --misc-info-bg: #000000;
   --misc-info-bg-hover: #000000;
-  --button-shadow-dark: 0 0 0 1px #ffffff;
+  --button-shadow-dark: none;
 }
 
 html[data-senren-theme="focus"] body {
   background: var(--background) !important;
   color: var(--text) !important;
-}
-
-html[data-senren-theme="focus"] :is(.front, .back)::before,
-html[data-senren-theme="focus"]
-  :is(.background-box, .picture-container, .notes-card, .definition-box, .glossary-box) {
-  border-color: #ffffff !important;
-  box-shadow: none !important;
-}
-
-html[data-senren-theme="focus"]
-  :is(.definition-box, .glossary-box, .yomitan-glossary)
-  :is(span, div, li, p, a, i, b, em, strong, th, td) {
-  color: #ffffff !important;
-  border-color: #ffffff !important;
 }
 
 /* Audio Hint Toggle */
@@ -1069,7 +1056,7 @@ html[data-senren-theme="focus"]
 @container style(--reading-position: below) {
   #word ruby {
     ruby-position: under !important;
-    -webkit-ruby-position: after !important;
+    -webkit-ruby-position: under !important;
     text-align: center;
   }
 
@@ -1130,7 +1117,7 @@ html[data-senren-theme="focus"]
   .grid-container {
     display: grid;
     gap: var(--grid-gap);
-    align-items: centerh;
+    align-items: center;
     grid-template-areas:
       "word"
       "picture";
@@ -1574,7 +1561,7 @@ img {
 @container style(--sentence-alignment: left) {
   #sentenceEng {
     text-align: left;
-    justify-content: flex;
+    justify-content: flex-start;
     direction: ltr;
     unicode-bidi: normal;
   }
@@ -1583,7 +1570,7 @@ img {
 @container style(--sentence-alignment: right) {
   #sentenceEng {
     text-align: right;
-    justify-content: flex;
+    justify-content: flex-end;
     direction: ltr;
     unicode-bidi: normal;
   }
@@ -4267,7 +4254,7 @@ li[data-dictionary="漢検漢字辞典　第二版"]
   a[href*="yomitan_dictionary_media"][href$=".svg"]:has(> span > img):hover {
   height: auto;
   width: auto;
-  max-height: auto;
+  max-height: none;
 }
 
 li[data-dictionary="漢検漢字辞典　第二版"]
@@ -4285,7 +4272,7 @@ li[data-dictionary="漢検漢字辞典　第二版"]
   display: inline-block !important;
   width: auto;
   height: auto;
-  max-height: auto;
+  max-height: none;
 }
 
 li[data-dictionary="漢検漢字辞典　第二版"]
@@ -4623,7 +4610,7 @@ li[data-dictionary="漢検漢字辞典　第二版"]
 @container style(--misc-info-alignment: left) {
   .misc-info {
     text-align: left;
-    justify-content: flex;
+    justify-content: flex-start;
     direction: ltr;
     unicode-bidi: normal;
   }
@@ -4632,7 +4619,7 @@ li[data-dictionary="漢検漢字辞典　第二版"]
 @container style(--misc-info-alignment: right) {
   .misc-info {
     text-align: right;
-    justify-content: flex;
+    justify-content: flex-end;
     direction: ltr;
     unicode-bidi: normal;
   }
@@ -5598,8 +5585,9 @@ html[data-senren-theme="nord"] .card {
   --weblio-kogo-jiten-color-rgb: var(--weblio-kogo-jiten-color-rgb-light);
 }
 
-/* 2. Nord Dark Theme Colors (Pastel) */
-html[data-senren-theme="nord"] .card.nightMode {
+/* 2. Dark Dictionary Colors (Nord night mode and Focus) */
+html[data-senren-theme="nord"] .card.nightMode,
+html[data-senren-theme="focus"] .card {
   --selection-text-color: var(--selection-text-color-dark);
   --selection-text-color-rgb: var(--selection-text-color-dark-rgb);
   --jmdict-color: var(--jmdict-color-dark);
@@ -5684,92 +5672,6 @@ html[data-senren-theme="nord"] .card.nightMode {
   --shogakukan-reikai-12-color-rgb: var(--shogakukan-reikai-12-color-dark-rgb);
   --weblio-kogo-jiten-color: var(--weblio-kogo-jiten-color-dark);
   --weblio-kogo-jiten-color-rgb: var(--weblio-kogo-jiten-color-dark-rgb);
-}
-
-/* Focus Dictionary Colors (Strict Monochrome) */
-html[data-senren-theme="focus"] .card {
-  --selection-text-color: #ffffff !important;
-  --selection-text-color-rgb: 255, 255, 255 !important;
-  --jmdict-color: #ffffff !important;
-  --jmdict-color-rgb: 255, 255, 255 !important;
-  --shinmeikai-color: #ffffff !important;
-  --shinmeikai-color-rgb: 255, 255, 255 !important;
-  --daijirin-color: #ffffff !important;
-  --daijirin-color-rgb: 255, 255, 255 !important;
-  --digital-daijisen-color: #ffffff !important;
-  --digital-daijisen-color-rgb: 255, 255, 255 !important;
-  --gendai-kokugo-reikai-color: #ffffff !important;
-  --gendai-kokugo-reikai-color-rgb: 255, 255, 255 !important;
-  --iwanami-kokugo-jiten-color: #ffffff !important;
-  --iwanami-kokugo-jiten-color-rgb: 255, 255, 255 !important;
-  --koujien-color: #ffffff !important;
-  --koujien-color-rgb: 255, 255, 255 !important;
-  --meikyo-kokugo-jiten-color: #ffffff !important;
-  --meikyo-kokugo-jiten-color-rgb: 255, 255, 255 !important;
-  --obunsha-kokugo-jiten-color: #ffffff !important;
-  --obunsha-kokugo-jiten-color-rgb: 255, 255, 255 !important;
-  --sanseido-kokugo-jiten-color: #ffffff !important;
-  --sanseido-kokugo-jiten-color-rgb: 255, 255, 255 !important;
-  --shinsen-kokugo-color: #ffffff !important;
-  --shinsen-kokugo-color-rgb: 255, 255, 255 !important;
-  --seisenban-color: #ffffff !important;
-  --seisenban-color-rgb: 255, 255, 255 !important;
-  --hybrid-shin-jirin-color: #ffffff !important;
-  --hybrid-shin-jirin-color-rgb: 255, 255, 255 !important;
-  --new-saitou-waei-color: #ffffff !important;
-  --new-saitou-waei-color-rgb: 255, 255, 255 !important;
-  --shin-waei-color: #ffffff !important;
-  --shin-waei-color-rgb: 255, 255, 255 !important;
-  --kanjigen-color: #ffffff !important;
-  --kanjigen-color-rgb: 255, 255, 255 !important;
-  --kanjipedia-doukun-igi-color: #ffffff !important;
-  --kanjipedia-doukun-igi-color-rgb: 255, 255, 255 !important;
-  --kanken-kanji-jiten-color: #ffffff !important;
-  --kanken-kanji-jiten-color-rgb: 255, 255, 255 !important;
-  --gakken-yojijukugo-color: #ffffff !important;
-  --gakken-yojijukugo-color-rgb: 255, 255, 255 !important;
-  --gogen-yurai-jiten-color: #ffffff !important;
-  --gogen-yurai-jiten-color-rgb: 255, 255, 255 !important;
-  --koji-kotowaza-no-jiten-color: #ffffff !important;
-  --koji-kotowaza-no-jiten-color-rgb: 255, 255, 255 !important;
-  --nihongo-zokugo-jisho-color: #ffffff !important;
-  --nihongo-zokugo-jisho-color-rgb: 255, 255, 255 !important;
-  --ruigo-jiten-online-color: #ffffff !important;
-  --ruigo-jiten-online-color-rgb: 255, 255, 255 !important;
-  --shingo-jiji-yougo-color: #ffffff !important;
-  --shingo-jiji-yougo-color-rgb: 255, 255, 255 !important;
-  --donna-toki-dou-tsukau-color: #ffffff !important;
-  --donna-toki-dou-tsukau-color-rgb: 255, 255, 255 !important;
-  --e-de-wakaru-nihongo-color: #ffffff !important;
-  --e-de-wakaru-nihongo-color-rgb: 255, 255, 255 !important;
-  --jlpt-bunpou-kaisetsu-color: #ffffff !important;
-  --jlpt-bunpou-kaisetsu-color-rgb: 255, 255, 255 !important;
-  --mainichi-nonbiri-color: #ffffff !important;
-  --mainichi-nonbiri-color-rgb: 255, 255, 255 !important;
-  --nihongo-bunpou-jiten-color: #ffffff !important;
-  --nihongo-bunpou-jiten-color-rgb: 255, 255, 255 !important;
-  --reikai-gakushuu-kokugo-color: #ffffff !important;
-  --reikai-gakushuu-kokugo-color-rgb: 255, 255, 255 !important;
-  --tsukaikata-no-wakaru-color: #ffffff !important;
-  --tsukaikata-no-wakaru-color-rgb: 255, 255, 255 !important;
-  --kids-japonica-color: #ffffff !important;
-  --kids-japonica-color-rgb: 255, 255, 255 !important;
-  --jiten-online-color: #ffffff !important;
-  --jiten-online-color-rgb: 255, 255, 255 !important;
-  --jitsuyou-nihongo-color: #ffffff !important;
-  --jitsuyou-nihongo-color-rgb: 255, 255, 255 !important;
-  --pixiv-color: #ffffff !important;
-  --pixiv-color-rgb: 255, 255, 255 !important;
-  --sozai-jiten-color: #ffffff !important;
-  --sozai-jiten-color-rgb: 255, 255, 255 !important;
-  --wikipedia-color: #ffffff !important;
-  --wikipedia-color-rgb: 255, 255, 255 !important;
-  --goiryoku-nijijukugo-color: #ffffff !important;
-  --goiryoku-nijijukugo-color-rgb: 255, 255, 255 !important;
-  --shogakukan-reikai-12-color: #ffffff !important;
-  --shogakukan-reikai-12-color-rgb: 255, 255, 255 !important;
-  --weblio-kogo-jiten-color: #ffffff !important;
-  --weblio-kogo-jiten-color-rgb: 255, 255, 255 !important;
 }
 
 /* Specific Color Definitions for Each Dictionary */
@@ -6502,28 +6404,6 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
 
 /* Nord Dictionary Palette: END */
 
-/* Final Focus guard: dictionary HTML often ships its own inline colors. Keep
-   every card surface and text treatment monochrome without altering media. */
-html[data-senren-theme="focus"] .card,
-html[data-senren-theme="focus"] .card *:not(img):not(video) {
-  color: #ffffff !important;
-  border-color: #ffffff !important;
-  outline-color: #ffffff !important;
-  text-decoration-color: #ffffff !important;
-  background-color: #000000 !important;
-  box-shadow: none !important;
-}
-
-html[data-senren-theme="focus"] .card :is(svg, svg *) {
-  fill: #ffffff !important;
-  stroke: #ffffff !important;
-}
-
-html[data-senren-theme="focus"] .card ::selection {
-  color: #000000 !important;
-  background: #ffffff !important;
-}
-
 /* Dictionary Collapse */
 .definition-box.is-collapsed,
 .glossary-box.is-collapsed {
@@ -6616,16 +6496,14 @@ html[data-senren-theme="focus"] .card ::selection {
   background: linear-gradient(to left, rgba(0, 0, 0, 1), transparent);
 }
 
-:is(.card.nightMode, .custom-dark-mode) {
-  .sentence-nav.left {
-    left: 0;
-    background: linear-gradient(to right, rgba(255, 255, 255, 1), transparent);
-  }
+:is(.card.nightMode, .custom-dark-mode) .sentence-nav.left {
+  left: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 1), transparent);
+}
 
-  .sentence-nav.right {
-    right: 0;
-    background: linear-gradient(to left, rgba(255, 255, 255, 1), transparent);
-  }
+:is(.card.nightMode, .custom-dark-mode) .sentence-nav.right {
+  right: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 1), transparent);
 }
 
 /* Hide scrollbar */
@@ -8150,95 +8028,6 @@ html[data-senren-theme="focus"] .card ::selection {
 .yomitan-glossary [data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-div[data-sc-head2] { margin-top: 0.25em; }
 .yomitan-glossary [data-dictionary="明鏡国語辞典 第三版"] .gloss-image-link[data-background="true"] > .gloss-image-container { background-color: inherit !important; }
 .yomitan-glossary [data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-span[data-sc-red] .gloss-sc-span[data-sc-img][data-sc-class="gaiji"] { filter: invert(60%) sepia(75%) saturate(7130%) hue-rotate(340deg) brightness(97%) contrast(108%) !important; }
-.yomitan-glossary { [data-dictionary="Jitendex.org [2026-01-04]"] {span[title] { cursor: help; }
-ul[data-sc-content="sense-groups"] { list-style-type: "＊"; }
-li[data-sc-content="sense-group"], li[data-sc-content="forms"] { padding-left: 0.25em; }
-div[data-sc-content="sense-group"], li[data-sc-content="sense-group"]:first-child { margin-top: 0.1em; }
-li[data-sc-content="sense-group"] + li[data-sc-content="sense-group"], div[data-sc-content="forms"], li[data-sc-content="forms"] { margin-top: 0.5em; }
-li[data-sc-content="sense"] {
-  padding-left: 0.25em;
-  & ul[data-sc-content="glossary"] { list-style-type: none; padding-left: 0.25em; }
-}
-span[data-sc-class="tag"] { border-radius: 0.3em; font-size: 0.8em; font-weight: bold; margin-right: 0.5em; padding: 0.2em 0.3em; vertical-align: text-bottom; word-break: keep-all; }
-span[data-sc-content="part-of-speech-info"] { background-color: rgb(86, 86, 86); color: white; }
-span[data-sc-content="misc-info"] { background-color: brown; color: white; }
-span[data-sc-content="field-info"] { background-color: purple; color: white; }
-span[data-sc-content="dialect-info"] { background-color: green; color: white; }
-span[data-sc-content="lang-source-wasei"] { background-color: orange; color: black; margin-left: 0.5em; margin-right: 0px; }
-span[data-sc-content="forms-label"] { background-color: rgb(86, 86, 86); color: white; }
-ul[data-sc-content="glossary"] { list-style-type: disc; }
-span[data-sc-content="registered-trademark"] { vertical-align: super; font-size: 0.6em; }
-div[data-sc-class="extra-box"] { border-radius: 0.4rem; border-style: none none none solid; border-width: calc(3em / var(--font-size-no-units, 14)); margin-bottom: 0.5rem; margin-top: 0.5rem; padding: 0.5rem; width: fit-content; }
-div[data-sc-class="extra-content"] { margin-left: 0.5rem; }
-div[data-sc-content="info-gloss"] { border-color: green; background-color: color-mix(in srgb, green 5%, transparent); }
-div[data-sc-content="sense-note"] { border-color: goldenrod; background-color: color-mix(in srgb, goldenrod 5%, transparent); }
-div[data-sc-content="lang-source"] { border-color: purple; background-color: color-mix(in srgb, purple 5%, transparent); }
-div[data-sc-content="xref"] {
-  border-color: rgb(26, 115, 232); background-color: color-mix(in srgb, rgb(26, 115, 232) 5%, transparent);
-  & span[data-sc-content="reference-label"] { color: rgb(26, 115, 232); }
-}
-div[data-sc-content="antonym"] {
-  border-color: brown; background-color: color-mix(in srgb, brown 5%, transparent);
-  & span[data-sc-content="reference-label"] { color: brown; }
-}
-div[data-sc-content="example-sentence"] { border-color: var(--text-color, var(--fg, #333)); background-color: color-mix(in srgb, var(--text-color, var(--fg, #333)) 5%, transparent); }
-div[data-sc-content="extra-info"] { margin-left: 0.5em; }
-div[data-sc-class="extra-label"] { color: rgb(119, 119, 119); font-size: 0.8em; font-style: italic; }
-span[data-sc-content="reference-label"] { font-size: 0.8em; margin-right: 0.5rem; }
-div[data-sc-content="xref-content"], div[data-sc-content="antonym-content"] { font-size: 1.3em; }
-div[data-sc-content="xref-glossary"], div[data-sc-content="antonym-glossary"] { font-size: 0.8rem; }
-div[data-sc-content="example-sentence-a"] { font-size: 1.3em; }
-div[data-sc-content="example-sentence-b"] { font-size: 0.8em; }
-span[data-sc-content="example-keyword"] { color: color-mix(in srgb, lime, var(--text-color, var(--fg, #333))); }
-span[data-sc-content="attribution-footnote"] { color: rgb(119, 119, 119); font-size: 0.8em; margin-left: 0.25rem; vertical-align: top; }
-div[data-sc-content="graphic"] {
-  margin-bottom: 0.5rem; margin-top: 0.5rem;
-  & .gloss-image-container { border: solid calc(42em / var(--font-size-no-units, 14)) var(--text-color, var(--fg, #333)); border-radius: 3%; }
-}
-div[data-sc-content="graphic-attribution"] { font-size: 70%; margin-top: 0.25rem; }
-div[data-sc-content="forms"], li[data-sc-content="forms"] {
-  & ul { font-size: 1.2em; list-style-type: circle; }
-  & table { margin-top: 0.2em; }
-  & tr { border-width: 1px; }
-  & th { border-width: 1px; font-weight: normal; }
-  & td {
-  border-width: 1px; text-align: center;
-  & span { clip-path: circle(); display: block; font-weight: bold; padding: 0px 0.5em; }
-}
-}
-th[data-sc-content="forms-row-senses"], tr[data-sc-content="forms-col-senses-row"] th { text-align: center; }
-tr[data-sc-content="forms-header-row"] th {
-  font-size: 1.2em; text-align: center; vertical-align: text-bottom;
-  & span[data-sc-class="old-character"] { text-emphasis-style: dot; }
-}
-span[data-sc-class="form-special"] { color: crimson; }
-td[data-sc-class="form-pri"] > span {
-  color: white; background: radial-gradient(green 50%, white 100%);
-  &::before { content: "△"; }
-}
-td[data-sc-class="form-irr"] > span {
-  color: white; background: radial-gradient(crimson 50%, white 100%);
-  &::before { content: "✕"; }
-}
-td[data-sc-class="form-out"] > span {
-  color: white; background: radial-gradient(blue 50%, white 100%);
-  &::before { content: "古"; }
-}
-td[data-sc-class="form-old"] > span {
-  color: white; background: radial-gradient(blue 50%, white 100%);
-  &::before { content: "旧"; }
-}
-td[data-sc-class="form-rare"] > span {
-  color: white; background: radial-gradient(purple 50%, white 100%);
-  &::before { content: "▽"; }
-}
-td[data-sc-class="form-valid"] > span {
-  color: var(--background-color, var(--canvas, #f8f9fa)); background: radial-gradient(var(--text-color, var(--fg, #333)) 50%, white 100%);
-  &::before { content: "◇"; }
-}
-div[data-sc-content="attribution"] { font-size: 0.7em; text-align: right; }
-div[data-sc-content="redirect-glossary"] { font-size: 180%; margin-top: 0.2em; }
-} }
 .yomitan-glossary [data-dictionary="絵でわかる慣用句"] summary { padding: 0.2em 0.5em; font-size: 0.8em; font-weight: bold; cursor: pointer; user-select: none; outline: none; }
 .yomitan-glossary [data-dictionary="絵でわかる慣用句"] details { display: inline-block; margin: 0.2em 0px; border: 1px solid; border-radius: 4px; overflow: hidden; vertical-align: middle; }
 .yomitan-glossary [data-dictionary="語彙力・熟語の百科事典"] details { display: inline-block; margin: 0.2em 0px; border: 1px solid; border-radius: 4px; overflow: hidden; vertical-align: middle; }
