@@ -254,6 +254,10 @@
 
   /* COLOR PALETTE
   ============================================ */
+  /* Canonical editable palette for Nord (native light/dark) and Focus.
+     Keep these as the first declarations of each setting variable: the
+     settings panel intentionally updates only this block. Cyberpunk owns its
+     separate data-senren-theme block below. */
   /* Light Theme
   -------------------------------------------- */
   /* Text Colors */
@@ -306,51 +310,51 @@
   /* Dark Theme
   -------------------------------------------- */
   /* Text Colors */
-  --text: #f1f1f1;
-  --dark-devoiced-color: #00f0ff;
-  --dark-highlight: #fcee0a;
-  --freq-text: #8f8f8f;
+  --text: #fcfcfc;
+  --dark-devoiced-color: cornflowerBlue;
+  --dark-highlight: #fcff61;
+  --freq-text: rgba(255, 255, 255, 0.2);
   --freq-text-hover: rgba(255, 255, 255, 1);
-  --tag-color: #d6d6d6;
-  --tag-color-hover: #ffffff;
-  --misc-info-text: #d0d0d0;
-  --misc-info-text-hover: #ffffff;
+  --tag-color: rgba(255, 255, 255, 0.21);
+  --tag-color-hover: rgba(255, 255, 255, 1);
+  --misc-info-text: rgba(255, 255, 255, 0.21);
+  --misc-info-text-hover: rgba(255, 255, 255, 1);
 
   /* Pitch Colors */
-  --pitch-red: #ff0055;
-  --pitch-blue: #00f0ff;
-  --pitch-orange: #ff9f1c;
-  --pitch-green: #39ff14;
-  --pitch-purple: #bd00ff;
+  --pitch-red: #f5436d;
+  --pitch-blue: #39c1ff;
+  --pitch-orange: #fca311;
+  --pitch-green: #40d4a6;
+  --pitch-purple: #afa2ff;
 
   /* Icon Colors */
-  --svg-color: #00f0ff;
-  --svg-hover: #fcee0a;
+  --svg-color: rgba(255, 255, 255, 0.2);
+  --svg-hover: rgba(255, 255, 255, 1);
 
   /* Background Colors */
-  --background: #040405;
-  --card-bg: #09090c;
-  --card-shadow: rgba(255, 0, 85, 0.22);
-  --word-bg: #11131a;
-  --pitch-position-bg: #35003b;
-  --picture-bg: #11131a;
-  --notes-bg: #14161d;
-  --definition-bg: #14161d;
+  --background: #2c2c2c;
+  --card-bg: rgba(0, 0, 0, 0.4);
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --word-bg: rgba(0, 0, 0, 0.3);
+  --pitch-position-bg: rgba(0, 0, 0, 0.2);
+  --picture-bg: rgba(0, 0, 0, 0.3);
+  --notes-bg: rgba(0, 0, 0, 0.3);
+  --definition-bg: rgba(0, 0, 0, 0.3);
   --dictionary-collapse-fade: linear-gradient(
     to bottom,
     rgba(44, 44, 44, 0),
     rgba(26, 26, 26, 9)
   );
-  --buttons-bg: #10141b;
-  --buttons-bg-hover: #fcee0a;
-  --lightbox-bg: #040405;
-  --frequency-bg: #2a0b35;
-  --tag-bg: #2a0b35;
+  --buttons-bg: rgba(0, 0, 0, 0.1);
+  --buttons-bg-hover: rgba(0, 0, 0, 0.63);
+  --lightbox-bg: rgba(0, 0, 0, 0.8);
+  --frequency-bg: rgba(0, 0, 0, 0.63);
+  --tag-bg: rgba(0, 0, 0, 0.1);
   --tag-bg-hover: rgba(0, 0, 0, 0.3);
-  --external-links-bg: #10141b;
+  --external-links-bg: rgba(0, 0, 0, 0.4);
   --external-links-bg-hover: rgba(0, 0, 0, 0.63);
-  --misc-info-bg: #10141b;
-  --misc-info-bg-hover: #ff0055;
+  --misc-info-bg: rgba(0, 0, 0, 0.1);
+  --misc-info-bg-hover: rgba(0, 0, 0, 0.3);
 
   /* DIMENSIONS & SPACING
   ============================================ */
@@ -707,14 +711,16 @@ b {
   list-style: none !important;
 }
 
-/* Custom Dark Mode */
-.custom-dark-mode body {
-  background: black !important;
-  color: white !important;
+/* Focus theme uses the editable dark palette. Theme-specific identity is
+   selected by data-senren-theme; custom-dark-mode remains a compatibility
+   class for shared dark component rules. */
+html[data-senren-theme="focus"] body {
+  background: var(--background) !important;
+  color: var(--text) !important;
 }
 
 /* Cyberpunk Theme */
-html.cyberpunk-theme {
+html[data-senren-theme="cyberpunk"] {
   --text: #f1f1f1;
   --dark-devoiced-color: #00f0ff;
   --dark-highlight: #fcee0a;            /* Cyberpunk yellow as highlight */
@@ -760,13 +766,13 @@ html.cyberpunk-theme {
   --lightbox-shadow: 0 0 14px rgba(0, 240, 255, 0.24) !important;
 }
 
-html.cyberpunk-theme body {
+html[data-senren-theme="cyberpunk"] body {
   color: var(--text) !important;
   background-color: #040405 !important;
   background-image: none !important;
 }
 
-html.cyberpunk-theme :is(.front, .back)::before {
+html[data-senren-theme="cyberpunk"] :is(.front, .back)::before {
   border: 1px solid rgba(0, 240, 255, 0.4) !important;
   border-left: 5px solid #00f0ff !important;
   border-top: 4px solid #fcee0a !important;
@@ -780,7 +786,7 @@ html.cyberpunk-theme :is(.front, .back)::before {
 }
 
 /* Slanted Cyberpunk HUD indicator tab */
-html.cyberpunk-theme :is(.front, .back)::after {
+html[data-senren-theme="cyberpunk"] :is(.front, .back)::after {
   content: "DECK_SYS // N.C.PD_SECURE_LINK" !important;
   position: absolute !important;
   top: -12px !important;
@@ -797,7 +803,7 @@ html.cyberpunk-theme :is(.front, .back)::after {
   box-shadow: 2px 2px 0px #ff0055 !important;
 }
 
-html.cyberpunk-theme :is(#word, .highlight, b) {
+html[data-senren-theme="cyberpunk"] :is(#word, .highlight, b) {
   color: #fcee0a !important;
   text-shadow:
     0 0 4px rgba(252, 238, 10, 0.4),
@@ -805,31 +811,31 @@ html.cyberpunk-theme :is(#word, .highlight, b) {
 }
 
 
-html.cyberpunk-theme :is(.background-box, .picture-container, .notes-card, .misc-info) {
+html[data-senren-theme="cyberpunk"] :is(.background-box, .picture-container, .notes-card, .misc-info) {
   border-color: rgba(0, 240, 255, 0.32) !important;
   box-shadow:
     inset 0 0 0 1px rgba(252, 238, 10, 0.05),
     3px 3px 0 rgba(255, 0, 85, 0.16) !important;
 }
 
-html.cyberpunk-theme :is(.tags, .frequency-box, .pitch-position, .external-links a) {
+html[data-senren-theme="cyberpunk"] :is(.tags, .frequency-box, .pitch-position, .external-links a) {
   border-radius: 2px !important;
   box-shadow: 2px 2px 0 rgba(255, 0, 85, 0.22) !important;
 }
 
-html.cyberpunk-theme .toggle-custom-dark-mode.cyberpunk-mode {
+html[data-senren-theme="cyberpunk"] .toggle-custom-dark-mode.cyberpunk-mode {
   color: #ff0055;
   text-shadow: 0 0 8px rgba(255, 0, 85, 0.55);
 }
 
-html.cyberpunk-theme
+html[data-senren-theme="cyberpunk"]
   .card
   :is(#wordAudio, #sentenceAudio):hover {
   background: #00f0ff !important;
   box-shadow: 0 0 8px #00f0ff !important;
 }
 
-html.cyberpunk-theme
+html[data-senren-theme="cyberpunk"]
   .card
   :is(#wordAudio, #sentenceAudio):hover
   .playImage
@@ -5570,9 +5576,10 @@ li.is-new-card:not(:hover) .related-word {
   z-index: 0;
 }
 
-/* Dictionary Theme Mapping */
+/* Dictionary Theme Mapping. Theme identity comes from data-senren-theme;
+   native Anki nightMode only chooses Nord's light/dark palette. */
 /* 1. Nord Light Theme Colors */
-html:not(.focus-theme):not(.cyberpunk-theme) .card {
+html[data-senren-theme="nord"] .card {
   --selection-text-color: var(--selection-text-color-light);
   --selection-text-color-rgb: var(--selection-text-color-rgb-light);
   --jmdict-color: var(--jmdict-color-light);
@@ -5658,7 +5665,7 @@ html:not(.focus-theme):not(.cyberpunk-theme) .card {
 }
 
 /* 2. Nord Dark Theme Colors (Pastel) */
-html:not(.focus-theme):not(.cyberpunk-theme) :is(.card.nightMode, .definition-box, .glossary-box) {
+html[data-senren-theme="nord"] .card.nightMode {
   --selection-text-color: var(--selection-text-color-dark);
   --selection-text-color-rgb: var(--selection-text-color-dark-rgb);
   --jmdict-color: var(--jmdict-color-dark);
@@ -5746,7 +5753,7 @@ html:not(.focus-theme):not(.cyberpunk-theme) :is(.card.nightMode, .definition-bo
 }
 
 /* 3. Cyberpunk Theme Colors (Vibrant Neon) */
-html.cyberpunk-theme :is(.card, .definition-box, .glossary-box) {
+html[data-senren-theme="cyberpunk"] .card {
   --selection-text-color: #fcee0a !important;
   --selection-text-color-rgb: 252, 238, 10 !important;
   --jmdict-color: #00f0ff !important;
@@ -5832,7 +5839,7 @@ html.cyberpunk-theme :is(.card, .definition-box, .glossary-box) {
 }
 
 /* 4. Focus Theme Colors (Muted High-Contrast Modern Dark) */
-html.focus-theme :is(.card, .definition-box, .glossary-box) {
+html[data-senren-theme="focus"] .card {
   --selection-text-color: #e2e8f0 !important;
   --selection-text-color-rgb: 226, 232, 240 !important;
   --jmdict-color: #38bdf8 !important;
@@ -8794,5 +8801,56 @@ div[data-sc-content="redirect-glossary"] { font-size: 180%; margin-top: 0.2em; }
   .external-links a:first-child,
   .external-links a:last-child {
     padding: 3px !important;
+  }
+}
+
+/* Phone layout must come after the tablet rules above. The tablet block also
+   matches phones and otherwise restores a 24px gutter, 20px card padding, and
+   a 36px front offset. */
+@media (max-width: 500px) {
+  html,
+  body,
+  .card,
+  #qa {
+    width: 100%;
+    max-width: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .front,
+  .back {
+    top: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-top: 8px !important;
+    padding-right: max(8px, env(safe-area-inset-right)) !important;
+    padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    padding-left: max(8px, env(safe-area-inset-left)) !important;
+    box-sizing: border-box;
+  }
+
+  .front::before,
+  .back::before {
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg) !important;
+  }
+
+  .front > .header {
+    margin-bottom: 4px;
+  }
+
+  .grid-container {
+    gap: 6px;
+  }
+
+  .sentence-container {
+    margin: 4px 0;
+  }
+
+  .mobile-word-layout > .background-box {
+    padding-top: 12px;
+    padding-bottom: 14px;
   }
 }

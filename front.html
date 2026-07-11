@@ -1,48 +1,4 @@
-<script>
-    (function () {
-        const normalizeThemeMode = (value) => {
-            const mode = (value || "").toString().trim().toLowerCase();
-            if (mode === "cyber") return "cyberpunk";
-            return ["nord", "focus", "cyberpunk"].includes(mode) ? mode : "";
-        };
-        const themeMode =
-            normalizeThemeMode(
-                localStorage.getItem("senren_--theme-mode") ||
-                    localStorage.getItem("senrenTheme"),
-            ) ||
-            (localStorage.getItem("darkMode") === "enabled" ? "focus" : "nord");
-        document.documentElement.classList.toggle("custom-dark-mode", themeMode !== "nord");
-        document.documentElement.classList.toggle("focus-theme", themeMode === "focus");
-        document.documentElement.classList.toggle("cyberpunk-theme", themeMode === "cyberpunk");
-        document.documentElement.dataset.senrenTheme = themeMode;
-        document.documentElement.style.setProperty("--theme-mode", themeMode);
-        try {
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith("senren_--")) {
-                    const varName = key.substring(7);
-                    const val = localStorage.getItem(key);
-                    if (val !== null) {
-                        document.documentElement.style.setProperty(varName, val);
-                    }
-                }
-            }
-            const customCss = localStorage.getItem("senren_user-custom-css");
-            if (customCss && customCss !== "null") {
-                let styleTag = document.getElementById("senren-live-custom-css");
-                if (!styleTag) {
-                    styleTag = document.createElement("style");
-                    styleTag.id = "senren-live-custom-css";
-                    (document.head || document.documentElement).appendChild(styleTag);
-                }
-                styleTag.textContent = customCss;
-            }
-        } catch (e) {
-            console.error(e);
-        }
-        window.__senrenSettingsRestored = true;
-    })();
-</script>
+<script src="_senren_theme_v4.7.0.js"></script>
 <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"

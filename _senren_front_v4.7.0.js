@@ -1,115 +1,17 @@
 var senrenConfig = {};
 
-    // Restore saved settings and custom CSS from localStorage immediately to prevent layout shifts and lags
-    (function () {
-        if (window.__senrenSettingsRestored) return;
-        try {
-            // Restore CSS variables
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith("senren_--")) {
-                    const varName = key.substring(7); // Remove "senren_"
-                    const val = localStorage.getItem(key);
-                    if (val !== null) {
-                        document.documentElement.style.setProperty(varName, val);
-                    }
-                }
-            }
-            // Restore Custom CSS
-            let customCss = localStorage.getItem("senren_user-custom-css");
-            if (customCss && customCss !== "null") {
-                let styleTag = document.getElementById("senren-live-custom-css");
-                if (!styleTag) {
-                    styleTag = document.createElement("style");
-                    styleTag.id = "senren-live-custom-css";
-                    document.head.appendChild(styleTag);
-                }
-                styleTag.textContent = customCss;
-            }
-        } catch (e) {
-            console.error("Error restoring settings:", e);
-        }
-        window.__senrenSettingsRestored = true;
-    })();
-
     // Deck Presets
     (function () {
-        const themeScopedPresetVars = new Set([
-            "--bd-text-shadow-color-light",
-            "--bd-text-shadow-color",
-            "--bd-text-shadow-opacity-light",
-            "--bd-text-shadow-opacity",
-            "--text-light",
-            "--text",
-            "--light-highlight",
-            "--dark-highlight",
-            "--light-devoiced-color",
-            "--dark-devoiced-color",
-            "--freq-text-light",
-            "--freq-text",
-            "--tag-bg-light",
-            "--tag-bg",
-            "--tag-color-light",
-            "--tag-color",
-            "--tag-color-hover-light",
-            "--tag-color-hover",
-            "--external-links-bg-light",
-            "--external-links-bg",
-            "--external-links-bg-hover-light",
-            "--external-links-bg-hover",
-            "--misc-info-text-light",
-            "--misc-info-text",
-            "--misc-info-text-hover-light",
-            "--misc-info-text-hover",
-            "--misc-info-bg-light",
-            "--misc-info-bg",
-            "--misc-info-bg-hover-light",
-            "--misc-info-bg-hover",
-            "--svg-color-light",
-            "--svg-color",
-            "--svg-hover-light",
-            "--svg-hover",
-            "--buttons-bg-light",
-            "--buttons-bg",
-            "--buttons-bg-hover-light",
-            "--buttons-bg-hover",
-            "--background-light",
-            "--background",
-            "--card-bg-light",
-            "--card-bg",
-            "--card-shadow-light",
-            "--card-shadow",
-            "--lightbox-bg-light",
-            "--lightbox-bg",
-            "--pitch-position-bg-light",
-            "--pitch-position-bg",
-            "--pitch-red-light",
-            "--pitch-red",
-            "--pitch-blue-light",
-            "--pitch-blue",
-            "--pitch-orange-light",
-            "--pitch-orange",
-            "--pitch-green-light",
-            "--pitch-green",
-            "--pitch-purple-light",
-            "--pitch-purple",
-            "--word-bg-light",
-            "--word-bg",
-            "--picture-bg-light",
-            "--picture-bg",
-            "--notes-bg-light",
-            "--notes-bg",
-            "--definition-bg-light",
-            "--definition-bg",
-            "--frequency-bg-light",
-            "--frequency-bg",
-        ]);
+        const themeRuntime = window.SenrenTheme;
+        const themeScopedPresetVars = new Set(
+            themeRuntime?.themeScopedVariables || [],
+        );
 
         const shouldApplyDeckPresetVar = (settings, key) => {
             if (!key.startsWith("--") || key === "--theme-mode") return false;
             return !(
-                String(settings["--theme-mode"] || "").toLowerCase() ===
-                    "cyberpunk" && themeScopedPresetVars.has(key)
+                themeRuntime?.getActive() === "cyberpunk" &&
+                themeScopedPresetVars.has(key)
             );
         };
 
@@ -248,105 +150,15 @@ var senrenConfig = {};
         );
     }
 
-    var SENREN_THEME_MODES = window.SENREN_THEME_MODES || [
-        "nord",
-        "focus",
-        "cyberpunk",
-    ];
-    window.SENREN_THEME_MODES = SENREN_THEME_MODES;
-
-    function normalizeThemeMode(value) {
-        const mode = (value || "").toString().trim().toLowerCase();
-        if (mode === "cyber") return "cyberpunk";
-        return SENREN_THEME_MODES.includes(mode) ? mode : "";
-    }
-
-    function getStoredThemeMode() {
-        const savedMode = normalizeThemeMode(
-            localStorage.getItem("senren_--theme-mode") ||
-                localStorage.getItem("senrenTheme"),
-        );
-        if (savedMode) return savedMode;
-
-        return localStorage.getItem("darkMode") === "enabled"
-            ? "focus"
-            : "nord";
-    }
-
-    function getActiveThemeMode() {
-        const root = document.documentElement;
-        if (root.classList.contains("cyberpunk-theme")) return "cyberpunk";
-        if (
-            root.classList.contains("focus-theme") ||
-            root.classList.contains("custom-dark-mode")
-        ) {
-            return "focus";
-        }
-        return "nord";
-    }
-
-    window.senrenApplyThemeMode = function (value) {
-        const themeMode = normalizeThemeMode(value) || getStoredThemeMode();
-        const root = document.documentElement;
-        const button = document.querySelector(".toggle-custom-dark-mode");
-        const sunIcon = document.querySelector(".sun-icon");
-        const moonIcon = document.querySelector(".moon-icon");
-
-        root.classList.remove(
-            "custom-dark-mode",
-            "focus-theme",
-            "cyberpunk-theme",
-        );
-        if (themeMode !== "nord") root.classList.add("custom-dark-mode");
-        if (themeMode === "focus") root.classList.add("focus-theme");
-        if (themeMode === "cyberpunk") root.classList.add("cyberpunk-theme");
-        root.dataset.senrenTheme = themeMode;
-        root.style.setProperty("--theme-mode", themeMode);
-
-        localStorage.setItem("senren_--theme-mode", themeMode);
-        localStorage.setItem("senrenTheme", themeMode);
-        localStorage.setItem(
-            "darkMode",
-            themeMode === "nord" ? "disabled" : "enabled",
-        );
-
-        if (button) {
-            button.classList.toggle("dark-mode", themeMode !== "nord");
-            button.classList.toggle("cyberpunk-mode", themeMode === "cyberpunk");
-            button.setAttribute(
-                "title",
-                `Theme: ${themeMode === "nord" ? "Nord" : themeMode === "focus" ? "Focus" : "Cyberpunk"}`,
-            );
-        }
-
-        if (sunIcon) sunIcon.style.display = themeMode === "focus" ? "inline" : "none";
-        if (moonIcon) moonIcon.style.display = themeMode === "focus" ? "none" : "inline";
-
-        const themeControls = document.querySelectorAll(
-            '.senren-segment-group[data-var="--theme-mode"] .senren-segment-btn',
-        );
-        themeControls.forEach((btn) => {
-            btn.classList.toggle(
-                "active",
-                normalizeThemeMode(btn.getAttribute("data-val")) === themeMode,
-            );
-        });
-
-        return themeMode;
-    };
-
     // Theme toggle
     function darkMode() {
+        if (!window.SenrenTheme) return;
         const button = document.querySelector(".toggle-custom-dark-mode");
-        window.senrenApplyThemeMode();
+        window.SenrenTheme.apply();
 
         if (button && !button.dataset.hasClickListener) {
             button.addEventListener("click", () => {
-                const current = getActiveThemeMode();
-                const currentIndex = SENREN_THEME_MODES.indexOf(current);
-                const nextTheme =
-                    SENREN_THEME_MODES[(currentIndex + 1) % SENREN_THEME_MODES.length];
-                window.senrenApplyThemeMode(nextTheme);
+                window.SenrenTheme.cycle();
             });
             button.dataset.hasClickListener = "true";
         }

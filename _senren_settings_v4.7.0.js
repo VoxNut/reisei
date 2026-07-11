@@ -348,6 +348,7 @@
         label: "Custom CSS",
         var: "user-custom-css",
         type: "textarea",
+        desc: "Live preview for the CUSTOM CSS block in style.css. It is persisted only when you select Save to Anki.",
       }
     ]
   };
@@ -400,82 +401,16 @@
 
   const SENREN_THEME_MODES = ["nord", "focus", "cyberpunk"];
   const THEME_MODE_VAR = "--theme-mode";
-  const BASE_THEME_DEFAULTS = {
-    "--bd-text-shadow-color-light": "255, 255, 255",
-    "--bd-text-shadow-color": "0, 0, 0",
-    "--bd-text-shadow-opacity-light": "0.6",
-    "--bd-text-shadow-opacity": "0.6",
-    "--text-light": "#020202",
-    "--text": "#fcfcfc",
-    "--light-highlight": "#E20033",
-    "--dark-highlight": "#5e81ac",
-    "--light-devoiced-color": "RoyalBlue",
-    "--dark-devoiced-color": "cornflowerBlue",
-    "--freq-text-light": "rgba(105, 105, 105, 0.3)",
-    "--freq-text": "rgba(255, 255, 255, 0.2)",
-    "--tag-bg-light": "rgba(0, 0, 0, 0.03)",
-    "--tag-bg": "rgba(0, 0, 0, 0.1)",
-    "--tag-color-light": "rgba(105, 105, 105, 0.26)",
-    "--tag-color": "rgba(255, 255, 255, 0.21)",
-    "--tag-color-hover-light": "rgba(255, 255, 255, 1)",
-    "--tag-color-hover": "rgba(255, 255, 255, 1)",
-    "--external-links-bg-light": "rgba(0, 0, 0, 0.1)",
-    "--external-links-bg": "rgba(0, 0, 0, 0.4)",
-    "--misc-info-text-light": "rgba(105, 105, 105, 0.26)",
-    "--misc-info-text": "rgba(255, 255, 255, 0.21)",
-    "--misc-info-text-hover-light": "rgba(255, 255, 255, 1)",
-    "--misc-info-text-hover": "rgba(255, 255, 255, 1)",
-    "--misc-info-bg-light": "rgba(0, 0, 0, 0.03)",
-    "--misc-info-bg": "rgba(0, 0, 0, 0.1)",
-    "--misc-info-bg-hover-light": "rgba(0, 0, 0, 0.63)",
-    "--misc-info-bg-hover": "rgba(0, 0, 0, 0.3)",
-    "--svg-color-light": "rgba(105, 105, 105, 0.3)",
-    "--svg-color": "rgba(255, 255, 255, 0.2)",
-    "--svg-hover-light": "rgba(255, 255, 255, 1)",
-    "--svg-hover": "rgba(255, 255, 255, 1)",
-    "--buttons-bg-light": "rgba(0, 0, 0, 0.03)",
-    "--buttons-bg": "rgba(0, 0, 0, 0.1)",
-    "--buttons-bg-hover-light": "rgba(0, 0, 0, 0.63)",
-    "--buttons-bg-hover": "rgba(0, 0, 0, 0.63)",
-    "--background-light": "#f5f5f5",
-    "--background": "#2e3440",
-    "--card-bg-light": "rgba(255, 255, 255, 0.4)",
-    "--card-bg": "rgba(0, 0, 0, 0.4)",
-    "--card-shadow-light": "rgba(0, 0, 0, 0.05)",
-    "--card-shadow": "rgba(0, 0, 0, 0.3)",
-    "--lightbox-bg-light": "rgba(0, 0, 0, 0.8)",
-    "--lightbox-bg": "rgba(0, 0, 0, 0.8)",
-    "--pitch-position-bg-light": "rgba(255, 255, 255, 0.8)",
-    "--pitch-position-bg": "rgba(0, 0, 0, 0.2)",
-    "--pitch-red-light": "#D62839",
-    "--pitch-red": "#f5436d",
-    "--pitch-blue-light": "#3474FF",
-    "--pitch-blue": "#39c1ff",
-    "--pitch-orange-light": "#FF6E03",
-    "--pitch-orange": "#fca311",
-    "--pitch-green-light": "#2BAF7E",
-    "--pitch-green": "#40d4a6",
-    "--pitch-purple-light": "#8A5EDE",
-    "--pitch-purple": "#afa2ff",
-    "--word-bg-light": "rgba(0, 0, 0, 0.03)",
-    "--word-bg": "rgba(0, 0, 0, 0.3)",
-    "--picture-bg-light": "rgba(0, 0, 0, 0.03)",
-    "--picture-bg": "rgba(0, 0, 0, 0.3)",
-    "--notes-bg-light": "rgba(0, 0, 0, 0.03)",
-    "--notes-bg": "rgba(0, 0, 0, 0.3)",
-    "--definition-bg-light": "rgba(0, 0, 0, 0.03)",
-    "--definition-bg": "rgba(0, 0, 0, 0.3)",
-    "--frequency-bg-light": "rgba(255, 255, 255, 0.8)",
-    "--frequency-bg": "rgba(0, 0, 0, 0.63)",
-  };
 
   function normalizeThemeMode(value) {
-    const mode = (value || "").toString().trim().toLowerCase();
+    if (window.SenrenTheme) return window.SenrenTheme.normalize(value);
+    const mode = String(value || "").trim().toLowerCase();
     if (mode === "cyber") return "cyberpunk";
     return SENREN_THEME_MODES.includes(mode) ? mode : "";
   }
 
   function getStoredThemeMode() {
+    if (window.SenrenTheme) return window.SenrenTheme.getStored();
     const savedMode = normalizeThemeMode(
       localStorage.getItem("senren_" + THEME_MODE_VAR) ||
         localStorage.getItem("senrenTheme")
@@ -491,7 +426,10 @@
   }
 
   function getActiveThemeMode() {
+    if (window.SenrenTheme) return window.SenrenTheme.getActive();
     const root = document.documentElement;
+    const dataMode = normalizeThemeMode(root.dataset.senrenTheme);
+    if (dataMode) return dataMode;
     if (root.classList.contains("cyberpunk-theme")) return "cyberpunk";
     if (
       root.classList.contains("focus-theme") ||
@@ -503,12 +441,8 @@
   }
 
   function applyThemeMode(value) {
+    if (window.SenrenTheme) return window.SenrenTheme.apply(value);
     const mode = normalizeThemeMode(value) || getStoredThemeMode();
-
-    if (typeof window.senrenApplyThemeMode === "function") {
-      window.senrenApplyThemeMode(mode);
-      return mode;
-    }
 
     const root = document.documentElement;
     root.classList.remove(
@@ -528,6 +462,9 @@
   }
 
   function getThemeScopedVars() {
+    if (window.SenrenTheme) {
+      return new Set(window.SenrenTheme.themeScopedVariables);
+    }
     return new Set(
       Object.values(groups)
         .flatMap(g => Array.isArray(g) ? g : g.items)
@@ -537,7 +474,7 @@
   }
 
   function shouldSkipPresetVar(settings, key) {
-    if (key === THEME_MODE_VAR) return true;
+    if (key === THEME_MODE_VAR || key === "user-custom-css") return true;
     return (
       normalizeThemeMode(settings && settings[THEME_MODE_VAR]) === "cyberpunk" &&
       getThemeScopedVars().has(key)
@@ -545,17 +482,18 @@
   }
 
   function getLiveCustomCss() {
-    const liveTag = document.getElementById("senren-live-custom-css");
-    if (liveTag && liveTag.textContent.trim()) return liveTag.textContent.trim();
-
+    // The embedded block in style.css is canonical. The live tag is only a
+    // temporary preview while the Advanced editor is open.
     const styles = document.querySelectorAll('style');
     for (const s of styles) {
       if (s.textContent.includes('/* CUSTOM CSS START */')) {
         const match = s.textContent.match(/\/\* CUSTOM CSS START \*\/([\s\S]*?)\/\* CUSTOM CSS END \*\//);
-        if (match && match[1]) return match[1].trim();
+        if (match) return match[1].trim();
       }
     }
-    return null;
+
+    const liveTag = document.getElementById("senren-live-custom-css");
+    return liveTag ? liveTag.textContent.trim() : "";
   }
 
   // UPDATE BACKDROP STATE CLASSES
@@ -646,15 +584,17 @@
       items.forEach(item => {
         if (item.type === 'header' || item.type === 'sub-header') return;
 
-        let newVal = liveSettings[item.var];
+        let newVal =
+          item.type === "textarea"
+            ? document.querySelector(`[data-var="${item.var}"]`)?.value ||
+              getLiveCustomCss()
+            : liveSettings[item.var];
         if (item.var === THEME_MODE_VAR) {
           newVal = "nord";
-        } else if (
-          activeThemeMode === "cyberpunk" &&
-          item.theme &&
-          BASE_THEME_DEFAULTS[item.var] !== undefined
-        ) {
-          newVal = BASE_THEME_DEFAULTS[item.var];
+        } else if (activeThemeMode === "cyberpunk" && item.theme) {
+          // Cyberpunk owns its palette in the dedicated theme block. Do not
+          // rewrite the canonical Nord/Focus values while it is active.
+          return;
         }
 
         if (item.type === 'textarea') {
@@ -675,7 +615,9 @@
           if (newVal === null || newVal === undefined) return;
 
           const safeVar = item.var.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-          const regex = new RegExp(`(${safeVar}\\s*:\\s*)([^;\\r\\n]+)(;)([ \\t]*)(\\/\\*.*)?`, 'g');
+          // Only the first declaration is the canonical setting. Later
+          // declarations belong to themes and responsive override layers.
+          const regex = new RegExp(`(${safeVar}\\s*:\\s*)([^;\\r\\n]+)(;)([ \\t]*)(\\/\\*.*)?`);
 
           if (regex.test(modifiedCss)) {
             modifiedCss = modifiedCss.replace(regex, (match, prefix, oldVal, semi, padding, comment) => {
@@ -888,6 +830,7 @@
     const items = Object.values(groups).flatMap(g => Array.isArray(g) ? g : g.items);
     items.forEach(item => {
       if (item.type === 'header' || item.type === 'sub-header') return;
+      if (item.type === 'textarea') return;
       if (item.var === THEME_MODE_VAR) return;
       if (activeThemeMode === "cyberpunk" && item.theme) return;
 
@@ -921,20 +864,16 @@
 
       // Fallback to Computed Card Styles
       if (val === null || val === "null") {
-        if (item.var === 'user-custom-css') {
-          val = getLiveCustomCss();
-        } else {
-          val = computedRoot.getPropertyValue(item.var).trim();
-          if ((!val || val === '' || val === 'initial') && computedCard) {
-            val = computedCard.getPropertyValue(item.var).trim();
-          }
+        val = computedRoot.getPropertyValue(item.var).trim();
+        if ((!val || val === '' || val === 'initial') && computedCard) {
+          val = computedCard.getPropertyValue(item.var).trim();
         }
       }
 
       if (val === "null") val = "";
 
       if (val !== null) {
-        if (item.type === 'textarea' || (val !== '' && val !== 'initial')) {
+        if (val !== '' && val !== 'initial') {
           settings[item.var] = val;
         }
       }
@@ -947,6 +886,7 @@
 
     items.forEach(item => {
       if (item.type === 'header' || item.type === 'sub-header') return;
+      if (item.type === 'textarea') return;
       if (item.var === THEME_MODE_VAR) return;
       localStorage.removeItem("senren_" + item.var);
       document.documentElement.style.removeProperty(item.var);
@@ -965,6 +905,7 @@
     if (container) {
       items.forEach(item => {
         if (item.type === 'header' || item.type === 'sub-header') return;
+        if (item.type === 'textarea') return;
 
         const savedVal = localStorage.getItem("senren_" + item.var);
         const input = document.querySelector(`[data-var="${item.var}"]`);
@@ -1311,23 +1252,6 @@
       window.senrenUpdateConfig(true);
     }
 
-    let customCssVal = localStorage.getItem("senren_user-custom-css");
-    if (customCssVal === null || customCssVal === "null") {
-      customCssVal = getLiveCustomCss();
-    }
-    if (customCssVal === null && activePreset && presetsCache[activePreset] && presetsCache[activePreset]["user-custom-css"] !== undefined) {
-      customCssVal = presetsCache[activePreset]["user-custom-css"];
-    }
-    const safeCss = (customCssVal === null || customCssVal === "null" || customCssVal === undefined) ? "" : customCssVal;
-
-    let styleTag = document.getElementById("senren-live-custom-css");
-    if (!styleTag) {
-      styleTag = document.createElement("style");
-      styleTag.id = "senren-live-custom-css";
-      document.head.appendChild(styleTag);
-    }
-    styleTag.textContent = safeCss;
-
     if (typeof window.alternativePitchStyle === 'function') window.alternativePitchStyle();
     if (typeof window.dynamicWordSize === 'function') window.dynamicWordSize();
     if (typeof window.toggleDefinition === 'function') window.toggleDefinition();
@@ -1347,6 +1271,7 @@
 
     items.forEach(item => {
       if (item.type === 'header' || item.type === 'sub-header') return;
+      if (item.type === 'textarea') return;
 
       const savedVal = localStorage.getItem("senren_" + item.var);
 
@@ -1377,7 +1302,8 @@
     let contentHtml = '';
     let groupIndex = 0;
 
-    const isDark = getStoredThemeMode() !== "nord" || document.body.classList.contains('nightMode') || document.documentElement.classList.contains('custom-dark-mode');
+    const activeThemeMode = getActiveThemeMode();
+    const isDark = activeThemeMode !== "nord" || document.body.classList.contains('nightMode');
 
     for (const [groupName, groupData] of Object.entries(groups)) {
       const items = Array.isArray(groupData) ? groupData : groupData.items;
@@ -1405,7 +1331,10 @@
         }
 
         items.forEach(item => {
-          if (item.theme && item.theme !== (isDark ? 'dark' : 'light')) {
+          if (
+            (activeThemeMode === "cyberpunk" && item.theme) ||
+            (item.theme && item.theme !== (isDark ? 'dark' : 'light'))
+          ) {
             return;
           }
 
@@ -1619,6 +1548,18 @@
           }
         }
 
+        if (type === "textarea") {
+          let styleTag = document.getElementById("senren-live-custom-css");
+          if (!styleTag) {
+            styleTag = document.createElement("style");
+            styleTag.id = "senren-live-custom-css";
+            document.head.appendChild(styleTag);
+          }
+          styleTag.textContent = newVal;
+          triggerUpdates();
+          return;
+        }
+
         document.documentElement.style.setProperty(varName, newVal);
         localStorage.setItem("senren_" + varName, newVal);
 
@@ -1659,7 +1600,10 @@
     const cardEl = document.querySelector('.card');
     const computedCard = cardEl ? getComputedStyle(cardEl) : null;
 
-    let currentVal = localStorage.getItem("senren_" + item.var);
+    let currentVal =
+      item.type === "textarea"
+        ? getLiveCustomCss()
+        : localStorage.getItem("senren_" + item.var);
 
     if (currentVal === null || currentVal === "null") {
       if (item.var === 'user-custom-css') {
@@ -1854,7 +1798,7 @@
         if (match) {
           const defaultValue = match[1].trim();
 
-          const replaceRegex = new RegExp(`(${safeVar}\\s*:\\s*)([^;\\r\\n]+)(;)([ \\t]*)(\\/\\*.*)?`, 'g');
+          const replaceRegex = new RegExp(`(${safeVar}\\s*:\\s*)([^;\\r\\n]+)(;)([ \\t]*)(\\/\\*.*)?`);
           if (replaceRegex.test(modifiedCss)) {
             modifiedCss = modifiedCss.replace(replaceRegex, (m, prefix, oldVal, semi, padding, comment) => {
               if (clean(oldVal) !== clean(defaultValue)) {
