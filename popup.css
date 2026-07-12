@@ -489,8 +489,9 @@ html:has(
   --headword-current-kanji-text-color: var(--pitch-purple);
 }
 
-/* An explicit [1] downstep is Atamadaka and takes priority over a broader
-   Kifuku headword category elsewhere in the current entry. */
+/* A lone explicit [1] downstep is Atamadaka. The multi-pattern Kifuku rule
+   below intentionally has the final say when the pronunciation list contains
+   more than one pattern. */
 html:has(
   .entry-current
     .pronunciation
@@ -514,6 +515,45 @@ html:has(
   --headword-text-color: var(--pitch-red);
   --headword-current-kanji-border-color: var(--pitch-red);
   --headword-current-kanji-text-color: var(--pitch-red);
+}
+
+/* Multiple pitch patterns + at least one real downstep = Kifuku.
+   Position [0] is Heiban, so it does not count as a pitch drop. Keeping both
+   conditions on the same current entry prevents a hidden result from affecting
+   the visible popup entry. */
+html:has(
+  .entry-current:has(
+      .pronunciation-list > .pronunciation:nth-child(2)
+    ):has(
+      .pronunciation-downstep-notation[data-downstep-position]:not(
+          [data-downstep-position="0"]
+        )
+    )
+) {
+  --accent-color: var(--pitch-purple);
+}
+
+.entry-current:has(
+    .pronunciation-list > .pronunciation:nth-child(2)
+  ):has(
+    .pronunciation-downstep-notation[data-downstep-position]:not(
+        [data-downstep-position="0"]
+      )
+  )
+  .headword[data-is-primary="true"],
+.entry-current:has(
+    .pronunciation-list > .pronunciation:nth-child(2)
+  ):has(
+    .pronunciation-downstep-notation[data-downstep-position]:not(
+        [data-downstep-position="0"]
+      )
+  )
+  .headword[data-is-primary="true"]
+  rt {
+  color: var(--pitch-purple);
+  --headword-text-color: var(--pitch-purple);
+  --headword-current-kanji-border-color: var(--pitch-purple);
+  --headword-current-kanji-text-color: var(--pitch-purple);
 }
 
 /* Nasal Mora */
@@ -1085,14 +1125,18 @@ div[data-sc-content="attribution"] {
 
 .definition-item[data-dictionary="明鏡国語辞典 第三版"] {
   font-family: "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "HiraMinProN-W3", "MS Mincho", serif;
-  .gloss-sc-span[data-sc-class="gaiji"] .gloss-image { -webkit-filter: invert(90%); filter: invert(90%); }
-  .gloss-sc-span[data-sc-zoomkanji] { background-color: #533e48; }
-  .gloss-sc-div[data-sc-class="shikiri"] { background-color: rgb(155, 88, 86); }
-  .gloss-sc-span[data-sc-fbox][data-sc-class="使い方"] { background-color: rgb(204, 51, 51); border-color: rgb(182, 62, 56); }
-  .gloss-sc-span[data-sc-column], .gloss-sc-div[data-sc-column] { border-left: solid 5px rgb(79, 48, 46); border-right: solid 5px rgb(79, 48, 46); }
-  .gloss-sc-div[data-sc-class="hinkaku"] { background-color: rgb(155, 88, 86); }
-  .gloss-sc-span[data-sc-fbox][data-sc-class="品格"] { background-color: rgb(204, 51, 51); border-color: rgb(182, 62, 56); }
 }
+
+.definition-item[data-dictionary="明鏡国語辞典 第三版"]
+  .gloss-sc-span[data-sc-class="gaiji"]
+  .gloss-image { -webkit-filter: invert(90%); filter: invert(90%); }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-span[data-sc-zoomkanji] { background-color: #533e48; }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-div[data-sc-class="shikiri"] { background-color: rgb(155, 88, 86); }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-span[data-sc-fbox][data-sc-class="使い方"] { background-color: rgb(204, 51, 51); border-color: rgb(182, 62, 56); }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-span[data-sc-column],
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-div[data-sc-column] { border-left: solid 5px rgb(79, 48, 46); border-right: solid 5px rgb(79, 48, 46); }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-div[data-sc-class="hinkaku"] { background-color: rgb(155, 88, 86); }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] .gloss-sc-span[data-sc-fbox][data-sc-class="品格"] { background-color: rgb(204, 51, 51); border-color: rgb(182, 62, 56); }
 
 [data-dictionary="NEW斎藤和英大辞典"] ul.gloss-sc-ul > li:nth-child(n + 5) { display: none; }
 
@@ -1116,17 +1160,18 @@ div[data-sc-content="attribution"] {
 }
 
 
-.definition-item[data-dictionary='明鏡国語辞典 第三版'] {
-    /* Disable furigana */
-    .gloss-sc-ruby[data-sc-class="full"] .gloss-sc-rt[data-sc-rt] {
-        display: none;
-    }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"]
+  .gloss-sc-ruby[data-sc-class="full"]
+  .gloss-sc-rt[data-sc-rt] {
+  display: none;
+}
 
-    /* Show the 類語 section */
-    div[data-sc-ruigo_items] {
-        display: block;
-    }
+.definition-item[data-dictionary="明鏡国語辞典 第三版"] div[data-sc-ruigo_items] {
+  display: block;
+}
 
+.definition-item[data-dictionary="明鏡国語辞典 第三版"]
+  :is(
     [data-sc-body],
     span[data-sc-rect],
     span[data-sc-katsuyo],
@@ -1140,19 +1185,13 @@ div[data-sc-content="attribution"] {
     div[data-sc-meaning][data-sc-class="columntitle"],
     span[data-sc-b],
     a,
-    span[data-sc-bc]  {
-        font-family: "Hiragino Mincho ProN";
-    }
-
+    span[data-sc-bc],
     div[data-sc-example],
     span[data-sc-fbox][data-sc-class="品格"],
     span[data-sc-headword][data-sc-class="表記"],
     span[data-sc-headword][data-sc-class="原綴"],
-    span[data-sc-zoomkanji] {
-        font-family: "Hiragino Mincho ProN";
-    }
-
-    span[data-sc-pron] {
-        font-family: "Hiragino Mincho ProN";
-    }
+    span[data-sc-zoomkanji],
+    span[data-sc-pron]
+  ) {
+  font-family: "Hiragino Mincho ProN";
 }
