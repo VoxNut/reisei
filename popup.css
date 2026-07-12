@@ -489,73 +489,155 @@ html:has(
   --headword-current-kanji-text-color: var(--pitch-purple);
 }
 
-/* A lone explicit [1] downstep is Atamadaka. The multi-pattern Kifuku rule
-   below intentionally has the final say when the pronunciation list contains
-   more than one pattern. */
+/* Resolve the headline color from agreement between the actual pitch graphs.
+   Any real downstep starts as Kifuku; an exact consensus below overrides it. */
 html:has(
   .entry-current
-    .pronunciation
-    .pronunciation-downstep-notation[data-downstep-position="1"]
-) {
-  --accent-color: var(--pitch-red);
-}
-
-.entry-current:has(
-    .pronunciation
-      .pronunciation-downstep-notation[data-downstep-position="1"]
-  )
-  .headword[data-is-primary="true"],
-.entry-current:has(
-    .pronunciation
-      .pronunciation-downstep-notation[data-downstep-position="1"]
-  )
-  .headword[data-is-primary="true"]
-  rt {
-  color: var(--pitch-red);
-  --headword-text-color: var(--pitch-red);
-  --headword-current-kanji-border-color: var(--pitch-red);
-  --headword-current-kanji-text-color: var(--pitch-red);
-}
-
-/* Multiple pitch patterns + at least one real downstep = Kifuku.
-   Position [0] is Heiban, so it does not count as a pitch drop. Keeping both
-   conditions on the same current entry prevents a hidden result from affecting
-   the visible popup entry. */
-html:has(
-  .entry-current:has(
-      .pronunciation-list > .pronunciation:nth-child(2)
-    ):has(
-      .pronunciation-downstep-notation[data-downstep-position]:not(
-          [data-downstep-position="0"]
-        )
+    .pronunciation-downstep-notation[data-downstep-position]:not(
+      [data-downstep-position="0"]
     )
 ) {
   --accent-color: var(--pitch-purple);
 }
 
 .entry-current:has(
-    .pronunciation-list > .pronunciation:nth-child(2)
-  ):has(
     .pronunciation-downstep-notation[data-downstep-position]:not(
         [data-downstep-position="0"]
       )
-  )
-  .headword[data-is-primary="true"],
-.entry-current:has(
-    .pronunciation-list > .pronunciation:nth-child(2)
-  ):has(
-    .pronunciation-downstep-notation[data-downstep-position]:not(
-        [data-downstep-position="0"]
-      )
-  )
-  .headword[data-is-primary="true"]
-  rt {
-  color: var(--pitch-purple);
-  --headword-text-color: var(--pitch-purple);
-  --headword-current-kanji-border-color: var(--pitch-purple);
-  --headword-current-kanji-text-color: var(--pitch-purple);
+  ) {
+  --resolved-pitch-color: var(--pitch-purple);
 }
 
+/* Every graph is Heiban [0]. */
+.entry-current:has(.pronunciation):not(
+    :has(
+      .pronunciation:not(
+          :has(
+            .pronunciation-downstep-notation[data-downstep-position="0"]
+          )
+        )
+    )
+  ) {
+  --resolved-pitch-color: var(--pitch-blue);
+}
+
+html:has(
+  .entry-current:has(.pronunciation):not(
+      :has(
+        .pronunciation:not(
+            :has(
+              .pronunciation-downstep-notation[data-downstep-position="0"]
+            )
+          )
+      )
+    )
+) {
+  --accent-color: var(--pitch-blue);
+}
+
+/* Every graph is Atamadaka [1]. */
+.entry-current:has(.pronunciation):not(
+    :has(
+      .pronunciation:not(
+          :has(
+            .pronunciation-downstep-notation[data-downstep-position="1"]
+          )
+        )
+    )
+  ) {
+  --resolved-pitch-color: var(--pitch-red);
+}
+
+html:has(
+  .entry-current:has(.pronunciation):not(
+      :has(
+        .pronunciation:not(
+            :has(
+              .pronunciation-downstep-notation[data-downstep-position="1"]
+            )
+          )
+      )
+    )
+) {
+  --accent-color: var(--pitch-red);
+}
+
+/* Every graph drops before its final mora: Nakadaka. */
+.entry-current:has(.pronunciation):not(
+    :has(
+      .pronunciation:not(
+          :has(
+            .pronunciation-downstep-notation[data-downstep-position]:not(
+                [data-downstep-position="0"]
+              ):not([data-downstep-position="1"])
+          ):has(
+            .pronunciation-mora:not(:last-child)[data-pitch-next="low"]
+          )
+        )
+    )
+  ) {
+  --resolved-pitch-color: var(--pitch-orange);
+}
+
+html:has(
+  .entry-current:has(.pronunciation):not(
+      :has(
+        .pronunciation:not(
+            :has(
+              .pronunciation-downstep-notation[data-downstep-position]:not(
+                  [data-downstep-position="0"]
+                ):not([data-downstep-position="1"])
+            ):has(
+              .pronunciation-mora:not(:last-child)[data-pitch-next="low"]
+            )
+          )
+      )
+    )
+) {
+  --accent-color: var(--pitch-orange);
+}
+
+/* Every graph drops after its final mora: Odaka. */
+.entry-current:has(.pronunciation):not(
+    :has(
+      .pronunciation:not(
+          :has(
+            .pronunciation-downstep-notation[data-downstep-position]:not(
+                [data-downstep-position="0"]
+              ):not([data-downstep-position="1"])
+          ):has(.pronunciation-mora:last-child[data-pitch-next="low"])
+        )
+    )
+  ) {
+  --resolved-pitch-color: var(--pitch-green);
+}
+
+html:has(
+  .entry-current:has(.pronunciation):not(
+      :has(
+        .pronunciation:not(
+            :has(
+              .pronunciation-downstep-notation[data-downstep-position]:not(
+                  [data-downstep-position="0"]
+                ):not([data-downstep-position="1"])
+            ):has(.pronunciation-mora:last-child[data-pitch-next="low"])
+          )
+      )
+    )
+) {
+  --accent-color: var(--pitch-green);
+}
+
+.entry-current:has(.pronunciation)
+  .headword[data-is-primary="true"],
+.entry-current:has(.pronunciation)
+  .headword[data-is-primary="true"]
+  rt {
+  color: var(--resolved-pitch-color);
+  --headword-text-color: var(--resolved-pitch-color);
+  --headword-current-kanji-border-color: var(--resolved-pitch-color);
+  --headword-current-kanji-text-color: var(--resolved-pitch-color);
+}
 /* Nasal Mora */
 .pronunciation-nasal-indicator {
   border: 0.1em solid var(--nasal-color);
