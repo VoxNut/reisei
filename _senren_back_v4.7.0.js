@@ -3113,8 +3113,6 @@ var senrenConfig = {};
       else SENTENCE_DELAY = baseWaitTime + charCount * timePerChar;
     }
 
-    let initialPlayTimeout;
-
     const backContainer = ELS.back;
     let newArrows = [];
 
@@ -3344,9 +3342,6 @@ var senrenConfig = {};
         e.stopPropagation();
 
         if (replayTimeout) clearTimeout(replayTimeout);
-        if (typeof initialPlayTimeout !== "undefined")
-          clearTimeout(initialPlayTimeout);
-
         document.querySelectorAll("audio").forEach((a) => {
           try {
             a.pause();
@@ -3371,18 +3366,12 @@ var senrenConfig = {};
         if (e.key === "j") {
           e.preventDefault();
           e.stopPropagation();
-          if (typeof initialPlayTimeout !== "undefined")
-            clearTimeout(initialPlayTimeout);
-
           currentIndex--;
           if (currentIndex < 0) currentIndex = totalSlides - 1;
           updateDisplay(true);
         } else if (e.key === "k") {
           e.preventDefault();
           e.stopPropagation();
-          if (typeof initialPlayTimeout !== "undefined")
-            clearTimeout(initialPlayTimeout);
-
           currentIndex++;
           if (currentIndex >= totalSlides) currentIndex = 0;
           updateDisplay(true);
@@ -3566,8 +3555,6 @@ var senrenConfig = {};
         event.preventDefault();
         event.stopPropagation();
 
-        if (initialPlayTimeout) clearTimeout(initialPlayTimeout);
-
         const direction = arrow.classList.contains("left") ? -1 : 1;
         currentIndex += direction;
 
@@ -3584,13 +3571,10 @@ var senrenConfig = {};
     window.senrenRefreshScenes = () => updateDisplay(false);
     updateDisplay(false);
 
-    const muteNsfw = senrenConfig.muteNsfwAudio;
-
-    if (muteNsfw !== "true" || !window.IS_NSFW) {
-      initialPlayTimeout = setTimeout(() => {
-        playActiveAudio();
-      }, SENTENCE_DELAY);
-    }
+    // Do not synthesize sentence-audio playback when the back side loads.
+    // Anki's own replay/autoplay policy should behave the same for single- and
+    // multi-scene cards. Navigation and the replay shortcut still call
+    // updateDisplay(true), which intentionally plays the selected scene.
   }
 
   // Toggle Image
