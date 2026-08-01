@@ -6873,7 +6873,8 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
     position: absolute;
     top: 61px;
     right: 20px;
-    z-index: var(--z-index-toggle);
+    /* Keep the open list above pitch-position and other card annotations. */
+    z-index: calc(var(--z-index-base) + 1);
   }
 
   .glossary-box,
