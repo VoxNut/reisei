@@ -2367,12 +2367,87 @@ var senrenConfig = {};
   }
   window.senrenGetPitchType = getPitchType;
 
+  function getDirectListItems(container) {
+    if (!container) return [];
+
+    const list = Array.from(container.children).find((child) =>
+      child.matches("ol, ul"),
+    );
+    return list
+      ? Array.from(list.children).filter((child) => child.matches("li"))
+      : [];
+  }
+
+  function getPitchGraphSignature(readingItem) {
+    const moraWrappers = Array.from(
+      readingItem.querySelectorAll(
+        '.pronunciation-mora, span[style*="display:inline-block"]',
+      ),
+    ).filter((wrapper) =>
+      Array.from(wrapper.children).some(
+        (child) =>
+          child.classList.contains("pronunciation-mora-line") ||
+          child.style.borderColor,
+      ),
+    );
+
+    if (moraWrappers.length === 0) {
+      return readingItem.innerHTML.replace(/\s+/g, "");
+    }
+
+    return moraWrappers
+      .map((wrapper) => {
+        const line = Array.from(wrapper.children).find(
+          (child) =>
+            child.classList.contains("pronunciation-mora-line") ||
+            child.style.borderColor,
+        );
+        const hasTopLine =
+          wrapper.dataset.pitch === "high" ||
+          Boolean(line?.style.borderTopWidth);
+        const hasDrop =
+          wrapper.dataset.pitchNext === "low" ||
+          Boolean(line?.style.borderRightWidth);
+        return `${hasTopLine ? "H" : "L"}${hasDrop ? "D" : ""}`;
+      })
+      .join("");
+  }
+
+  function deduplicatePitchReadings(rubyElement, positionElement) {
+    const readingItems = getDirectListItems(rubyElement?.querySelector("rt"));
+    const positionItems = getDirectListItems(positionElement);
+    const positionsAreAligned = positionItems.length === readingItems.length;
+    const seen = new Set();
+
+    readingItems.forEach((readingItem, index) => {
+      const readingText = (readingItem.textContent || "")
+        .normalize("NFC")
+        .replace(/\s+/g, "");
+      const positionMatch = positionItems[index]?.textContent.match(/\d+/);
+      const pitchIdentity = positionMatch
+        ? `position:${parseInt(positionMatch[0], 10)}`
+        : `graph:${getPitchGraphSignature(readingItem)}`;
+      const signature = `${readingText}|${pitchIdentity}`;
+
+      if (!seen.has(signature)) {
+        seen.add(signature);
+        return;
+      }
+
+      readingItem.remove();
+      if (positionsAreAligned) positionItems[index].remove();
+    });
+  }
+  window.senrenDeduplicatePitchReadings = deduplicatePitchReadings;
+
   // Format pitch accent positions and categories
   function cleanPitchPositions() {
     const positionElements = document.querySelectorAll("#position");
     const rubyElement = document.querySelector("#word > span > ruby");
     const mainWordSpan = document.querySelector("#word > span");
     const sentenceSpan = document.getElementById("formattedSentence");
+
+    deduplicatePitchReadings(rubyElement, positionElements[0]);
 
     const elementsToClean = [
       mainWordSpan,
