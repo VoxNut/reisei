@@ -2415,6 +2415,7 @@ var senrenConfig = {};
 
   function deduplicatePitchReadings(rubyElement, positionElement) {
     const readingItems = getDirectListItems(rubyElement?.querySelector("rt"));
+    const readingList = readingItems[0]?.parentElement;
     const positionItems = getDirectListItems(positionElement);
     const positionsAreAligned = positionItems.length === readingItems.length;
     const seen = new Set();
@@ -2459,6 +2460,7 @@ var senrenConfig = {};
       if (positionsAreAligned) positionItems[index].remove();
     });
 
+    readingList?.classList.add("pitch-readings-ready");
     return pitchTypes;
   }
   window.senrenDeduplicatePitchReadings = deduplicatePitchReadings;

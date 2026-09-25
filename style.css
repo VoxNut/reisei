@@ -1039,6 +1039,12 @@ html[data-senren-theme="focus"] body {
   white-space: nowrap;
 }
 
+/* Prevent the raw dictionary duplicates from affecting the first paint while
+   the back script builds the final unique accent list. */
+#word ruby rt > :is(ol, ul):not(.pitch-readings-ready) > li:not(:first-child) {
+  display: none;
+}
+
 #word ruby rt li + li::before {
   content: "／";
   margin-right: 0.55em;
