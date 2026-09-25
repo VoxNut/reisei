@@ -2418,6 +2418,14 @@ var senrenConfig = {};
     const positionItems = getDirectListItems(positionElement);
     const positionsAreAligned = positionItems.length === readingItems.length;
     const seen = new Set();
+    const pitchTypes = new Set();
+    const pitchClassNames = [
+      "heiban",
+      "atamadaka",
+      "nakadaka",
+      "odaka",
+      "kifuku",
+    ];
 
     readingItems.forEach((readingItem, index) => {
       const readingText = (readingItem.textContent || "")
@@ -2431,12 +2439,27 @@ var senrenConfig = {};
 
       if (!seen.has(signature)) {
         seen.add(signature);
+        readingItem.classList.add("pitch-reading");
+        readingItem.classList.remove(...pitchClassNames);
+
+        if (positionMatch) {
+          const pitchType = getPitchType(
+            parseInt(positionMatch[0], 10),
+            readingItem,
+          );
+          if (pitchType !== "unknown") {
+            readingItem.classList.add(pitchType);
+            pitchTypes.add(pitchType);
+          }
+        }
         return;
       }
 
       readingItem.remove();
       if (positionsAreAligned) positionItems[index].remove();
     });
+
+    return pitchTypes;
   }
   window.senrenDeduplicatePitchReadings = deduplicatePitchReadings;
 
@@ -2447,7 +2470,19 @@ var senrenConfig = {};
     const mainWordSpan = document.querySelector("#word > span");
     const sentenceSpan = document.getElementById("formattedSentence");
 
-    deduplicatePitchReadings(rubyElement, positionElements[0]);
+    const readingPitchTypes = deduplicatePitchReadings(
+      rubyElement,
+      positionElements[0],
+    );
+    const hasMultiplePitchReadings = readingPitchTypes.size > 1;
+    mainWordSpan?.classList.toggle(
+      "multiple-pitch-readings",
+      hasMultiplePitchReadings,
+    );
+    sentenceSpan?.classList.toggle(
+      "multiple-pitch-readings",
+      hasMultiplePitchReadings,
+    );
 
     const elementsToClean = [
       mainWordSpan,

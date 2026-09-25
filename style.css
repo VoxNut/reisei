@@ -1073,6 +1073,12 @@ html[data-senren-theme="focus"] body {
 
 #word ruby {
   line-height: 1.4;
+  ruby-align: center;
+}
+
+#word .ruby-base-word {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 #word rt {
@@ -2914,6 +2920,88 @@ svg.playImage path {
       #formattedSentence.alt-highlight.kifuku .highlight,
       #formattedSentence.alt-highlight.kifuku b
     ) {
+    color: var(--pitch-purple);
+  }
+
+  /* A multi-accent word has no single authoritative color. Keep the base word
+     and sentence neutral, then color each reading by its own pitch class. */
+  #word.alt > .multiple-pitch-readings,
+  #formattedSentence.alt-highlight.multiple-pitch-readings
+    :is(.highlight, b) {
+    color: var(--text-light);
+  }
+
+  :is(.card.nightMode, .custom-dark-mode)
+    :is(
+      #word.alt > .multiple-pitch-readings,
+      #formattedSentence.alt-highlight.multiple-pitch-readings
+        :is(.highlight, b)
+    ) {
+    color: var(--text);
+  }
+
+  #word .pitch-reading.heiban,
+  #word .pitch-reading.heiban span[style*="border-color:currentColor"] {
+    color: var(--pitch-blue-light);
+  }
+
+  #word .pitch-reading.atamadaka,
+  #word .pitch-reading.atamadaka span[style*="border-color:currentColor"] {
+    color: var(--pitch-red-light);
+  }
+
+  #word .pitch-reading.nakadaka,
+  #word .pitch-reading.nakadaka span[style*="border-color:currentColor"] {
+    color: var(--pitch-orange-light);
+  }
+
+  #word .pitch-reading.odaka,
+  #word .pitch-reading.odaka span[style*="border-color:currentColor"] {
+    color: var(--pitch-green-light);
+  }
+
+  #word .pitch-reading.kifuku,
+  #word .pitch-reading.kifuku span[style*="border-color:currentColor"] {
+    color: var(--pitch-purple-light);
+  }
+
+  :is(.card.nightMode, .custom-dark-mode) #word .pitch-reading.heiban,
+  :is(.card.nightMode, .custom-dark-mode)
+    #word
+    .pitch-reading.heiban
+    span[style*="border-color:currentColor"] {
+    color: var(--pitch-blue);
+  }
+
+  :is(.card.nightMode, .custom-dark-mode) #word .pitch-reading.atamadaka,
+  :is(.card.nightMode, .custom-dark-mode)
+    #word
+    .pitch-reading.atamadaka
+    span[style*="border-color:currentColor"] {
+    color: var(--pitch-red);
+  }
+
+  :is(.card.nightMode, .custom-dark-mode) #word .pitch-reading.nakadaka,
+  :is(.card.nightMode, .custom-dark-mode)
+    #word
+    .pitch-reading.nakadaka
+    span[style*="border-color:currentColor"] {
+    color: var(--pitch-orange);
+  }
+
+  :is(.card.nightMode, .custom-dark-mode) #word .pitch-reading.odaka,
+  :is(.card.nightMode, .custom-dark-mode)
+    #word
+    .pitch-reading.odaka
+    span[style*="border-color:currentColor"] {
+    color: var(--pitch-green);
+  }
+
+  :is(.card.nightMode, .custom-dark-mode) #word .pitch-reading.kifuku,
+  :is(.card.nightMode, .custom-dark-mode)
+    #word
+    .pitch-reading.kifuku
+    span[style*="border-color:currentColor"] {
     color: var(--pitch-purple);
   }
 
