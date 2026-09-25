@@ -8,6 +8,9 @@
   // =========================================================================
   const groups = {
     "Visibility": [
+      { type: "header", label: "All Screens" },
+      { label: "Auto-hide Left Controls", var: "--auto-hide-left-controls", type: "switch-bool", desc: "Hide the left-side card controls until the left edge is hovered on desktop or tapped on a touch screen." },
+
       { type: "header", label: "Desktop / Global" },
       { label: "Settings Toggle", var: "--settings-visibility", type: "switch-int", desc: "Show the gear icon to open the settings.", mobileHidden: true },
       { label: "Main Card Background", var: "--main-bg-visibility", type: "switch-int", desc: "Show the main card background.", mobileHidden: true },

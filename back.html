@@ -10,36 +10,44 @@
 <div class="back" data-tags="{{Tags}}">
   <!-- HEADER -->
   <div class="header">
+    <span
+      class="left-controls-reveal tappable"
+      role="button"
+      tabindex="0"
+      aria-label="Show card controls"
+      title="Show card controls"
+    ></span>
+
     <!-- Theme Toggle -->
-    <span class="toggle-custom-dark-mode tappable">
+    <span class="toggle-custom-dark-mode senren-left-control tappable">
       <i class="fas fa-sun sun-icon"></i>
       <i class="fas fa-moon moon-icon"></i>
     </span>
 
     <!-- Settings Toggle -->
-    <span class="toggle-settings-btn tappable">
+    <span class="toggle-settings-btn senren-left-control tappable">
       <i class="fas fa-cog"></i>
     </span>
 
     <!-- Audios -->
     {{#wordAudio}}
-    <div class="{{Tags}}"><span class="audio">{{wordAudio}}</span></div>
+    <div class="senren-left-control {{Tags}}"><span class="audio">{{wordAudio}}</span></div>
     {{/wordAudio}} {{#sentenceAudio}}
-    <div class="{{Tags}}">
+    <div class="senren-left-control {{Tags}}">
       <span class="sentenceaudio">{{sentenceAudio}}</span>
     </div>
     {{/sentenceAudio}}
 
     <!-- Notes Toggle -->
     {{#notes}}
-    <span class="toggle-notes tappable">
+    <span class="toggle-notes senren-left-control tappable">
       <div class="toggle-notes-svg"></div>
     </span>
     {{/notes}}
 
     <!-- Image Toggle -->
     <span
-      class="toggle-image-visibility show-btn tappable"
+      class="toggle-image-visibility show-btn senren-left-control tappable"
       style="display: none"
     >
       <i class="fas fa-image"></i>

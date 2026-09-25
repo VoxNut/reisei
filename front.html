@@ -11,15 +11,23 @@
 <div class="front">
     <!-- HEADER -->
     <div class="header">
+        <span
+            class="left-controls-reveal tappable"
+            role="button"
+            tabindex="0"
+            aria-label="Show card controls"
+            title="Show card controls"
+        ></span>
+
         <!-- Theme Toggle -->
-        <span class="toggle-custom-dark-mode tappable">
+        <span class="toggle-custom-dark-mode senren-left-control tappable">
             <i class="fas fa-sun sun-icon"></i>
             <i class="fas fa-moon moon-icon"></i>
         </span>
 
         {{#audioCard}}
         <span
-            class="audio-hint toggle-trigger tappable"
+            class="audio-hint senren-left-control toggle-trigger tappable"
             onclick="
                 toggleVisibility('sentence-wrapper-audio', 'sentence-audio')
             "
@@ -29,7 +37,7 @@
         {{/audioCard}}
 
         <!-- Settings Toggle -->
-        <span class="toggle-settings-btn tappable">
+        <span class="toggle-settings-btn senren-left-control tappable">
             <i class="fas fa-cog"></i>
         </span>
 

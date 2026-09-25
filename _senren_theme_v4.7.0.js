@@ -199,6 +199,53 @@
     }
   }
 
+  function setupLeftControlsReveal() {
+    if (window.__senrenLeftControlsRevealBound) return;
+    window.__senrenLeftControlsRevealBound = true;
+
+    const closeHeader = (header) => {
+      header.classList.remove("left-controls-open");
+      const focused = document.activeElement;
+      if (focused && header.contains(focused) && typeof focused.blur === "function") {
+        focused.blur();
+      }
+    };
+
+    const closeAll = (except = null) => {
+      document.querySelectorAll(".header.left-controls-open").forEach((header) => {
+        if (header !== except) closeHeader(header);
+      });
+    };
+
+    document.addEventListener("click", (event) => {
+      const reveal = event.target.closest?.(".left-controls-reveal");
+      if (reveal) {
+        event.preventDefault();
+        event.stopPropagation();
+        const header = reveal.closest(".header");
+        if (!header) return;
+
+        const shouldOpen = !header.classList.contains("left-controls-open");
+        closeAll(header);
+        if (shouldOpen) header.classList.add("left-controls-open");
+        else closeHeader(header);
+        return;
+      }
+
+      if (!event.target.closest?.(".header .senren-left-control")) closeAll();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      const reveal = event.target.closest?.(".left-controls-reveal");
+      if (reveal && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        reveal.click();
+      } else if (event.key === "Escape") {
+        closeAll();
+      }
+    });
+  }
+
   const api = Object.freeze({
     modes,
     themeScopedVariables,
@@ -217,6 +264,7 @@
   window.senrenApplyThemeMode = apply;
 
   restoreVariables();
+  setupLeftControlsReveal();
   apply(getStored(), { persist: false });
   window.__senrenSettingsRestored = true;
 })();

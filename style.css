@@ -60,6 +60,7 @@
 
   /* COMPONENT VISIBILITY ("1" to show, "0" to Hide)
   ============================================ */
+  --auto-hide-left-controls: false; /* Hide left controls until the left edge is hovered or tapped */
   --settings-visibility: 1; /* Settings toggle */
   --main-bg-visibility: 1; /* Main bg */
   --main-bg-shadow-visibility: 1; /* Box shadow around the main bg */
@@ -762,6 +763,47 @@ html[data-senren-theme="focus"] {
 html[data-senren-theme="focus"] body {
   background: var(--background) !important;
   color: var(--text) !important;
+}
+
+/* Optional auto-hide for the controls along the left edge. */
+.left-controls-reveal {
+  display: none;
+}
+
+@container style(--auto-hide-left-controls: true) {
+  .left-controls-reveal {
+    display: block;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 18px;
+    z-index: var(--z-index-toggle);
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .header .senren-left-control {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .header:is(:hover, :focus-within, .left-controls-open)
+    .senren-left-control {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+@media (hover: hover) {
+  @container style(--auto-hide-left-controls: true) {
+    .left-controls-reveal {
+      width: calc(
+        var(--spacing-xxxl) + var(--button-size) + (2 * var(--spacing-lg))
+      );
+    }
+  }
 }
 
 /* Audio Hint Toggle */

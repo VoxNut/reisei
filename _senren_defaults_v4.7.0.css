@@ -29,6 +29,7 @@
 
   /* COMPONENT VISIBILITY ("1" to show, "0" to Hide)
   ============================================ */
+  --auto-hide-left-controls: false; /* Hide left controls until the left edge is hovered or tapped */
   --settings-visibility: 1; /* Settings toggle */
   --main-bg-visibility: 1; /* Main bg */
   --main-bg-shadow-visibility: 0; /* Box shadow around the main bg */
