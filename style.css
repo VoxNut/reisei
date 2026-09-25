@@ -1078,17 +1078,29 @@ html[data-senren-theme="focus"] body {
 }
 
 #word ruby {
-  line-height: 1.4;
+  display: inline-grid;
+  grid-template-areas:
+    "reading"
+    "base";
+  justify-items: center;
+  align-items: center;
+  line-height: normal;
   ruby-align: center;
 }
 
 #word .ruby-base-word {
+  grid-area: base;
   display: inline-block;
+  line-height: 1.1;
   white-space: nowrap;
 }
 
 #word rt {
-  line-height: 1.5;
+  grid-area: reading;
+  display: block;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
   transform: translateY(var(--furigana-height));
 }
 
@@ -1126,13 +1138,16 @@ html[data-senren-theme="focus"] body {
 
 @container style(--reading-position: below) {
   #word ruby {
+    grid-template-areas:
+      "base"
+      "reading";
     ruby-position: under !important;
     -webkit-ruby-position: under !important;
     text-align: center;
   }
 
   #word ruby li {
-    padding-top: 10px;
+    padding-top: 0;
   }
 
   #word rt ol,

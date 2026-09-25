@@ -80,6 +80,80 @@
       </div>
     </div>
 
+    <!-- Stabilize the word/reading header before the external back script loads. -->
+    <script>
+      (() => {
+        const wordElement = document.getElementById("word");
+        const rubyElement = wordElement?.querySelector("ruby");
+        const baseElement = rubyElement?.querySelector(".ruby-base-word");
+        const readingElement = rubyElement?.querySelector("rt");
+        if (!wordElement || !rubyElement || !baseElement || !readingElement) {
+          return;
+        }
+
+        const getDirectItems = (container) => {
+          const list = Array.from(container.children).find((child) =>
+            child.matches("ol, ul"),
+          );
+          return list
+            ? Array.from(list.children).filter((child) => child.matches("li"))
+            : [];
+        };
+
+        const readingItems = getDirectItems(readingElement);
+        const positionElement = document.getElementById("position");
+        const positionItems = getDirectItems(positionElement);
+        const positionsAreAligned = positionItems.length === readingItems.length;
+
+        if (readingItems.length > 0) {
+          const seen = new Set();
+          readingItems.forEach((item, index) => {
+            const reading = (item.textContent || "")
+              .normalize("NFC")
+              .replace(/\s+/g, "");
+            const position = positionItems[index]?.textContent.match(/\d+/)?.[0];
+            const fallback = item.innerHTML.replace(/\s+/g, "");
+            const signature = `${reading}|${position ?? fallback}`;
+
+            if (seen.has(signature)) {
+              item.remove();
+              if (positionsAreAligned) positionItems[index].remove();
+              return;
+            }
+            seen.add(signature);
+          });
+          readingItems[0].parentElement?.classList.add("pitch-readings-ready");
+        }
+
+        const wordText = (baseElement.textContent || "").trim();
+        const hideDuplicateKana =
+          getComputedStyle(document.documentElement)
+            .getPropertyValue("--no-duplicate-kana")
+            .trim() === "true";
+
+        if (
+          hideDuplicateKana &&
+          wordText &&
+          !/[\u3400-\u4DBF\u4E00-\u9FFF\u3005\u3007]/.test(wordText)
+        ) {
+          const firstReading = readingElement.querySelector("li");
+          const readingHtml = firstReading
+            ? firstReading.innerHTML
+            : readingElement.innerHTML;
+
+          if (readingHtml.trim()) {
+            rubyElement.dataset.originalHtml = rubyElement.innerHTML;
+            baseElement.innerHTML = readingHtml;
+            readingElement.style.display = "none";
+            wordElement.classList.add("reading-is-word");
+          }
+        }
+
+        wordElement.classList.add(`length-${Math.min(wordText.length, 9)}`);
+        wordElement.classList.add("word-layout-ready");
+      })();
+    </script>
+
     <!-- Picture -->
     <div class="picture-container {{Tags}} clickable-image tappable">
       {{picture}}
