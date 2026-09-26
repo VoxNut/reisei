@@ -2237,9 +2237,10 @@ var senrenConfig = {};
     if (wordElement) {
       const wordSpan = wordElement.querySelector("span");
       if (wordSpan) {
-        const rubyElement = wordSpan.querySelector("ruby");
-        const content = rubyElement
-          ? rubyElement.firstChild.textContent.trim()
+        const stackElement = wordSpan.querySelector(".word-reading-stack, ruby");
+        const baseElement = stackElement?.querySelector(".ruby-base-word");
+        const content = stackElement
+          ? (baseElement || stackElement.firstChild).textContent.trim()
           : wordSpan.textContent.trim();
         const contentLength = content.length;
 
@@ -2378,6 +2379,10 @@ var senrenConfig = {};
       : [];
   }
 
+  function getWordReadingElement(stackElement) {
+    return stackElement?.querySelector(".word-reading, rt") || null;
+  }
+
   function getPitchGraphSignature(readingItem) {
     const moraWrappers = Array.from(
       readingItem.querySelectorAll(
@@ -2413,8 +2418,10 @@ var senrenConfig = {};
       .join("");
   }
 
-  function deduplicatePitchReadings(rubyElement, positionElement) {
-    const readingItems = getDirectListItems(rubyElement?.querySelector("rt"));
+  function deduplicatePitchReadings(stackElement, positionElement) {
+    const readingItems = getDirectListItems(
+      getWordReadingElement(stackElement),
+    );
     const readingList = readingItems[0]?.parentElement;
     const positionItems = getDirectListItems(positionElement);
     const positionsAreAligned = positionItems.length === readingItems.length;
@@ -2468,12 +2475,14 @@ var senrenConfig = {};
   // Format pitch accent positions and categories
   function cleanPitchPositions() {
     const positionElements = document.querySelectorAll("#position");
-    const rubyElement = document.querySelector("#word > span > ruby");
+    const stackElement = document.querySelector(
+      "#word > span > .word-reading-stack, #word > span > ruby",
+    );
     const mainWordSpan = document.querySelector("#word > span");
     const sentenceSpan = document.getElementById("formattedSentence");
 
     const readingPitchTypes = deduplicatePitchReadings(
-      rubyElement,
+      stackElement,
       positionElements[0],
     );
     const hasMultiplePitchReadings = readingPitchTypes.size > 1;
@@ -2489,7 +2498,7 @@ var senrenConfig = {};
     const elementsToClean = [
       mainWordSpan,
       sentenceSpan,
-      rubyElement,
+      stackElement,
       ...positionElements,
     ];
 
@@ -2515,7 +2524,7 @@ var senrenConfig = {};
         element.classList.add(newClassValue);
       }
     });
-    const rtElement = rubyElement?.querySelector("rt");
+    const rtElement = getWordReadingElement(stackElement);
 
     const updates = [];
     let potentialFallbackClass = null;
@@ -2842,15 +2851,15 @@ var senrenConfig = {};
     if (!wordElement) return;
 
     const mainSpan = wordElement.querySelector(":scope > span");
-    const rubyElement = mainSpan?.querySelector("ruby");
-    let rtElement = rubyElement?.querySelector("rt");
+    const stackElement = mainSpan?.querySelector(".word-reading-stack, ruby");
+    let rtElement = getWordReadingElement(stackElement);
 
     if (
       (wordElement.classList.contains("reading-is-word") ||
         (rtElement && !rtElement.textContent.trim())) &&
-      rubyElement
+      stackElement
     ) {
-      const wordSpan = rubyElement.querySelector("span");
+      const wordSpan = stackElement.querySelector(".ruby-base-word, span");
       if (wordSpan) {
         rtElement = wordSpan;
       }
@@ -3054,8 +3063,10 @@ var senrenConfig = {};
     const wordContainer = ELS.word;
     if (!wordContainer) return;
 
-    const rubyElement = wordContainer.querySelector("ruby");
-    if (!rubyElement) return;
+    const stackElement = wordContainer.querySelector(".word-reading-stack, ruby");
+    const baseElement = stackElement?.querySelector(".ruby-base-word");
+    const readingElement = getWordReadingElement(stackElement);
+    if (!stackElement || !baseElement || !readingElement) return;
 
     const substituteSetting = senrenConfig.noDuplicateKana;
     const shouldBeEnabled = substituteSetting === "true";
@@ -3063,9 +3074,10 @@ var senrenConfig = {};
       wordContainer.classList.contains("reading-is-word");
 
     if (!shouldBeEnabled) {
-      if (isCurrentlyEnabled && rubyElement.dataset.originalHtml) {
-        rubyElement.innerHTML = rubyElement.dataset.originalHtml;
-        delete rubyElement.dataset.originalHtml;
+      if (isCurrentlyEnabled && stackElement.dataset.originalBaseHtml) {
+        baseElement.innerHTML = stackElement.dataset.originalBaseHtml;
+        delete stackElement.dataset.originalBaseHtml;
+        readingElement.style.display = "";
         wordContainer.classList.remove("reading-is-word");
       }
       return;
@@ -3073,30 +3085,13 @@ var senrenConfig = {};
 
     if (shouldBeEnabled && isCurrentlyEnabled) return;
 
-    let fullWordText = "";
-    let nodesToRemove = [];
-
-    for (const node of rubyElement.childNodes) {
-      if (node.nodeName === "RT" || node.nodeName === "RP") continue;
-
-      if (
-        node.nodeType === Node.TEXT_NODE ||
-        node.nodeType === Node.ELEMENT_NODE
-      ) {
-        fullWordText += node.textContent;
-        nodesToRemove.push(node);
-      }
-    }
+    let fullWordText = baseElement.textContent || "";
 
     // Strip disambiguation parentheses: のに (Despite) → のに
     var disambigMatch = fullWordText.match(/^(.+?)\s*\(.*?\)\s*$/);
     if (disambigMatch) {
       fullWordText = disambigMatch[1].trim();
-      nodesToRemove.forEach(function (node) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          node.textContent = node.textContent.replace(/\s*\(.*?\)\s*$/, "");
-        }
-      });
+      baseElement.textContent = fullWordText;
     }
 
     if (!fullWordText.trim()) return;
@@ -3104,23 +3099,14 @@ var senrenConfig = {};
     const hasKanji = REGEX.KANJI.test(fullWordText);
 
     if (!hasKanji) {
-      const rtElement = rubyElement.querySelector("rt");
-      if (!rtElement) return;
-
       let readingHTML = "";
-      const firstLi = rtElement.querySelector("li");
-      readingHTML = firstLi ? firstLi.innerHTML : rtElement.innerHTML;
+      const firstLi = readingElement.querySelector("li");
+      readingHTML = firstLi ? firstLi.innerHTML : readingElement.innerHTML;
 
       if (readingHTML.trim()) {
-        rubyElement.dataset.originalHtml = rubyElement.innerHTML;
-
-        const readingWrapper = document.createElement("span");
-        readingWrapper.innerHTML = readingHTML;
-
-        nodesToRemove.forEach((node) => node.remove());
-
-        rubyElement.insertBefore(readingWrapper, rtElement);
-        rtElement.style.display = "none";
+        stackElement.dataset.originalBaseHtml = baseElement.innerHTML;
+        baseElement.innerHTML = readingHTML;
+        readingElement.style.display = "none";
 
         wordContainer.classList.add("reading-is-word");
       }
@@ -3183,7 +3169,7 @@ var senrenConfig = {};
     let charCount = 5;
 
     if (wordEl) {
-      const rt = wordEl.querySelector("rt");
+      const rt = wordEl.querySelector(".word-reading, rt");
       const targetElement =
         rt && rt.querySelector("li") ? rt.querySelector("li") : rt || wordEl;
 

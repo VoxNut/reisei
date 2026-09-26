@@ -73,7 +73,10 @@
     <div class="background-box tappable">
       <div id="word" class="pitch card-a">
         <span class="{{pitch}} {{Tags}}">
-          <ruby><span class="ruby-base-word">{{word}}</span><rt>{{reading}}</rt></ruby>
+          <span class="word-reading-stack">
+            <span class="ruby-base-word">{{word}}</span>
+            <span class="word-reading">{{reading}}</span>
+          </span>
           <div id="position">{{pitchPosition}}</div>
           <div id="categories" class="tappable">{{pitch}}</div>
         </span>
@@ -84,10 +87,10 @@
     <script>
       (() => {
         const wordElement = document.getElementById("word");
-        const rubyElement = wordElement?.querySelector("ruby");
-        const baseElement = rubyElement?.querySelector(".ruby-base-word");
-        const readingElement = rubyElement?.querySelector("rt");
-        if (!wordElement || !rubyElement || !baseElement || !readingElement) {
+        const stackElement = wordElement?.querySelector(".word-reading-stack");
+        const baseElement = stackElement?.querySelector(".ruby-base-word");
+        const readingElement = stackElement?.querySelector(".word-reading");
+        if (!wordElement || !stackElement || !baseElement || !readingElement) {
           return;
         }
 
@@ -142,7 +145,7 @@
             : readingElement.innerHTML;
 
           if (readingHtml.trim()) {
-            rubyElement.dataset.originalHtml = rubyElement.innerHTML;
+            stackElement.dataset.originalBaseHtml = baseElement.innerHTML;
             baseElement.innerHTML = readingHtml;
             readingElement.style.display = "none";
             wordElement.classList.add("reading-is-word");

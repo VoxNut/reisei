@@ -330,37 +330,38 @@
     const mainSpan = wordContainer.querySelector(':scope > span');
     if (!mainSpan) return;
 
-    const rubyElement = mainSpan.querySelector('ruby');
-    if (!rubyElement) return;
+    const wordStack = mainSpan.querySelector('.word-reading-stack, ruby');
+    if (!wordStack) return;
+
+    // The current card template uses a flex-based word/reading stack so the
+    // header does not reflow when the back script finishes loading. Keep
+    // native <ruby> support for older templates, but only modify the base-word
+    // element in the current template; replacing the whole stack would remove
+    // its reading and pitch markup.
+    const baseWordElement = wordStack.querySelector('.ruby-base-word');
+    const readingElement = wordStack.querySelector('.word-reading, rt');
 
     let wordText = '';
     let readingText = '';
 
-    const kanjiSpans = rubyElement.querySelectorAll('.kanji');
-    if (kanjiSpans.length > 0) {
-      wordText = Array.from(kanjiSpans).map(span => span.textContent.trim()).join('');
-    }
-
-    for (const node of rubyElement.childNodes) {
-      if (node.nodeName.toLowerCase() === 'rt') {
-        readingText = node.textContent.trim();
-        break;
-      }
-    }
-
-    if (!wordText) {
-      for (const node of rubyElement.childNodes) {
-        if (node.nodeName.toLowerCase() === 'rt') {
-          break;
-        }
+    if (baseWordElement) {
+      wordText = baseWordElement.textContent.trim();
+    } else {
+      for (const node of wordStack.childNodes) {
+        const nodeName = node.nodeName.toLowerCase();
+        if (nodeName === 'rt' || nodeName === 'rp') continue;
         if (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE) {
           wordText += node.textContent.trim();
         }
       }
     }
 
+    if (readingElement) readingText = readingElement.textContent.trim();
+
     if (!readingText) {
-      wordText = rubyElement.textContent.trim();
+      wordText = baseWordElement
+        ? baseWordElement.textContent.trim()
+        : wordStack.textContent.trim();
     }
     if (!/[一-龯㐀-䶿]/.test(wordText)) return;
 
@@ -468,16 +469,16 @@
       fragment.appendChild(document.createTextNode(textContent.slice(lastIndex)));
     }
 
-    const extraNodes = Array.from(rubyElement.childNodes).filter(node =>
-      node.nodeName.toLowerCase() === 'rt' || node.nodeName.toLowerCase() === 'rp'
-    );
+    if (baseWordElement) {
+      baseWordElement.replaceChildren(fragment);
+    } else {
+      const extraNodes = Array.from(wordStack.childNodes).filter(node =>
+        node.nodeName.toLowerCase() === 'rt' || node.nodeName.toLowerCase() === 'rp'
+      );
 
-    while (rubyElement.firstChild) {
-      rubyElement.removeChild(rubyElement.firstChild);
+      wordStack.replaceChildren(fragment);
+      extraNodes.forEach(node => wordStack.appendChild(node));
     }
-
-    rubyElement.appendChild(fragment);
-    extraNodes.forEach(node => rubyElement.appendChild(node));
   };
 
   window.senrenInitKanjiHover();
