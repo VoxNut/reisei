@@ -163,6 +163,7 @@
   --pitch-colors: true; /* "false" to disable pitch downstep coloring */
   --sentence-pitch-highlight: true; /* "true" to make pitch colors overwrite sentence highlights */
   --only-kana-pitch-size: 0.08em; /* Border thickness for kana-only words */
+  --pitch-line-clearance: 0.18em; /* Space between the pitch line and kana */
 
   /* KANJI HOVER SETTINGS
   ============================================ */
@@ -1026,11 +1027,14 @@ html[data-senren-theme="focus"] body {
 
 #word .word-reading > :is(ol, ul) {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.55em;
+  max-width: 100%;
+  gap: 0.15em 0.55em;
   margin: 0;
   padding: 0;
+  white-space: normal;
 }
 
 #word .word-reading li {
@@ -1048,17 +1052,28 @@ html[data-senren-theme="focus"] body {
   display: none;
 }
 
-#word .word-reading li + li::before {
+#word .word-reading li:not(:last-child)::after {
   content: "／";
-  margin-right: 0.55em;
+  margin-left: 0.55em;
   opacity: 0.45;
 }
 
 #word {
   position: relative;
+  min-width: 0;
+  max-width: 100%;
   font-family: var(--serif);
   font-size: var(--word-size-base);
   text-align: center;
+}
+
+#word > span {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  max-width: 100%;
 }
 
 #word.length-4 {
@@ -1082,11 +1097,26 @@ html[data-senren-theme="focus"] body {
 
 #word .word-reading-stack {
   display: inline-flex;
+  flex: 0 1 auto;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-width: 0;
+  max-width: 100%;
   line-height: normal;
-  white-space: nowrap;
+  white-space: normal;
+}
+
+#word .word-pitch-meta {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+#word .word-pitch-meta:not(:has(#position:not(:empty))) {
+  display: none;
 }
 
 #word .ruby-base-word {
@@ -1099,6 +1129,8 @@ html[data-senren-theme="focus"] body {
 #word .word-reading {
   order: 1;
   display: block;
+  min-width: 0;
+  max-width: 100%;
   line-height: 1.2;
   margin: 0;
   padding: 0;
@@ -1125,7 +1157,7 @@ html[data-senren-theme="focus"] body {
   justify-content: center;
   align-items: center;
   white-space: nowrap;
-  min-width: min-content;
+  min-width: 0;
 }
 
 .background-box {
@@ -1156,15 +1188,6 @@ html[data-senren-theme="focus"] body {
     display: inline-flex !important;
   }
 
-  #position {
-    top: auto !important;
-    align-content: center;
-  }
-
-  #categories {
-    top: auto !important;
-    transform-origin: bottom left !important;
-  }
 }
 
 /* Picture Container */
@@ -3080,6 +3103,19 @@ svg.playImage path {
 .pronunciation-mora {
   position: relative;
   display: inline-block;
+  padding-top: var(--pitch-line-clearance);
+}
+
+/* Yomitan's imported pitch graphs use inline-styled mora wrappers instead of
+   the fallback classes above. Target only the top-level morae: pronunciation
+   markers such as nasal/devoiced kana contain nested relative wrappers, and
+   padding those as well makes adjacent pitch-line segments change height. */
+#word
+  .word-reading
+  li
+  > span[style*="display:inline"]
+  > span[style*="display:inline-block"][style*="position:relative"] {
+  padding-top: var(--pitch-line-clearance) !important;
 }
 
 .pronunciation-mora[data-pitch="high"][data-pitch-next="low"] {
@@ -3096,7 +3132,7 @@ svg.playImage path {
   position: absolute;
   left: 0;
   right: 0;
-  top: 0.1em;
+  top: 0;
   border-top-width: 0.1em;
   border-top-style: solid;
   border-color: transparent; /* Hidden by default */
@@ -3197,15 +3233,11 @@ span[style*="display:inline-block;position:relative;"]
 #position {
   font-family: var(--sans);
   font-weight: bold;
-  color: white;
-  position: absolute;
-  top: 0;
-  left: 100%;
+  position: static;
   color: var(--text-light);
-  margin-left: var(--spacing-ms);
-  transform: translateY(var(--furigana-height));
+  margin: 0;
   font-size: 0.5rem;
-  padding: 5px 5px 5px 5px;
+  padding: 5px;
   border-radius: var(--border-radius-ms);
   z-index: var(--z-index-base);
   text-align: center;
@@ -3224,7 +3256,7 @@ span[style*="display:inline-block;position:relative;"]
 }
 
 @container style(--pitch-position-visibility: 0) {
-  #position {
+  #word .word-pitch-meta {
     display: none !important;
   }
 }
@@ -3233,11 +3265,11 @@ span[style*="display:inline-block;position:relative;"]
 #categories {
   font-family: var(--sans);
   position: absolute;
-  top: 0;
-  left: 100%;
-  margin-left: var(--spacing-ms);
+  top: calc(100% + var(--spacing-sm));
+  left: 50%;
+  margin: 0;
   font-size: 0.5rem;
-  padding: 5px 5px 5px 5px;
+  padding: 5px;
   border-radius: var(--border-radius-sm);
   z-index: var(--z-index-base);
   text-align: center;
@@ -3245,8 +3277,8 @@ span[style*="display:inline-block;position:relative;"]
   opacity: 0;
   visibility: hidden;
   overflow: hidden;
-  transform: scaleX(0);
-  transform-origin: left;
+  transform: translate(-50%, -0.2em) scale(0.96);
+  transform-origin: top center;
   transition:
     opacity var(--base-transition),
     transform var(--base-transition),
@@ -3259,7 +3291,7 @@ span[style*="display:inline-block;position:relative;"]
 #categories:hover {
   opacity: 1;
   visibility: visible;
-  transform: scaleX(1);
+  transform: translate(-50%, 0) scale(1);
   background: rgba(0, 0, 0, 1);
   color: rgba(255, 255, 255, 1);
 }
@@ -3275,7 +3307,7 @@ span[style*="display:inline-block;position:relative;"]
   color: rgba(0, 0, 0, 1);
   opacity: 1 !important;
   visibility: visible !important;
-  transform: scaleX(1);
+  transform: translate(-50%, 0) scale(1);
 }
 
 #categories:empty {
