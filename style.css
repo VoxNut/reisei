@@ -427,43 +427,98 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--sans);
+  width: 1em;
+  height: 1em;
   font-style: normal;
-  font-weight: normal;
   line-height: 1;
+  flex: 0 0 auto;
 }
 
-.fa-sun::before {
-  content: "☀";
+.fas::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: currentColor;
+  -webkit-mask: var(--senren-icon) center / contain no-repeat;
+  mask: var(--senren-icon) center / contain no-repeat;
 }
 
-.fa-moon::before {
-  content: "☾";
+.fa-sun {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42'/%3E%3C/svg%3E");
 }
 
-.fa-cog::before {
-  content: "⚙";
+.fa-moon {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'/%3E%3C/svg%3E");
 }
 
-.fa-lightbulb::before {
-  content: "◉";
+.fa-cog {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.09A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.14.37.36.7.65.96.3.25.68.4 1.08.4H21v4h-.09A1.7 1.7 0 0 0 19.4 15z'/%3E%3C/svg%3E");
 }
 
-.fa-question::before {
-  content: "?";
-  font-weight: bold;
+.fa-lightbulb {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6m-5 4h4m3-8c1.24-1.1 2-2.7 2-4.5a7 7 0 1 0-14 0c0 1.8.76 3.4 2 4.5.65.58 1 1.13 1 2h8c0-.87.35-1.42 1-2z'/%3E%3C/svg%3E");
 }
 
-.fa-image::before {
-  content: "▣";
+.fa-question {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M9.8 9a2.5 2.5 0 1 1 4.4 1.6c-.9.9-2.2 1.2-2.2 2.9M12 17h.01'/%3E%3C/svg%3E");
 }
 
-.fa-times::before {
-  content: "×";
+.fa-circle-info,
+.fa-info-circle {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v6M12 7h.01'/%3E%3C/svg%3E");
 }
 
-.fa-chevron-down::before {
-  content: "⌄";
+.fa-triangle-exclamation {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.3 3.6 1.8 18.2A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.8L13.7 3.6a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01'/%3E%3C/svg%3E");
+}
+
+.fa-image {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpath d='m21 15-5-5L5 21'/%3E%3C/svg%3E");
+}
+
+.fa-times {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E");
+}
+
+.fa-chevron-down {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.fa-chevron-up {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 15 6-6 6 6'/%3E%3C/svg%3E");
+}
+
+.fa-external-link-alt {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M10 14 21 3M18 13v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h7'/%3E%3C/svg%3E");
+}
+
+.fa-link {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.1 1.1M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1'/%3E%3C/svg%3E");
+}
+
+.fa-tags {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.6 13.6 11 4H4v7l9.6 9.6a2 2 0 0 0 2.8 0l4.2-4.2a2 2 0 0 0 0-2.8z'/%3E%3Ccircle cx='7.5' cy='7.5' r='1'/%3E%3C/svg%3E");
+}
+
+.fa-puzzle-piece {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 13h-2.1a3 3 0 1 0-5.8 0H9V9H5a2 2 0 1 1 0-4h4V3h4v2.1a3 3 0 1 1 0 5.8V13h2.1a3 3 0 1 1 3.9 3.9V21h-6v-2.1a3 3 0 1 0-4 0V21H3v-8h4'/%3E%3C/svg%3E");
+}
+
+.fa-cubes {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m12 2 4 2.3v4.6L12 11 8 8.9V4.3L12 2zM6 11l4 2.3v4.6L6 20l-4-2.1v-4.6L6 11zM18 11l4 2.3v4.6L18 20l-4-2.1v-4.6L18 11zM8 4.3l4 2.3 4-2.3M2 13.3l4 2.3 4-2.3M14 13.3l4 2.3 4-2.3'/%3E%3C/svg%3E");
+}
+
+.fa-equals {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M5 9h14M5 15h14'/%3E%3C/svg%3E");
+}
+
+.fa-right-left {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h14M17 3l4 4-4 4M17 17H3M7 13l-4 4 4 4'/%3E%3C/svg%3E");
+}
+
+.fa-columns {
+  --senren-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M12 4v16'/%3E%3C/svg%3E");
 }
 
 :root {
@@ -1161,23 +1216,6 @@ html[data-senren-theme="focus"] body {
 
 #word .word-pitch-meta:not(:has(#position:not(:empty))) {
   display: none;
-}
-
-@media (max-width: 624px) {
-  #word > span {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 0.3em;
-  }
-
-  #word .word-reading-stack,
-  #word .word-pitch-meta {
-    grid-column: 1;
-  }
-
-  #word .word-pitch-meta {
-    justify-self: center;
-    margin-left: 0;
-  }
 }
 
 #word .ruby-base-word {
@@ -4583,6 +4621,9 @@ li[data-dictionary="漢検漢字辞典　第二版"]
 }
 
 .freqbt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
   position: fixed;
   top: var(--spacing-md);
   right: var(--spacing-xxml);
@@ -4593,6 +4634,11 @@ li[data-dictionary="漢検漢字辞典　第二版"]
   transition:
     color var(--base-transition),
     text-shadow var(--base-transition);
+}
+
+.freqbt .fa-chevron-down {
+  width: 0.65em;
+  height: 0.65em;
 }
 
 :is(.card.nightMode, .custom-dark-mode) .freqbt {
@@ -8577,47 +8623,6 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
 /* Force dictionary entries to inherit the main card font */
 .yomitan-glossary [data-dictionary] * {
   font-family: inherit !important;
-}
-
-/* Fast local fallbacks while the optional Font Awesome stylesheet loads */
-.fas {
-  display: inline-block;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 1;
-  text-align: center;
-}
-
-.fa-sun::before {
-  content: "\2600";
-}
-
-.fa-moon::before {
-  content: "\263E";
-}
-
-.fa-lightbulb::before {
-  content: "?";
-}
-
-.fa-cog::before {
-  content: "\2699";
-}
-
-.fa-question::before {
-  content: "?";
-}
-
-.fa-image::before {
-  content: "\25A7";
-}
-
-.fa-times::before {
-  content: "\00D7";
-}
-
-.fa-chevron-down::before {
-  content: "\2304";
 }
 
 /* iPad Air 5 / tablet layout */
