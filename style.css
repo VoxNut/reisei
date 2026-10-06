@@ -1068,11 +1068,10 @@ html[data-senren-theme="focus"] body {
 }
 
 #word > span {
-  display: inline-flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
-  gap: 0.3em;
+  width: 100%;
   max-width: 100%;
 }
 
@@ -1096,8 +1095,8 @@ html[data-senren-theme="focus"] body {
 }
 
 #word .word-reading-stack {
-  display: inline-flex;
-  flex: 0 1 auto;
+  grid-column: 2;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -1108,15 +1107,34 @@ html[data-senren-theme="focus"] body {
 }
 
 #word .word-pitch-meta {
+  grid-column: 3;
+  justify-self: start;
   position: relative;
   display: inline-flex;
-  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  margin-left: 0.3em;
 }
 
 #word .word-pitch-meta:not(:has(#position:not(:empty))) {
   display: none;
+}
+
+@media (max-width: 624px) {
+  #word > span {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.3em;
+  }
+
+  #word .word-reading-stack,
+  #word .word-pitch-meta {
+    grid-column: 1;
+  }
+
+  #word .word-pitch-meta {
+    justify-self: center;
+    margin-left: 0;
+  }
 }
 
 #word .ruby-base-word {
@@ -7105,6 +7123,40 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
     bottom: auto !important;
   }
 
+  /* Keep the action controls anchored to the same viewport header on
+     both sides. Older per-control rules mixed absolute, fixed, and normal
+     positioning, which made the controls jump when the card was flipped. */
+  :is(.front, .back) > .header {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    z-index: var(--z-index-toggle);
+  }
+
+  :is(.front, .back)
+    > .header
+    > :is(
+      .audio-hint,
+      .toggle-custom-dark-mode,
+      .toggle-settings-btn,
+      .hint-btn,
+      .toggle-notes,
+      .toggle-image-visibility
+    ) {
+    position: static !important;
+    inset: auto !important;
+  }
+
+  :is(.front, .back) > .header > #frequency {
+    position: static;
+    margin-left: auto;
+  }
+
   .misc-info {
     padding-left: var(--spacing-md);
     padding-right: var(--spacing-md);
@@ -7640,6 +7692,36 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
       }
     }
   }
+}
+
+/* Removing the picture must collapse every grid/backdrop variant to one
+   centered word column. Keep this after the backdrop rules so layout-order
+   settings cannot leave the word occupying the former left or right track. */
+.back.image-removed .grid-container {
+  display: grid !important;
+  grid-template-areas: "word" !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  place-items: center stretch !important;
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  gap: 0 !important;
+}
+
+.back.image-removed .background-box {
+  grid-area: word !important;
+  align-self: center !important;
+  justify-self: stretch !important;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.back.image-removed #word {
+  width: 100%;
+  margin-inline: auto;
+  text-align: center;
 }
 
 /* Custom OFfsets to Align Front Word With Back Word */

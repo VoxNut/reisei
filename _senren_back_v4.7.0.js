@@ -2331,46 +2331,16 @@ var senrenConfig = {};
     }
   }
 
-  // Helper function to determine pitch type
-  function getPitchType(number, readingElement) {
-    if (!readingElement) return "unknown";
-
-    const firstLi = readingElement.querySelector("li");
-    const targetElement = firstLi || readingElement;
-
-    const readingText = (
-      targetElement.textContent ||
-      targetElement.innerText ||
-      ""
-    )
-      .replace(/<[^>]+>/g, "")
-      .replace(REGEX.COMBINING_MARK, "$1゙")
-      .normalize("NFC")
-      .replace(REGEX.SMALL_KANA, "")
-      .replace(/[・〜～]/g, "")
-      .replace(/\s+/g, "");
-
-    const moraCount = readingText.length;
-
-    if (moraCount === 0) {
-      return "unknown";
-    }
-
-    let resultType = "unknown";
-    if (number === 0) resultType = "heiban";
-    if (number === 1) resultType = "atamadaka";
-    if (moraCount > 1 && number === moraCount) resultType = "odaka";
-    if (number > 1 && number < moraCount && resultType === "unknown") {
-      resultType = "nakadaka";
-    }
-
-    return resultType;
-  }
-  window.senrenGetPitchType = getPitchType;
+  const PITCH_CLASS_NAMES = [
+    "heiban",
+    "atamadaka",
+    "nakadaka",
+    "odaka",
+    "kifuku",
+  ];
 
   function getDirectListItems(container) {
     if (!container) return [];
-
     const list = Array.from(container.children).find((child) =>
       child.matches("ol, ul"),
     );
@@ -2381,6 +2351,36 @@ var senrenConfig = {};
 
   function getWordReadingElement(stackElement) {
     return stackElement?.querySelector(".word-reading, rt") || null;
+  }
+
+  function normalizeReadingText(element) {
+    return (element?.textContent || "")
+      .replace(REGEX.COMBINING_MARK, "$1゙")
+      .normalize("NFC")
+      .replace(/[・〜～\s]/g, "");
+  }
+
+  function getReadingMorae(element) {
+    return normalizeReadingText(element).match(REGEX.MORA) || [];
+  }
+
+  // Explicit downstep positions are authoritative. Imported pitch classes are
+  // used only when no usable position was supplied by the note.
+  function getPitchType(number, readingElement) {
+    const moraCount = getReadingMorae(readingElement).length;
+    if (!moraCount || !Number.isInteger(number) || number < 0) return "unknown";
+    if (number === 0) return "heiban";
+    if (number === 1) return "atamadaka";
+    if (number >= moraCount) return moraCount > 1 ? "odaka" : "atamadaka";
+    return number > 1 ? "nakadaka" : "unknown";
+  }
+  window.senrenGetPitchType = getPitchType;
+
+  function getPitchPosition(element) {
+    const match = element?.textContent.match(/-?\d+/);
+    if (!match) return null;
+    const position = parseInt(match[0], 10);
+    return position >= 0 ? position : null;
   }
 
   function getPitchGraphSignature(readingItem) {
@@ -2396,7 +2396,7 @@ var senrenConfig = {};
       ),
     );
 
-    if (moraWrappers.length === 0) {
+    if (!moraWrappers.length) {
       return readingItem.innerHTML.replace(/\s+/g, "");
     }
 
@@ -2407,230 +2407,296 @@ var senrenConfig = {};
             child.classList.contains("pronunciation-mora-line") ||
             child.style.borderColor,
         );
-        const hasTopLine =
-          wrapper.dataset.pitch === "high" ||
-          Boolean(line?.style.borderTopWidth);
-        const hasDrop =
+        const high =
+          wrapper.dataset.pitch === "high" || Boolean(line?.style.borderTopWidth);
+        const drop =
           wrapper.dataset.pitchNext === "low" ||
           Boolean(line?.style.borderRightWidth);
-        return `${hasTopLine ? "H" : "L"}${hasDrop ? "D" : ""}`;
+        return `${high ? "H" : "L"}${drop ? "D" : ""}`;
       })
       .join("");
   }
 
-  function deduplicatePitchReadings(stackElement, positionElement) {
-    const readingItems = getDirectListItems(
-      getWordReadingElement(stackElement),
-    );
-    const readingList = readingItems[0]?.parentElement;
-    const positionItems = getDirectListItems(positionElement);
-    const positionsAreAligned = positionItems.length === readingItems.length;
+  function getReadingContext() {
+    const word = ELS.word;
+    const mainSpan = word?.querySelector(":scope > span");
+    const stack = mainSpan?.querySelector(".word-reading-stack, ruby");
+    return {
+      word,
+      mainSpan,
+      stack,
+      base: stack?.querySelector(".ruby-base-word") || null,
+      reading: getWordReadingElement(stack),
+      position: ELS.position,
+      categories: mainSpan?.querySelector("#categories") || null,
+      sentence: ELS.formattedSentence,
+    };
+  }
+
+  function collectReadingEntries(context) {
+    const readingItems = getDirectListItems(context.reading);
+    const positionItems = getDirectListItems(context.position);
+    const aligned =
+      readingItems.length > 0 && positionItems.length === readingItems.length;
+    const displayItems = readingItems.length
+      ? readingItems
+      : context.reading?.textContent.trim()
+        ? [context.reading]
+        : [];
+
+    return displayItems.map((element, index) => ({
+      element,
+      positionElement: aligned ? positionItems[index] : null,
+      position: aligned
+        ? getPitchPosition(positionItems[index])
+        : index === 0
+          ? getPitchPosition(context.position)
+          : null,
+      readingText: normalizeReadingText(element),
+    }));
+  }
+
+  function deduplicateReadingEntries(context) {
+    const entries = collectReadingEntries(context);
     const seen = new Set();
-    const pitchTypes = new Set();
-    const pitchClassNames = [
-      "heiban",
-      "atamadaka",
-      "nakadaka",
-      "odaka",
-      "kifuku",
-    ];
+    const uniqueEntries = [];
 
-    readingItems.forEach((readingItem, index) => {
-      const readingText = (readingItem.textContent || "")
-        .normalize("NFC")
-        .replace(/\s+/g, "");
-      const positionMatch = positionItems[index]?.textContent.match(/\d+/);
-      const pitchIdentity = positionMatch
-        ? `position:${parseInt(positionMatch[0], 10)}`
-        : `graph:${getPitchGraphSignature(readingItem)}`;
-      const signature = `${readingText}|${pitchIdentity}`;
+    entries.forEach((entry) => {
+      const pitchIdentity = Number.isInteger(entry.position)
+        ? `position:${entry.position}`
+        : `graph:${getPitchGraphSignature(entry.element)}`;
+      const signature = `${entry.readingText}|${pitchIdentity}`;
 
-      if (!seen.has(signature)) {
-        seen.add(signature);
-        readingItem.classList.add("pitch-reading");
-        readingItem.classList.remove(...pitchClassNames);
-
-        if (positionMatch) {
-          const pitchType = getPitchType(
-            parseInt(positionMatch[0], 10),
-            readingItem,
-          );
-          if (pitchType !== "unknown") {
-            readingItem.classList.add(pitchType);
-            pitchTypes.add(pitchType);
-          }
-        }
+      if (seen.has(signature)) {
+        if (entry.element !== context.reading) entry.element.remove();
+        entry.positionElement?.remove();
         return;
       }
 
-      readingItem.remove();
-      if (positionsAreAligned) positionItems[index].remove();
+      seen.add(signature);
+      uniqueEntries.push(entry);
     });
 
+    const readingList = getDirectListItems(context.reading)[0]?.parentElement;
     readingList?.classList.add("pitch-readings-ready");
-    return pitchTypes;
+    context.reading?.classList.add("reading-ready");
+    return uniqueEntries;
   }
-  window.senrenDeduplicatePitchReadings = deduplicatePitchReadings;
 
-  // Format pitch accent positions and categories
-  function cleanPitchPositions() {
-    const positionElements = document.querySelectorAll("#position");
-    const stackElement = document.querySelector(
-      "#word > span > .word-reading-stack, #word > span > ruby",
-    );
-    const mainWordSpan = document.querySelector("#word > span");
-    const sentenceSpan = document.getElementById("formattedSentence");
-
-    const readingPitchTypes = deduplicatePitchReadings(
-      stackElement,
-      positionElements[0],
-    );
-    const hasMultiplePitchReadings = readingPitchTypes.size > 1;
-    mainWordSpan?.classList.toggle(
-      "multiple-pitch-readings",
-      hasMultiplePitchReadings,
-    );
-    sentenceSpan?.classList.toggle(
-      "multiple-pitch-readings",
-      hasMultiplePitchReadings,
-    );
-
-    const elementsToClean = [
-      mainWordSpan,
-      sentenceSpan,
-      stackElement,
-      ...positionElements,
-    ];
-
-    elementsToClean.forEach((element) => {
-      if (!element) return;
-
-      const classList = element.classList;
-      let classToModify = "";
-
-      classList.forEach((cls) => {
-        if (cls.includes(",")) {
-          classToModify = cls;
-        }
+  function cleanCommaSeparatedClasses(elements) {
+    elements.filter(Boolean).forEach((element) => {
+      Array.from(element.classList).forEach((className) => {
+        if (!className.includes(",")) return;
+        element.classList.remove(className);
+        const primaryClass = className.split(",")[0].trim();
+        if (primaryClass) element.classList.add(primaryClass);
       });
+    });
+  }
 
-      if (classToModify) {
-        const commaIndex = classToModify.indexOf(",");
-        const newClassValue =
-          commaIndex !== -1
-            ? classToModify.substring(0, commaIndex).trim()
-            : classToModify;
-        element.classList.remove(classToModify);
-        element.classList.add(newClassValue);
+  function resolveEntryPitchTypes(context, entries) {
+    const importedTypes = (context.categories?.textContent || "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+
+    entries.forEach((entry, index) => {
+      entry.element.classList.add("pitch-reading");
+      entry.element.classList.remove(...PITCH_CLASS_NAMES);
+      const calculated = Number.isInteger(entry.position)
+        ? getPitchType(entry.position, entry.element)
+        : "unknown";
+      entry.pitchType =
+        calculated !== "unknown" ? calculated : importedTypes[index] || "unknown";
+      if (PITCH_CLASS_NAMES.includes(entry.pitchType)) {
+        entry.element.classList.add(entry.pitchType);
       }
     });
-    const rtElement = getWordReadingElement(stackElement);
+  }
 
-    const updates = [];
-    let potentialFallbackClass = null;
-    let applyFallback = false;
+  function buildPitchNotation(entry) {
+    if (!entry?.element || entry.element.children.length) return;
 
-    const hasPitchClass =
-      mainWordSpan &&
-      ["heiban", "atamadaka", "nakadaka", "odaka", "kifuku"].some((cls) =>
-        mainWordSpan.classList.contains(cls),
+    const morae = getReadingMorae(entry.element);
+    if (!morae.length) return;
+
+    let position = entry.position;
+    if (!Number.isInteger(position)) {
+      if (entry.pitchType === "heiban") position = 0;
+      else if (entry.pitchType === "atamadaka") position = 1;
+      else if (entry.pitchType === "odaka") position = morae.length;
+      else return;
+    }
+
+    const pronunciation = document.createElement("span");
+    pronunciation.className = "pronunciation";
+    if (PITCH_CLASS_NAMES.includes(entry.pitchType)) {
+      pronunciation.classList.add(entry.pitchType);
+    }
+
+    const pitchPattern = morae.map((_, index) =>
+      position === 0
+        ? index > 0
+        : position === 1
+          ? index === 0
+          : index > 0 && index < position,
+    );
+
+    morae.forEach((mora, index) => {
+      const isHigh = pitchPattern[index];
+      const nextIsLow =
+        isHigh &&
+        ((index + 1 < morae.length && !pitchPattern[index + 1]) ||
+          (entry.pitchType === "odaka" && index === morae.length - 1));
+      const moraElement = document.createElement("span");
+      moraElement.className = "pronunciation-mora";
+      moraElement.textContent = mora;
+      moraElement.dataset.pitch = isHigh ? "high" : "low";
+      if (nextIsLow) moraElement.dataset.pitchNext = "low";
+
+      const line = document.createElement("span");
+      line.className = "pronunciation-mora-line";
+      moraElement.appendChild(line);
+      pronunciation.appendChild(moraElement);
+    });
+
+    entry.element.replaceChildren(pronunciation);
+  }
+
+  function formatPitchMetadata(context, entries) {
+    const fallbackNumbers = Array.from(
+      context.position?.textContent.matchAll(/-?\d+/g) || [],
+      (match) => parseInt(match[0], 10),
+    ).filter((position) => position >= 0);
+    const numbers = [
+      ...new Set(
+        entries.some((entry) => Number.isInteger(entry.position))
+          ? entries
+              .map((entry) => entry.position)
+              .filter((position) => Number.isInteger(position))
+          : fallbackNumbers,
+      ),
+    ];
+    const resolvedTypes = numbers.map((number, index) => {
+      const entry = entries[index] || entries[0];
+      const calculated = getPitchType(number, entry?.element || context.reading);
+      return calculated !== "unknown"
+        ? calculated
+        : entry?.pitchType || "unknown";
+    });
+
+    if (context.position && numbers.length) {
+      context.position.replaceChildren(
+        ...numbers.flatMap((number, index) => {
+          const numberElement = document.createElement("span");
+          numberElement.className = `pitch-number ${resolvedTypes[index]}`;
+          numberElement.textContent = String(number);
+          if (index === numbers.length - 1) return [numberElement];
+          return [numberElement, document.createTextNode("・")];
+        }),
       );
+      context.position.dataset.cleaned = "true";
+    }
 
-    positionElements.forEach((element) => {
-      if (element.dataset.cleaned || !element.innerHTML.trim()) return;
-
-      const content = element.innerHTML.trim();
-      const numbers = [
-        ...new Set(content.match(/\d+/g)?.map((n) => parseInt(n, 10)) || []),
-      ];
-
-      if (numbers.length === 0) return;
-
-      if (!applyFallback && mainWordSpan && rtElement && !hasPitchClass) {
-        const calculated = getPitchType(numbers[0], rtElement);
-        if (calculated && calculated !== "unknown") {
-          potentialFallbackClass = calculated;
-          applyFallback = true;
-        }
-      }
-
-      const categoriesElement = element
-        .closest(".pitch")
-        ?.querySelector("#categories");
-      const pitchTypes = categoriesElement?.textContent.split(",") || [];
-
-      const resolvedTypes = [];
-      const newContentHTML = numbers
-        .map((num, index) => {
-          // An explicit downstep position is authoritative. In particular,
-          // position 1 is atamadaka even when the imported category says kifuku.
-          const calculatedPitchType = getPitchType(num, rtElement);
-          let pitchType =
-            calculatedPitchType !== "unknown"
-              ? calculatedPitchType
-              : pitchTypes[index]?.trim() || "unknown";
-          let cleanPitchType = pitchType.split(",")[0].trim();
-          resolvedTypes.push(cleanPitchType);
-          return `<span class="pitch-number ${cleanPitchType}">${num}</span>`;
-        })
-        .join("・");
-
-      updates.push({
-        element: element,
-        newHTML: newContentHTML,
-        catElement: categoriesElement,
-        fullCat: resolvedTypes.join("<br>"),
-        shortCat: resolvedTypes[0],
-      });
-    });
-
-    updates.forEach((update) => {
-      update.element.innerHTML = update.newHTML;
-      update.element.dataset.cleaned = "true";
-
-      if (update.catElement) {
-        if (update.fullCat) {
-          update.catElement.dataset.fullCategories = update.fullCat;
-          update.catElement.innerHTML = update.shortCat;
-          update.element.addEventListener("mouseenter", () => {
-            update.catElement.innerHTML =
-              update.catElement.dataset.fullCategories;
-          });
-        } else {
-          update.catElement.dataset.fullCategories = "";
-          update.catElement.innerHTML = "";
-        }
-      }
-    });
-
-    // Keep the word/sentence classes in sync with the first explicit pitch
-    // position instead of allowing a stale imported `kifuku` class to win.
-    const resolvedPrimaryPitchClass = updates[0]?.shortCat;
-    const pitchClassNames = [
-      "heiban",
-      "atamadaka",
-      "nakadaka",
-      "odaka",
-      "kifuku",
-    ];
-    if (
-      mainWordSpan &&
-      resolvedPrimaryPitchClass &&
-      resolvedPrimaryPitchClass !== "unknown"
-    ) {
-      mainWordSpan.classList.remove(...pitchClassNames);
-      mainWordSpan.classList.add(resolvedPrimaryPitchClass);
-      if (sentenceSpan) {
-        sentenceSpan.classList.remove(...pitchClassNames);
-        sentenceSpan.classList.add(resolvedPrimaryPitchClass);
+    if (context.categories && resolvedTypes.length) {
+      context.categories.dataset.fullCategories = resolvedTypes.join("<br>");
+      context.categories.textContent = resolvedTypes[0];
+      if (!context.position?.dataset.categoryHoverBound) {
+        context.position?.addEventListener("mouseenter", () => {
+          context.categories.innerHTML = context.categories.dataset.fullCategories;
+        });
+        if (context.position) context.position.dataset.categoryHoverBound = "true";
       }
     }
 
-    if (applyFallback && potentialFallbackClass) {
-      mainWordSpan.classList.add(potentialFallbackClass);
-      if (sentenceSpan) sentenceSpan.classList.add(potentialFallbackClass);
+    const pitchTypes = new Set(
+      entries
+        .map((entry) => entry.pitchType)
+        .filter((pitchType) => PITCH_CLASS_NAMES.includes(pitchType)),
+    );
+    const multiplePitchTypes = pitchTypes.size > 1;
+    context.mainSpan?.classList.toggle(
+      "multiple-pitch-readings",
+      multiplePitchTypes,
+    );
+    context.sentence?.classList.toggle(
+      "multiple-pitch-readings",
+      multiplePitchTypes,
+    );
+
+    const primaryType = entries[0]?.pitchType;
+    if (PITCH_CLASS_NAMES.includes(primaryType)) {
+      [context.mainSpan, context.sentence].filter(Boolean).forEach((element) => {
+        element.classList.remove(...PITCH_CLASS_NAMES);
+        element.classList.add(primaryType);
+      });
     }
   }
+
+  function restoreKanaReading(context) {
+    if (!context.word?.classList.contains("reading-is-word")) return;
+    const originalBaseHtml =
+      context.stack._senrenOriginalBaseHtml ??
+      context.stack.dataset.originalBaseHtml;
+    if (originalBaseHtml !== undefined) context.base.innerHTML = originalBaseHtml;
+    context.reading.style.display = "";
+    context.word.classList.remove("reading-is-word");
+  }
+
+  function applyKanaReading(context, entries) {
+    restoreKanaReading(context);
+    if (senrenConfig.noDuplicateKana !== "true" || entries.length !== 1) return;
+
+    let wordText = context.base.textContent.trim();
+    const disambiguated = wordText.match(/^(.+?)\s*\(.*?\)\s*$/);
+    if (disambiguated) {
+      wordText = disambiguated[1].trim();
+      context.base.textContent = wordText;
+    }
+    if (!wordText || REGEX.KANJI.test(wordText)) return;
+
+    context.stack._senrenOriginalBaseHtml = context.base.innerHTML;
+    context.base.innerHTML = entries[0].element.innerHTML;
+    context.reading.style.display = "none";
+    context.word.classList.add("reading-is-word");
+  }
+
+  function renderBackReading() {
+    const context = getReadingContext();
+    if (!context.word || !context.stack || !context.base || !context.reading) {
+      return;
+    }
+
+    let entries = context.stack._senrenReadingEntries;
+    if (!entries) {
+      cleanCommaSeparatedClasses([
+        context.mainSpan,
+        context.stack,
+        context.position,
+        context.sentence,
+      ]);
+      entries = deduplicateReadingEntries(context);
+      resolveEntryPitchTypes(context, entries);
+      entries.forEach(buildPitchNotation);
+      formatPitchMetadata(context, entries);
+      context.stack._senrenReadingEntries = entries;
+    }
+
+    applyKanaReading(context, entries);
+    context.word.classList.add("word-layout-ready");
+  }
+
+  // Compatibility entry points used by settings and the kanji-hover module.
+  window.renderBackReading = renderBackReading;
+  window.noDuplicateKana = renderBackReading;
+  window.senrenDeduplicatePitchReadings = (stackElement, positionElement) => {
+    const context = getReadingContext();
+    if (stackElement) context.stack = stackElement;
+    if (positionElement) context.position = positionElement;
+    const entries = deduplicateReadingEntries(context);
+    resolveEntryPitchTypes(context, entries);
+    return new Set(entries.map((entry) => entry.pitchType));
+  };
 
   // Highlight the target word in the furigana sentence
   function highlightFurigana() {
@@ -2845,143 +2911,6 @@ var senrenConfig = {};
     }
   }
 
-  // Creates downstep notation for pitch accent
-  function createDownstepNotation() {
-    const wordElement = ELS.word;
-    if (!wordElement) return;
-
-    const mainSpan = wordElement.querySelector(":scope > span");
-    const stackElement = mainSpan?.querySelector(".word-reading-stack, ruby");
-    let rtElement = getWordReadingElement(stackElement);
-
-    if (
-      (wordElement.classList.contains("reading-is-word") ||
-        (rtElement && !rtElement.textContent.trim())) &&
-      stackElement
-    ) {
-      const wordSpan = stackElement.querySelector(".ruby-base-word, span");
-      if (wordSpan) {
-        rtElement = wordSpan;
-      }
-    }
-
-    if (!rtElement) {
-      return;
-    }
-
-    if (rtElement.querySelector("span[style], ol, li")) {
-      return;
-    }
-
-    const readingText = rtElement.textContent.trim();
-    if (!readingText) {
-      return;
-    }
-
-    const normalizedReading = readingText.normalize("NFC");
-    const morae = normalizedReading.match(REGEX.MORA) || [];
-
-    const moraCount = morae.length;
-    if (moraCount === 0) return;
-
-    let pitchPosition = -1;
-    let pitchClass = "";
-    const positionElement = ELS.position;
-
-    const mainClasses = mainSpan.classList;
-    const isOriginallyKifuku = mainClasses.contains("kifuku");
-    if (mainClasses.contains("heiban")) pitchClass = "heiban";
-    else if (mainClasses.contains("atamadaka")) pitchClass = "atamadaka";
-    else if (mainClasses.contains("nakadaka")) pitchClass = "nakadaka";
-    else if (mainClasses.contains("odaka")) pitchClass = "odaka";
-    else if (isOriginallyKifuku) pitchClass = "kifuku";
-
-    if (positionElement && positionElement.textContent.trim()) {
-      const firstNumMatch = positionElement.textContent.trim().match(/\d+/);
-      if (firstNumMatch) {
-        pitchPosition = parseInt(firstNumMatch[0], 10);
-      }
-    }
-
-    if (pitchPosition !== -1) {
-      if (pitchPosition === 0) pitchClass = "heiban";
-      else if (pitchPosition === 1) pitchClass = "atamadaka";
-      else if (moraCount > 1 && pitchPosition === moraCount)
-        pitchClass = "odaka";
-      else if (moraCount > 1 && pitchPosition > 1 && pitchPosition < moraCount)
-        pitchClass = "nakadaka";
-      else if (moraCount > 1 && pitchPosition >= moraCount)
-        pitchClass = "odaka";
-      else if (moraCount === 1 && pitchPosition >= 1) pitchClass = "atamadaka";
-      else {
-        if (!pitchClass) pitchPosition = -1;
-      }
-    } else if (
-      pitchClass &&
-      pitchClass !== "kifuku" &&
-      pitchClass !== "nakadaka"
-    ) {
-      if (pitchClass === "heiban") pitchPosition = 0;
-      else if (pitchClass === "atamadaka") pitchPosition = 1;
-      else if (pitchClass === "odaka") pitchPosition = moraCount;
-    }
-
-    if (
-      pitchPosition === -1 &&
-      !isOriginallyKifuku &&
-      pitchClass !== "kifuku"
-    ) {
-      return;
-    }
-
-    let pitchPattern = [];
-    for (let i = 0; i < moraCount; i++) {
-      if (pitchPosition === 0) pitchPattern.push(i === 0 ? "L" : "H");
-      else if (pitchPosition === 1) pitchPattern.push(i === 0 ? "H" : "L");
-      else {
-        if (i === 0) pitchPattern.push("L");
-        else if (i < pitchPosition) pitchPattern.push("H");
-        else pitchPattern.push("L");
-      }
-    }
-
-    const fragment = document.createDocumentFragment();
-    const container = document.createElement("span");
-    container.className = "pronunciation";
-
-    if (pitchClass) {
-      container.classList.add(pitchClass);
-    }
-
-    const moraeSpans = morae.map((mora, i) => {
-      const currentPitch = pitchPattern[i];
-      const moraSpan = document.createElement("span");
-      moraSpan.className = "pronunciation-mora";
-      moraSpan.textContent = mora;
-      moraSpan.dataset.pitch = currentPitch === "H" ? "high" : "low";
-
-      if (
-        currentPitch === "H" &&
-        ((i + 1 < moraCount && pitchPattern[i + 1] === "L") ||
-          (pitchClass === "odaka" && i === moraCount - 1))
-      ) {
-        moraSpan.dataset.pitchNext = "low";
-      }
-
-      const lineSpan = document.createElement("span");
-      lineSpan.className = "pronunciation-mora-line";
-      moraSpan.appendChild(lineSpan);
-      return moraSpan;
-    });
-
-    container.append(...moraeSpans);
-    rtElement.replaceChildren(container);
-    rtElement.style.paddingTop = "";
-    rtElement.style.marginBottom = "";
-    rtElement.style.position = "";
-    rtElement.style.overflow = "visible";
-  }
-
   // Merge entries from the same dictionary
   function consolidateYomitanGlossaryEntries() {
     const glossaryOuterDiv = ELS.glossary;
@@ -3055,61 +2984,6 @@ var senrenConfig = {};
 
     if (consolidationHappened) {
       glossarySpan.dataset.consolidated = "true";
-    }
-  }
-
-  // Replaces the word with its reading when the word is written only in kana
-  function noDuplicateKana() {
-    const wordContainer = ELS.word;
-    if (!wordContainer) return;
-
-    const stackElement = wordContainer.querySelector(".word-reading-stack, ruby");
-    const baseElement = stackElement?.querySelector(".ruby-base-word");
-    const readingElement = getWordReadingElement(stackElement);
-    if (!stackElement || !baseElement || !readingElement) return;
-
-    const substituteSetting = senrenConfig.noDuplicateKana;
-    const shouldBeEnabled = substituteSetting === "true";
-    const isCurrentlyEnabled =
-      wordContainer.classList.contains("reading-is-word");
-
-    if (!shouldBeEnabled) {
-      if (isCurrentlyEnabled && stackElement.dataset.originalBaseHtml) {
-        baseElement.innerHTML = stackElement.dataset.originalBaseHtml;
-        delete stackElement.dataset.originalBaseHtml;
-        readingElement.style.display = "";
-        wordContainer.classList.remove("reading-is-word");
-      }
-      return;
-    }
-
-    if (shouldBeEnabled && isCurrentlyEnabled) return;
-
-    let fullWordText = baseElement.textContent || "";
-
-    // Strip disambiguation parentheses: のに (Despite) → のに
-    var disambigMatch = fullWordText.match(/^(.+?)\s*\(.*?\)\s*$/);
-    if (disambigMatch) {
-      fullWordText = disambigMatch[1].trim();
-      baseElement.textContent = fullWordText;
-    }
-
-    if (!fullWordText.trim()) return;
-
-    const hasKanji = REGEX.KANJI.test(fullWordText);
-
-    if (!hasKanji) {
-      let readingHTML = "";
-      const firstLi = readingElement.querySelector("li");
-      readingHTML = firstLi ? firstLi.innerHTML : readingElement.innerHTML;
-
-      if (readingHTML.trim()) {
-        stackElement.dataset.originalBaseHtml = baseElement.innerHTML;
-        baseElement.innerHTML = readingHTML;
-        readingElement.style.display = "none";
-
-        wordContainer.classList.add("reading-is-word");
-      }
     }
   }
 
@@ -3917,11 +3791,9 @@ var senrenConfig = {};
       darkMode();
       nsfw();
       muteSentence();
-      noDuplicateKana();
       splitTags();
       highlightFurigana();
-      cleanPitchPositions();
-      createDownstepNotation();
+      renderBackReading();
       dynamicWordSize();
       alternativePitchStyle();
       dictionaryTitle();
