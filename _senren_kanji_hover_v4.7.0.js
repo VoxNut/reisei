@@ -8,16 +8,19 @@
   let hideTooltipTimeout = null;
 
   const preloadedKanjiData = {};
+  const fallbackKanjiRegex = /[\u3400-\u4DBF\u4E00-\u9FFF\u3005\u3007]/;
+  const fallbackMoraRegex =
+    /[きしちにひみりぎじぢびぴゔ][ゃゅょ]|[うくすつぬふむゆるぐずづぶゔ][ぁぃぅぇぉ]|[てで][ぃ]|[とど][ぅ]|[キシチニヒミリギジヂビピヴ][ャュョ]|[ウクスツヌフムユルグズヅブプヴ][ァィゥェォ]|[テデ][ィ]|[トド][ぅ]|[クグ][ヮ]|[フ][ォ]|[っッ]|ー|[んン]|[\u3041-\u3096\u30A1-\u30F6\u30FD\u30FE]|\S/g;
 
   function isKanji(char) {
-    return window.REGEX.KANJI.test(char);
+    return (window.REGEX?.KANJI || fallbackKanjiRegex).test(char);
   }
 
   // Helper function to draw pitch accent lines in the tooltip (fallback)
   function drawTooltipPitchLines(tooltip) {
     if (!tooltip) return;
 
-    const moraRegex = window.REGEX.MORA;
+    const moraRegex = window.REGEX?.MORA || fallbackMoraRegex;
 
     const entries = tooltip.querySelectorAll('li');
 

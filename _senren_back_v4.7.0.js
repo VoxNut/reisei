@@ -2331,7 +2331,7 @@ var senrenConfig = {};
     }
   }
 
-  const PITCH_CLASS_NAMES = [
+  var senrenPitchClassNames = [
     "heiban",
     "atamadaka",
     "nakadaka",
@@ -2502,13 +2502,13 @@ var senrenConfig = {};
 
     entries.forEach((entry, index) => {
       entry.element.classList.add("pitch-reading");
-      entry.element.classList.remove(...PITCH_CLASS_NAMES);
+      entry.element.classList.remove(...senrenPitchClassNames);
       const calculated = Number.isInteger(entry.position)
         ? getPitchType(entry.position, entry.element)
         : "unknown";
       entry.pitchType =
         calculated !== "unknown" ? calculated : importedTypes[index] || "unknown";
-      if (PITCH_CLASS_NAMES.includes(entry.pitchType)) {
+      if (senrenPitchClassNames.includes(entry.pitchType)) {
         entry.element.classList.add(entry.pitchType);
       }
     });
@@ -2530,7 +2530,7 @@ var senrenConfig = {};
 
     const pronunciation = document.createElement("span");
     pronunciation.className = "pronunciation";
-    if (PITCH_CLASS_NAMES.includes(entry.pitchType)) {
+    if (senrenPitchClassNames.includes(entry.pitchType)) {
       pronunciation.classList.add(entry.pitchType);
     }
 
@@ -2612,7 +2612,7 @@ var senrenConfig = {};
     const pitchTypes = new Set(
       entries
         .map((entry) => entry.pitchType)
-        .filter((pitchType) => PITCH_CLASS_NAMES.includes(pitchType)),
+        .filter((pitchType) => senrenPitchClassNames.includes(pitchType)),
     );
     const multiplePitchTypes = pitchTypes.size > 1;
     context.mainSpan?.classList.toggle(
@@ -2625,9 +2625,9 @@ var senrenConfig = {};
     );
 
     const primaryType = entries[0]?.pitchType;
-    if (PITCH_CLASS_NAMES.includes(primaryType)) {
+    if (senrenPitchClassNames.includes(primaryType)) {
       [context.mainSpan, context.sentence].filter(Boolean).forEach((element) => {
-        element.classList.remove(...PITCH_CLASS_NAMES);
+        element.classList.remove(...senrenPitchClassNames);
         element.classList.add(primaryType);
       });
     }
@@ -3870,7 +3870,8 @@ var senrenConfig = {};
                   window.senrenInitKanjiHover();
                 } else {
                   const script = document.createElement("script");
-                  script.src = "_senren_kanji_hover_v4.7.0.js";
+                  script.src =
+                    "_senren_kanji_hover_v4.7.0.js?v=20261006.1";
                   document.body.appendChild(script);
                 }
               }

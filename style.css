@@ -423,6 +423,49 @@
 }
 
 /* Card Layout */
+.fas {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+}
+
+.fa-sun::before {
+  content: "☀";
+}
+
+.fa-moon::before {
+  content: "☾";
+}
+
+.fa-cog::before {
+  content: "⚙";
+}
+
+.fa-lightbulb::before {
+  content: "◉";
+}
+
+.fa-question::before {
+  content: "?";
+  font-weight: bold;
+}
+
+.fa-image::before {
+  content: "▣";
+}
+
+.fa-times::before {
+  content: "×";
+}
+
+.fa-chevron-down::before {
+  content: "⌄";
+}
+
 :root {
   font-size: var(--base-size);
   container-type: normal;
