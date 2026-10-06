@@ -8835,8 +8835,42 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
     border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg) !important;
   }
 
-  .front > .header {
-    margin-bottom: 4px;
+  /* On phones the controls must participate in layout. The shared tablet
+     header is fixed, which leaves the word underneath it and lets the pitch
+     metadata collide with the frequency control. */
+  :is(.front, .back) > .header {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    min-width: 0;
+    min-height: calc(var(--button-size) + (2 * var(--spacing-ms)));
+    margin: 0 0 8px;
+    padding: 0;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    align-content: flex-start;
+  }
+
+  .back > .header > #frequency {
+    min-width: max-content;
+    margin-left: auto;
+    align-self: center;
+  }
+
+  .back > .header .frequency-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .back > .header .freqbt {
+    position: static;
+    inset: auto;
+  }
+
+  .back > .header .frequency-content {
+    top: calc(100% + 8px);
+    right: 0;
   }
 
   .grid-container {
