@@ -164,7 +164,7 @@
   --pitch-colors: true; /* "false" to disable pitch downstep coloring */
   --sentence-pitch-highlight: true; /* "true" to make pitch colors overwrite sentence highlights */
   --only-kana-pitch-size: 0.08em; /* Border thickness for kana-only words */
-  --pitch-line-clearance: 0.32em; /* Space between the pitch line and kana */
+  --pitch-line-clearance: 0.18em; /* Space between the pitch line and kana */
 
   /* KANJI HOVER SETTINGS
   ============================================ */
