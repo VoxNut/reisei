@@ -70,6 +70,7 @@
   --definition-title-visibility: 1; /* Dict title in the definition box */
   --glossary-title-visibility: 1; /* Dict title in the glossary box */
   --tag-visibility: 1; /* Tags */
+  --misc-info-visibility: 1; /* Misc info field */
   --external-links-visibility: 1; /* External links */
   --pitch-position-visibility: 1; /* Pitch downstep position */
   --misc-info-bg-visibility: 1; /* Misc info background */
@@ -4901,6 +4902,13 @@ li[data-dictionary="漢検漢字辞典　第二版"]
 
 .misc-info.has-content {
   display: flex !important;
+}
+
+@container style(--misc-info-visibility: 0) {
+  .misc-info,
+  .misc-info.has-content {
+    display: none !important;
+  }
 }
 
 :is(.card.nightMode, .custom-dark-mode) .misc-info {

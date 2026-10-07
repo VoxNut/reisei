@@ -18,7 +18,8 @@
       { label: "Theme Toggle", var: "--custom-dark-mode-visibility", type: "switch-int", desc: "Show the theme icon to switch between Nord and Focus.", mobileHidden: true },
       { label: "Audio Buttons", var: "--audio-visibility", type: "switch-int", desc: "Show replay buttons for Word/Sentence audio.", mobileHidden: true },
       { label: "Frequency", var: "--freq-visibility", type: "switch-int", desc: "Show the frequency rank indicator.", mobileHidden: true },
-      { label: "Tags", var: "--tag-visibility", type: "switch-int", desc: "Show tags in the bottom-left area of the card footer." },
+      { label: "Anki Tags", var: "--tag-visibility", type: "switch-int", desc: "Show the note's Anki tags in the card footer." },
+      { label: "Misc Info", var: "--misc-info-visibility", type: "switch-int", desc: "Show the miscInfo field in the card footer." },
       { label: "External Links", var: "--external-links-visibility", type: "switch-int", desc: "Show icons for external links such as Jisho, JPDB, Immersion Kit, etc." },
       { label: "Pitch Position", var: "--pitch-position-visibility", type: "switch-int", desc: "Show pitch downstep position." },
 
