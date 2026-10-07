@@ -3718,6 +3718,13 @@ var senrenConfig = {};
       senrenConfig.miscInfoDefaultExpanded = getVar(
         "--misc-info-default-expanded",
       );
+      senrenConfig.miscInfoVisibility = getVar("--misc-info-visibility");
+      if (window.ELS.miscInfo) {
+        window.ELS.miscInfo.classList.toggle(
+          "senren-misc-info-hidden",
+          senrenConfig.miscInfoVisibility === "0",
+        );
+      }
 
       // Audio
       senrenConfig.muteNsfwAudio = getVar("--mute-nsfw-audio");
