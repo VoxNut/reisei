@@ -72,7 +72,7 @@
   --tag-visibility: 1; /* Tags */
   --misc-info-visibility: 1; /* Misc info field */
   --external-links-visibility: 1; /* External links */
-  --pitch-position-visibility: 1; /* Pitch downstep position */
+  --pitch-position-visibility: 1; /* Pitch number and hover label */
   --misc-info-bg-visibility: 1; /* Misc info background */
 
   /* Header/Mobile Visibility (≤ 1050px) */
@@ -5179,7 +5179,7 @@ li[data-dictionary="漢検漢字辞典　第二版"]
 }
 
 @container style(--pitch-position-visibility: 0) {
-  #kanji-tooltip .position {
+  #kanji-tooltip :is(.position, .categories) {
     display: none !important;
   }
 }

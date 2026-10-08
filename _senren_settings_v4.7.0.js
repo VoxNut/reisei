@@ -21,7 +21,7 @@
       { label: "Anki Tags", var: "--tag-visibility", type: "switch-int", desc: "Show the note's Anki tags in the card footer." },
       { label: "Misc Info", var: "--misc-info-visibility", type: "switch-int", desc: "Show the miscInfo field in the card footer." },
       { label: "External Links", var: "--external-links-visibility", type: "switch-int", desc: "Show icons for external links such as Jisho, JPDB, Immersion Kit, etc." },
-      { label: "Pitch Position", var: "--pitch-position-visibility", type: "switch-int", desc: "Show pitch downstep position." },
+      { label: "Pitch Number & Label", var: "--pitch-position-visibility", type: "switch-int", desc: "Show the numeric pitch position and its accent-type label on hover." },
 
       { type: "header", label: "Smaller Screens (≤ 1050px)" },
       { label: "Settings Toggle", var: "--settings-visibility-header", type: "switch-int", desc: "Show the gear icon in the header to open the settings." },

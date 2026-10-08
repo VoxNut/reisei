@@ -40,7 +40,7 @@
   --glossary-title-visibility: 1; /* Dict title in the glossary box */
   --tag-visibility: 1; /* Tags */
   --external-links-visibility: 1; /* External links */
-  --pitch-position-visibility: 1; /* Pitch downstep position */
+  --pitch-position-visibility: 1; /* Pitch number and hover label */
   --misc-info-bg-visibility: 1; /* Misc info background */
 
   /* Header/Mobile Visibility (≤ 1050px) */
