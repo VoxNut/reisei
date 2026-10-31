@@ -6737,20 +6737,19 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
   li[data-dictionary]::after {
   content: "";
   position: absolute;
-  inset: -0.35em -0.55em;
-  border: 1px solid rgba(76, 86, 106, 0.15);
-  border-left: 0.28em solid color-mix(in srgb, var(--dict-color) 82%, transparent);
-  border-radius: 0.65em;
+  inset: -0.35em auto -0.35em -0.55em;
+  width: 0.36em;
+  background-color: color-mix(in srgb, var(--dict-color) 82%, transparent);
+  border-radius: 0.3em;
   pointer-events: none;
 }
 
 html[data-senren-theme="nord"] .card.nightMode
   :is(.definition-box, .glossary-box) li[data-dictionary]::after {
-  border-color: rgba(216, 222, 233, 0.15);
-  border-left-color: color-mix(in srgb, var(--dict-color) 74%, transparent);
+  background-color: color-mix(in srgb, var(--dict-color) 74%, transparent);
 }
 
-/* Reserve ::before for the title fallback and ::after for the frame. */
+/* Reserve ::before for the title fallback and ::after for the left accent. */
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
   li[data-dictionary]::before {
   content: none;
@@ -6763,13 +6762,14 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
   max-width: 100%;
   color: #2e3440;
   isolation: isolate;
+  translate: 0.4rem 0;
 }
 
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
   :is(.dictionary-title, .yomitan-glossary > i)::before {
   content: "";
   position: absolute;
-  inset: -0.1rem -0.2rem calc(10px - 0.1rem);
+  inset: -0.2rem -0.25rem calc(10px - 0.2rem);
   border-radius: 0.2rem;
   background-color: var(--dict-color, #81a1c1);
   z-index: -1;
@@ -6795,6 +6795,7 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
   .yomitan-glossary
   li[data-dictionary]:not(:has(> .dictionary-title))::before {
   color: #2e3440;
+  translate: 0.4rem 0;
   background: linear-gradient(var(--dict-color), var(--dict-color))
     left top / 100% var(--dict-size) no-repeat;
 }
