@@ -217,7 +217,7 @@ var senrenConfig = {};
     const glossary = ELS.glossary;
     const allGlossaryListItems = [
       ...document.querySelectorAll(
-        "#glossary > .glossary-box > span > div li[data-dictionary], #glossary > div > span > div > i",
+        "#glossary .glossary-box li[data-dictionary], #glossary > div > span > div > i",
       ),
       ...document.querySelectorAll(
         '#glossary div[style*="margin-bottom: 12px"][style*="display: flex"]',

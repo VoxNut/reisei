@@ -1,0 +1,75 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Glossary switching regression</title>
+<link rel="stylesheet" href="../style.css">
+<body class="card nightMode">
+<output id="result">Running…</output>
+<div class="back" id="fixture"></div>
+<script>
+  // Serve the repository over HTTP and open tests/glossary-switching.html.
+  (async () => {
+    try {
+      const response = await fetch("../_senren_back_v4.7.0.js");
+      if (!response.ok) throw new Error("Cannot load the back script");
+      const source = await response.text();
+      const start = source.indexOf("  function toggleDefinition() {");
+      const end = source.indexOf("  function enableInteractions() {", start);
+      if (start < 0 || end < 0) throw new Error("Cannot locate toggleDefinition");
+      const buildToggle = new Function("ELS", "collapseDictionary", "lightbox",
+        source.slice(start, end) + "\nreturn toggleDefinition;");
+      const entry = (name, text) => `<li data-dictionary="${name}">${text}</li>`;
+      const a = entry("A", "First dictionary<ul><li>A nested definition</li></ul>");
+      const b = entry("B", "Second dictionary");
+      const c = entry("C", "Third dictionary");
+      const cases = [
+        ["standard export", `<div class="yomitan-glossary"><ol>${a}${b}${c}</ol></div>`],
+        ["split export (ぐっすり)", `<div class="yomitan-glossary"><ol>${a}</ol></div>${b}${c}`],
+        ["list without a wrapper", `<ol>${a}${b}${c}</ol>`],
+        ["extra wrapper", `<section><div class="yomitan-glossary"><ol>${a}${b}${c}</ol></div></section>`],
+      ];
+      const saved = ["lastSelectedDictionary", "lastDictionaryName"]
+        .map(key => [key, localStorage.getItem(key)]);
+      let checks = 0;
+      try {
+        for (const theme of ["nord", "focus"]) {
+          document.documentElement.dataset.senrenTheme = theme;
+          document.documentElement.classList.toggle("custom-dark-mode", theme === "focus");
+          for (const [name, html] of cases) {
+            fixture.innerHTML = `<div id="glossary" class="yomitan-glossary"><div class="dictionary-counter"></div><div class="toggle-area left"></div><div class="toggle-area right"></div><div class="glossary-box"><span></span></div></div>`;
+            const glossary = fixture.querySelector("#glossary");
+            glossary.querySelector(".glossary-box > span").innerHTML = html;
+            localStorage.setItem("lastSelectedDictionary", "glossary");
+            localStorage.setItem("lastDictionaryName", "B");
+            buildToggle({ glossary }, () => {}, null)();
+            for (const [expected, direction] of [
+              ["B", "right"], ["C", "right"], ["A", "right"],
+              ["B", "left"], ["A", "left"], ["C", "right"],
+            ]) {
+              const visible = [...glossary.querySelectorAll("li[data-dictionary]")]
+                .filter(li => getComputedStyle(li).display !== "none");
+              if (visible.length !== 1 || visible[0].dataset.dictionary !== expected) {
+                throw new Error(`${theme}, ${name}: expected only ${expected}, got ${visible.map(li => li.dataset.dictionary)}`);
+              }
+              const index = ["A", "B", "C"].indexOf(expected) + 1;
+              if (glossary.querySelector(".dictionary-counter").textContent !== `${index} / 3`) {
+                throw new Error(`${theme}, ${name}: incorrect dictionary counter`);
+              }
+              checks++;
+              glossary.querySelector(`.toggle-area.${direction}`).click();
+            }
+          }
+        }
+      } finally {
+        for (const [key, value] of saved) {
+          if (value === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, value);
+        }
+      }
+      result.textContent = `PASS: ${checks} dictionary visibility and cycling checks`;
+      document.documentElement.dataset.testResult = "pass";
+    } catch (error) {
+      result.textContent = `FAIL: ${error.message}`;
+      document.documentElement.dataset.testResult = "fail";
+    }
+  })();
+</script>
