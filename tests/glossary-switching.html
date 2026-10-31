@@ -17,6 +17,11 @@
       if (start < 0 || end < 0) throw new Error("Cannot locate toggleDefinition");
       const buildToggle = new Function("ELS", "collapseDictionary", "lightbox",
         source.slice(start, end) + "\nreturn toggleDefinition;");
+      const consolidateStart = source.indexOf("  function consolidateYomitanGlossaryEntries() {");
+      const consolidateEnd = source.indexOf("  // Collapses long dictionary entries", consolidateStart);
+      if (consolidateStart < 0 || consolidateEnd < 0) throw new Error("Cannot locate glossary consolidation");
+      const buildConsolidate = new Function("ELS",
+        source.slice(consolidateStart, consolidateEnd) + "\nreturn consolidateYomitanGlossaryEntries;");
       const entry = (name, text) => `<li data-dictionary="${name}">${text}</li>`;
       const a = entry("A", "First dictionary<ul><li>A nested definition</li></ul>");
       const b = entry("B", "Second dictionary");
@@ -26,6 +31,7 @@
         ["split export (ぐっすり)", `<div class="yomitan-glossary"><ol>${a}</ol></div>${b}${c}`],
         ["list without a wrapper", `<ol>${a}${b}${c}</ol>`],
         ["extra wrapper", `<section><div class="yomitan-glossary"><ol>${a}${b}${c}</ol></div></section>`],
+        ["detached definition list (ぐっすり)", `<div class="yomitan-glossary"><ol>${a}${b}<li data-owner="B">B_EXTRA_TEXT<ul><li>B_NESTED_TEXT</li></ul></li><li data-owner="B">B_SECOND_EXTRA_TEXT</li></ol></div>${c}`],
       ];
       const saved = ["lastSelectedDictionary", "lastDictionaryName"]
         .map(key => [key, localStorage.getItem(key)]);
@@ -40,6 +46,9 @@
             glossary.querySelector(".glossary-box > span").innerHTML = html;
             localStorage.setItem("lastSelectedDictionary", "glossary");
             localStorage.setItem("lastDictionaryName", "B");
+            const consolidate = buildConsolidate({ glossary });
+            consolidate();
+            consolidate();
             buildToggle({ glossary }, () => {}, null)();
             for (const [expected, direction] of [
               ["B", "right"], ["C", "right"], ["A", "right"],
@@ -49,6 +58,15 @@
                 .filter(li => getComputedStyle(li).display !== "none");
               if (visible.length !== 1 || visible[0].dataset.dictionary !== expected) {
                 throw new Error(`${theme}, ${name}: expected only ${expected}, got ${visible.map(li => li.dataset.dictionary)}`);
+              }
+              for (const extra of glossary.querySelectorAll("[data-owner]")) {
+                if (extra.closest("li[data-dictionary]")?.dataset.dictionary !== extra.dataset.owner) {
+                  throw new Error(`${theme}, ${name}: detached definition lost its dictionary`);
+                }
+                const textVisible = glossary.innerText.includes(extra.firstChild.textContent);
+                if (textVisible !== (extra.dataset.owner === expected)) {
+                  throw new Error(`${theme}, ${name}: stray definition text when displaying ${expected}`);
+                }
               }
               const index = ["A", "B", "C"].indexOf(expected) + 1;
               if (glossary.querySelector(".dictionary-counter").textContent !== `${index} / 3`) {

@@ -2924,6 +2924,16 @@ var senrenConfig = {};
 
     if (glossarySpan.dataset.consolidated === "true") return;
 
+    // Some exports close the dictionary entry before its definition list.
+    glossarySpan.querySelectorAll("li[data-dictionary]").forEach((entry) => {
+      if (!entry.nextElementSibling?.matches("li:not([data-dictionary])")) return;
+      const continuation = document.createElement("ul");
+      while (entry.nextElementSibling?.matches("li:not([data-dictionary])")) {
+        continuation.appendChild(entry.nextElementSibling);
+      }
+      entry.appendChild(continuation);
+    });
+
     const yomitanGlossaryDivs = glossarySpan.querySelectorAll(
       "div.yomitan-glossary",
     );
