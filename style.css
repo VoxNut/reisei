@@ -6728,6 +6728,15 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dicti
 
 /* Nord Dictionary Palette: END */
 
+html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) {
+  background: var(--word-bg-light);
+}
+
+html[data-senren-theme="nord"] .card.nightMode
+  :is(.definition-box, .glossary-box) {
+  background: var(--word-bg);
+}
+
 /* Nord decorations do not change the Focus text layout. */
 html[data-senren-theme="nord"] :is(.definition-box, .glossary-box) li[data-dictionary] {
   --dict-color: #81a1c1;
