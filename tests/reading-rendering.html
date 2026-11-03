@@ -83,6 +83,18 @@
           if (test.lastType) assert(entries.at(-1).pitchType === test.lastType, "category shifted after deduplication");
           assert(word.classList.contains("reading-is-word") === Boolean(test.kana), "wrong kana shortcut");
           if (test.kana) assert(base.innerHTML === entries[0].element.innerHTML, "kana graph not preserved");
+          const readingTarget = test.kana ? base : reading;
+          const originalFont = getComputedStyle(readingTarget).fontFamily;
+          for (const [serif, sans] of [["serif", "monospace"], ["cursive", "fantasy"]]) {
+            document.documentElement.style.setProperty("--serif", serif);
+            document.documentElement.style.setProperty("--sans", sans);
+            assert(getComputedStyle(readingTarget).fontFamily === originalFont && originalFont.includes("notosansjp"), "reading font changed with typography");
+            assert([...readingTarget.querySelectorAll("span, li")].every(node => getComputedStyle(node).fontFamily === originalFont), "reading child font differs");
+            assert(getComputedStyle(fixture.querySelector("#formattedSentence")).fontFamily === sans, "general text stopped following typography");
+            if (!test.kana) assert(getComputedStyle(base).fontFamily === serif, "word stopped following typography");
+          }
+          document.documentElement.style.removeProperty("--serif");
+          document.documentElement.style.removeProperty("--sans");
           if (test.count > 1) {
             const rects = entries.map(entry => entry.element.getBoundingClientRect());
             assert(rects.every((rect, i) => !i || rect.top >= rects[i - 1].bottom), "reading rows overlap");
@@ -94,6 +106,9 @@
           config.noDuplicateKana = "false";
           api.renderBackReading();
           assert(base.textContent === test.word, "original word not restored");
+          document.documentElement.style.setProperty("--serif", "monospace");
+          assert(getComputedStyle(base).fontFamily === "monospace", "restored word kept reading font");
+          document.documentElement.style.removeProperty("--serif");
           assert(reading.style.display !== "none", "reading not restored");
           config.noDuplicateKana = "true";
           api.renderBackReading();

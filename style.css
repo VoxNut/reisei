@@ -1232,8 +1232,16 @@ html[data-senren-theme="focus"] body {
 }
 
 #word .word-reading {
-  font-family: var(--sans);
   font-size: var(--furigana-size);
+}
+
+/* Keep readings independent of the configurable word and general fonts. */
+#word .word-reading,
+#word .word-reading *,
+#word.reading-is-word .ruby-base-word,
+#word.reading-is-word .ruby-base-word * {
+  font-family: "Noto Sans JP", notosansjp, "Noto Sans CJK JP",
+    "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif !important;
 }
 
 @container style(--dynamic-furigana-size: 1) {
