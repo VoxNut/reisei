@@ -2383,10 +2383,19 @@ var senrenConfig = {};
     return position >= 0 ? position : null;
   }
 
+  function isDevoicingMarker(element) {
+    // The extracted-media class identifies the circle before its CSS loads.
+    return element.classList.contains("ic-3c7893fbde") ||
+      element.style.borderStyle === "dotted" ||
+      getComputedStyle(element).borderTopStyle === "dotted";
+  }
+
   function getPitchGraphSignature(readingItem) {
-    // Keep distinct annotations even when a note gives them the same number.
-    // Comparing source markup also works before imported stylesheets load.
     const copy = readingItem.cloneNode(true);
+    const originalSpans = readingItem.querySelectorAll("span");
+    copy.querySelectorAll("span").forEach((span, index) => {
+      if (isDevoicingMarker(originalSpans[index])) span.remove();
+    });
     copy.querySelectorAll("style, script").forEach((node) => node.remove());
     return copy.innerHTML.replace(/>\s+</g, "><").trim();
   }
@@ -2436,7 +2445,7 @@ var senrenConfig = {};
 
   function deduplicateReadingEntries(context) {
     const entries = collectReadingEntries(context);
-    const seen = new Set();
+    const seen = new Map();
     const uniqueEntries = [];
 
     entries.forEach((entry) => {
@@ -2447,13 +2456,28 @@ var senrenConfig = {};
         getPitchGraphSignature(entry.element),
       ]);
 
-      if (seen.has(signature)) {
-        if (entry.element !== context.reading) entry.element.remove();
-        entry.positionElement?.remove();
+      const previous = seen.get(signature);
+      if (previous) {
+        const markerCount = (item) => Array.from(item.element.querySelectorAll("span"))
+          .filter(isDevoicingMarker).length;
+        const preferCurrent = markerCount(entry) < markerCount(previous);
+        const discarded = preferCurrent ? previous : entry;
+        if (preferCurrent) {
+          previous.element.replaceWith(entry.element);
+          if (previous.positionElement && entry.positionElement) {
+            previous.positionElement.replaceWith(entry.positionElement);
+          }
+        }
+        if (discarded.element !== context.reading) discarded.element.remove();
+        discarded.positionElement?.remove();
+        if (preferCurrent) {
+          uniqueEntries[uniqueEntries.indexOf(previous)] = entry;
+          seen.set(signature, entry);
+        }
         return;
       }
 
-      seen.add(signature);
+      seen.set(signature, entry);
       uniqueEntries.push(entry);
     });
 

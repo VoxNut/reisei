@@ -30,7 +30,17 @@
       const graph = (text, drop = false) => `<span class="test-inline">${[...text].map((kana, i) =>
         `<span class="test-mora"><span class="test-inline">${kana}</span><span class="${i ? "test-high" : ""} ${drop && i === text.length - 1 ? "test-drop" : ""}"></span></span>`).join("")}</span>`;
       const a = graph("いる"), b = graph("いる", true);
+      const circled = a.replace('い</span>',
+        'い</span><span class="ic-3c7893fbde"></span>');
+      const inlineCircled = a.replace('い</span>',
+        'い</span><span style="border:1.5px dotted #c83c28"></span>');
       const cases = [
+        { name: "prefer plain over earlier circle", word: "居る", reading: list(circled, a), position: list(0, 0), count: 1, numbers: "0", noCircle: true },
+        { name: "prefer plain over later circle", word: "居る", reading: list(a, circled), position: list(0, 0), count: 1, numbers: "0", noCircle: true },
+        { name: "replacement preserves accent order", word: "居る", reading: list(circled, b, a), position: list(0, 2, 0), count: 2, numbers: "0・2", noCircle: true },
+        { name: "inline circle without pitch metadata", word: "居る", reading: list(inlineCircled, a), count: 1, numbers: "", noCircle: true },
+        { name: "circle kept when no plain match exists", word: "居る", reading: list(circled, circled), count: 1, numbers: "" },
+        { name: "circle on distinct pitch retained", word: "居る", reading: list(circled, b), position: list(0, 2), count: 2, numbers: "0・2" },
         { name: "five identical imports", word: "居る", reading: list(a, a, a, a, a), position: list(0, 0, 0, 0, 0), types: "heiban", count: 1, numbers: "0" },
         { name: "different graphs with the same number", word: "居る", reading: list(a, b, a), position: list(0, 0, 0), count: 2, numbers: "0" },
         { name: "different positions", word: "居る", reading: list(a, a, a), position: list(0, 2, 0), count: 2, numbers: "0・2" },
@@ -79,6 +89,7 @@
           if (originalItems.length) assert(entries.every(entry => originalItems.includes(entry.element.innerHTML)), "graph markup changed");
           if (originalStyle) assert(reading.querySelector("style")?.outerHTML === originalStyle, "stylesheet lost");
           if (test.plain) assert(reading.innerHTML === "いる", "plain reading was rebuilt");
+          if (test.noCircle) assert(entries.every(entry => !entry.element.querySelector('.ic-3c7893fbde, [style*="dotted"]')), "circled duplicate was preferred");
           if (test.marker) assert(getComputedStyle(reading.querySelector('span[style*="dotted"]')).display !== "none", "devoicing marker hidden");
           if (test.lastType) assert(entries.at(-1).pitchType === test.lastType, "category shifted after deduplication");
           assert(word.classList.contains("reading-is-word") === Boolean(test.kana), "wrong kana shortcut");
