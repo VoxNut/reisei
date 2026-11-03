@@ -81,7 +81,23 @@
             if (!condition) throw Error(`${theme}, ${test.name}: ${message}`);
             checks++;
           };
-          api.renderBackReading();
+          const originalGetComputedStyle = window.getComputedStyle;
+          const readingMutations = new MutationObserver(() => {});
+          readingMutations.observe(reading, {childList: true, subtree: true});
+          let styleReadAfterRemoval = false;
+          window.getComputedStyle = (...args) => {
+            if (readingMutations.takeRecords().some(record => record.removedNodes.length)) {
+              styleReadAfterRemoval = true;
+            }
+            return originalGetComputedStyle(...args);
+          };
+          try {
+            api.renderBackReading();
+          } finally {
+            window.getComputedStyle = originalGetComputedStyle;
+            readingMutations.disconnect();
+          }
+          assert(!styleReadAfterRemoval, "style reads interleaved with duplicate removal");
           const stack = word.querySelector(".word-reading-stack");
           const entries = stack._senrenReadingEntries;
           assert(entries.length === test.count, `expected ${test.count} entries, got ${entries.length}`);

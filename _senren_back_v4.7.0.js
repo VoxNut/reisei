@@ -2393,11 +2393,18 @@ var senrenConfig = {};
   function getPitchGraphSignature(readingItem) {
     const copy = readingItem.cloneNode(true);
     const originalSpans = readingItem.querySelectorAll("span");
+    let markerCount = 0;
     copy.querySelectorAll("span").forEach((span, index) => {
-      if (isDevoicingMarker(originalSpans[index])) span.remove();
+      if (isDevoicingMarker(originalSpans[index])) {
+        span.remove();
+        markerCount++;
+      }
     });
     copy.querySelectorAll("style, script").forEach((node) => node.remove());
-    return copy.innerHTML.replace(/>\s+</g, "><").trim();
+    return {
+      graphSignature: copy.innerHTML.replace(/>\s+</g, "><").trim(),
+      markerCount,
+    };
   }
 
   function getReadingContext() {
@@ -2440,6 +2447,8 @@ var senrenConfig = {};
           : null,
       readingText: normalizeReadingText(element),
       importedType: importedTypes.length === 1 ? importedTypes[0] : importedTypes[index],
+      // Read styles for all entries before removing duplicates invalidates layout.
+      ...getPitchGraphSignature(element),
     }));
   }
 
@@ -2453,14 +2462,12 @@ var senrenConfig = {};
         entry.readingText,
         entry.position,
         Number.isInteger(entry.position) ? null : entry.importedType,
-        getPitchGraphSignature(entry.element),
+        entry.graphSignature,
       ]);
 
       const previous = seen.get(signature);
       if (previous) {
-        const markerCount = (item) => Array.from(item.element.querySelectorAll("span"))
-          .filter(isDevoicingMarker).length;
-        const preferCurrent = markerCount(entry) < markerCount(previous);
+        const preferCurrent = entry.markerCount < previous.markerCount;
         const discarded = preferCurrent ? previous : entry;
         if (preferCurrent) {
           previous.element.replaceWith(entry.element);
