@@ -1108,53 +1108,47 @@ html[data-senren-theme="focus"] body {
 }
 
 /* Word + Grid Settings */
-#word.reading-is-word span[style*="border-top-width"],
-#word.reading-is-word span[style*="border-right-width"],
 #word.reading-is-word
   .pronunciation-mora[data-pitch="high"]
   > .pronunciation-mora-line {
   border-top-width: var(--only-kana-pitch-size) !important;
 }
 
-#word.reading-is-word span[style*="border-top-width"],
-#word.reading-is-word span[style*="border-right-width"],
 #word.reading-is-word
   .pronunciation-mora[data-pitch-next="low"]
   > .pronunciation-mora-line {
   border-right-width: var(--only-kana-pitch-size) !important;
 }
 
-#word .word-reading > :is(ol, ul) {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
+#word .word-reading :is(ol, ul) {
+  display: block;
   max-width: 100%;
-  gap: 0.15em 0.55em;
   margin: 0;
-  padding: 0;
+  padding-left: 1.5em;
+  text-align: left;
   white-space: normal;
 }
 
+#word .word-reading ol { list-style: decimal; }
+#word .word-reading ul { list-style: disc; }
+
+#word .word-reading.reading-single :is(ol, ul) {
+  list-style: none;
+  padding-left: 0;
+}
+
 #word .word-reading li {
-  display: inline-flex;
-  align-items: center;
+  display: list-item;
   white-space: nowrap;
 }
 
 /* Prevent the raw dictionary duplicates from affecting the first paint while
-   the back script builds the final unique accent list. */
+   the back script filters the original list. */
 #word
   .word-reading
   > :is(ol, ul):not(.pitch-readings-ready)
   > li:not(:first-child) {
   display: none;
-}
-
-#word .word-reading li:not(:last-child)::after {
-  content: "／";
-  margin-left: 0.55em;
-  opacity: 0.45;
 }
 
 #word {
@@ -1281,11 +1275,6 @@ html[data-senren-theme="focus"] body {
 
   #word .word-reading li {
     padding-top: 0;
-  }
-
-  #word .word-reading ol,
-  #word .word-reading ul {
-    display: inline-flex !important;
   }
 
 }
@@ -3206,22 +3195,6 @@ svg.playImage path {
   padding-top: var(--pitch-line-clearance);
 }
 
-/* Yomitan's imported pitch graphs use inline-styled mora wrappers instead of
-   the fallback classes above. Target only the top-level morae: pronunciation
-   markers such as nasal/devoiced kana contain nested relative wrappers, and
-   padding those as well makes adjacent pitch-line segments change height. */
-#word
-    .word-reading
-    li
-    > span[style*="display:inline"]
-    > span[style*="display:inline-block"][style*="position:relative"],
-#word.reading-is-word
-  .ruby-base-word
-  > span[style*="display:inline"]
-  > span[style*="display:inline-block"][style*="position:relative"] {
-  padding-top: var(--pitch-line-clearance) !important;
-}
-
 .pronunciation-mora[data-pitch="high"][data-pitch-next="low"] {
   position: relative;
   display: inline-block;
@@ -3301,7 +3274,7 @@ svg.playImage path {
 }
 
 /* Nasal Mora */
-span[style*="border:1.5px solid #c83c28"] {
+span[style*="border:1.5px solid #c83c28"]:not(#word *) {
   border: 0.1em solid #ff4936 !important;
   margin: 2px 0px;
   width: 0.3rem !important;
@@ -3309,12 +3282,12 @@ span[style*="border:1.5px solid #c83c28"] {
 }
 
 /* Devoiced Mora */
-span[style*="border:1.5px dotted #c83c28"] {
+span[style*="border:1.5px dotted #c83c28"]:not(#word *) {
   display: none !important;
 }
 
 span[style*="display:inline-block;position:relative;"]
-  > span[style*="display:inline"]:has(
+  > span[style*="display:inline"]:not(#word *):has(
     + span[style*="border:1.5px dotted #c83c28"]
   ) {
   color: var(--light-devoiced-color) !important;
@@ -3322,12 +3295,12 @@ span[style*="display:inline-block;position:relative;"]
 
 .card.nightMode
   span[style*="display:inline-block;position:relative;"]
-  > span[style*="display:inline"]:has(
+  > span[style*="display:inline"]:not(#word *):has(
     + span[style*="border:1.5px dotted #c83c28"]
   ),
 .custom-dark-mode
   span[style*="display:inline-block;position:relative;"]
-  > span[style*="display:inline"]:has(
+  > span[style*="display:inline"]:not(#word *):has(
     + span[style*="border:1.5px dotted #c83c28"]
   ) {
   color: var(--dark-devoiced-color) !important;

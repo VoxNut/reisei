@@ -2341,12 +2341,12 @@ var senrenConfig = {};
 
   function getDirectListItems(container) {
     if (!container) return [];
-    const list = Array.from(container.children).find((child) =>
-      child.matches("ol, ul"),
+    const lists = Array.from(container.querySelectorAll("ol, ul")).filter(
+      (list) => !container.contains(list.parentElement.closest("ol, ul")),
     );
-    return list
-      ? Array.from(list.children).filter((child) => child.matches("li"))
-      : [];
+    return lists.flatMap((list) =>
+      Array.from(list.children).filter((child) => child.matches("li")),
+    );
   }
 
   function getWordReadingElement(stackElement) {
@@ -2354,14 +2354,13 @@ var senrenConfig = {};
   }
 
   function normalizeReadingText(element) {
-    return (element?.textContent || "")
-      .replace(REGEX.COMBINING_MARK, "$1゙")
-      .normalize("NFC")
-      .replace(/[・〜～\s]/g, "");
+    const copy = element?.cloneNode(true);
+    copy?.querySelectorAll("style, script, rt, rp").forEach((node) => node.remove());
+    return (copy?.textContent || "").normalize("NFC").replace(/\s/g, "");
   }
 
   function getReadingMorae(element) {
-    return normalizeReadingText(element).match(REGEX.MORA) || [];
+    return normalizeReadingText(element).replace(/[゙゚]/g, "").match(REGEX.MORA) || [];
   }
 
   // Explicit downstep positions are authoritative. Imported pitch classes are
@@ -2371,7 +2370,8 @@ var senrenConfig = {};
     if (!moraCount || !Number.isInteger(number) || number < 0) return "unknown";
     if (number === 0) return "heiban";
     if (number === 1) return "atamadaka";
-    if (number >= moraCount) return moraCount > 1 ? "odaka" : "atamadaka";
+    if (number > moraCount) return "unknown";
+    if (number === moraCount) return moraCount > 1 ? "odaka" : "atamadaka";
     return number > 1 ? "nakadaka" : "unknown";
   }
   window.senrenGetPitchType = getPitchType;
@@ -2384,37 +2384,11 @@ var senrenConfig = {};
   }
 
   function getPitchGraphSignature(readingItem) {
-    const moraWrappers = Array.from(
-      readingItem.querySelectorAll(
-        '.pronunciation-mora, span[style*="display:inline-block"]',
-      ),
-    ).filter((wrapper) =>
-      Array.from(wrapper.children).some(
-        (child) =>
-          child.classList.contains("pronunciation-mora-line") ||
-          child.style.borderColor,
-      ),
-    );
-
-    if (!moraWrappers.length) {
-      return readingItem.innerHTML.replace(/\s+/g, "");
-    }
-
-    return moraWrappers
-      .map((wrapper) => {
-        const line = Array.from(wrapper.children).find(
-          (child) =>
-            child.classList.contains("pronunciation-mora-line") ||
-            child.style.borderColor,
-        );
-        const high =
-          wrapper.dataset.pitch === "high" || Boolean(line?.style.borderTopWidth);
-        const drop =
-          wrapper.dataset.pitchNext === "low" ||
-          Boolean(line?.style.borderRightWidth);
-        return `${high ? "H" : "L"}${drop ? "D" : ""}`;
-      })
-      .join("");
+    // Keep distinct annotations even when a note gives them the same number.
+    // Comparing source markup also works before imported stylesheets load.
+    const copy = readingItem.cloneNode(true);
+    copy.querySelectorAll("style, script").forEach((node) => node.remove());
+    return copy.innerHTML.replace(/>\s+</g, "><").trim();
   }
 
   function getReadingContext() {
@@ -2438,9 +2412,12 @@ var senrenConfig = {};
     const positionItems = getDirectListItems(context.position);
     const aligned =
       readingItems.length > 0 && positionItems.length === readingItems.length;
+    const importedTypes = (context.categories?.textContent || "")
+      .split(",")
+      .map((value) => value.trim());
     const displayItems = readingItems.length
       ? readingItems
-      : context.reading?.textContent.trim()
+      : normalizeReadingText(context.reading)
         ? [context.reading]
         : [];
 
@@ -2449,10 +2426,11 @@ var senrenConfig = {};
       positionElement: aligned ? positionItems[index] : null,
       position: aligned
         ? getPitchPosition(positionItems[index])
-        : index === 0
+        : displayItems.length === 1 && positionItems.length <= 1
           ? getPitchPosition(context.position)
           : null,
       readingText: normalizeReadingText(element),
+      importedType: importedTypes.length === 1 ? importedTypes[0] : importedTypes[index],
     }));
   }
 
@@ -2462,10 +2440,12 @@ var senrenConfig = {};
     const uniqueEntries = [];
 
     entries.forEach((entry) => {
-      const pitchIdentity = Number.isInteger(entry.position)
-        ? `position:${entry.position}`
-        : `graph:${getPitchGraphSignature(entry.element)}`;
-      const signature = `${entry.readingText}|${pitchIdentity}`;
+      const signature = JSON.stringify([
+        entry.readingText,
+        entry.position,
+        Number.isInteger(entry.position) ? null : entry.importedType,
+        getPitchGraphSignature(entry.element),
+      ]);
 
       if (seen.has(signature)) {
         if (entry.element !== context.reading) entry.element.remove();
@@ -2477,9 +2457,13 @@ var senrenConfig = {};
       uniqueEntries.push(entry);
     });
 
-    const readingList = getDirectListItems(context.reading)[0]?.parentElement;
-    readingList?.classList.add("pitch-readings-ready");
+    uniqueEntries.forEach((entry) => {
+      if (entry.element !== context.reading) {
+        entry.element.parentElement.classList.add("pitch-readings-ready");
+      }
+    });
     context.reading?.classList.add("reading-ready");
+    context.reading?.classList.toggle("reading-single", uniqueEntries.length === 1);
     return uniqueEntries;
   }
 
@@ -2495,97 +2479,38 @@ var senrenConfig = {};
   }
 
   function resolveEntryPitchTypes(context, entries) {
-    const importedTypes = (context.categories?.textContent || "")
-      .split(",")
-      .map((value) => value.trim())
-      .filter(Boolean);
-
-    entries.forEach((entry, index) => {
+    entries.forEach((entry) => {
       entry.element.classList.add("pitch-reading");
       entry.element.classList.remove(...senrenPitchClassNames);
       const calculated = Number.isInteger(entry.position)
         ? getPitchType(entry.position, entry.element)
         : "unknown";
       entry.pitchType =
-        calculated !== "unknown" ? calculated : importedTypes[index] || "unknown";
+        calculated !== "unknown" ? calculated : entry.importedType || "unknown";
       if (senrenPitchClassNames.includes(entry.pitchType)) {
         entry.element.classList.add(entry.pitchType);
       }
     });
   }
 
-  function buildPitchNotation(entry) {
-    if (!entry?.element || entry.element.children.length) return;
-
-    const morae = getReadingMorae(entry.element);
-    if (!morae.length) return;
-
-    let position = entry.position;
-    if (!Number.isInteger(position)) {
-      if (entry.pitchType === "heiban") position = 0;
-      else if (entry.pitchType === "atamadaka") position = 1;
-      else if (entry.pitchType === "odaka") position = morae.length;
-      else return;
-    }
-
-    const pronunciation = document.createElement("span");
-    pronunciation.className = "pronunciation";
-    if (senrenPitchClassNames.includes(entry.pitchType)) {
-      pronunciation.classList.add(entry.pitchType);
-    }
-
-    const pitchPattern = morae.map((_, index) =>
-      position === 0
-        ? index > 0
-        : position === 1
-          ? index === 0
-          : index > 0 && index < position,
-    );
-
-    morae.forEach((mora, index) => {
-      const isHigh = pitchPattern[index];
-      const nextIsLow =
-        isHigh &&
-        ((index + 1 < morae.length && !pitchPattern[index + 1]) ||
-          (entry.pitchType === "odaka" && index === morae.length - 1));
-      const moraElement = document.createElement("span");
-      moraElement.className = "pronunciation-mora";
-      moraElement.textContent = mora;
-      moraElement.dataset.pitch = isHigh ? "high" : "low";
-      if (nextIsLow) moraElement.dataset.pitchNext = "low";
-
-      const line = document.createElement("span");
-      line.className = "pronunciation-mora-line";
-      moraElement.appendChild(line);
-      pronunciation.appendChild(moraElement);
-    });
-
-    entry.element.replaceChildren(pronunciation);
-  }
-
   function formatPitchMetadata(context, entries) {
-    const fallbackNumbers = Array.from(
-      context.position?.textContent.matchAll(/-?\d+/g) || [],
-      (match) => parseInt(match[0], 10),
-    ).filter((position) => position >= 0);
-    const numbers = [
-      ...new Set(
-        entries.some((entry) => Number.isInteger(entry.position))
-          ? entries
-              .map((entry) => entry.position)
-              .filter((position) => Number.isInteger(position))
-          : fallbackNumbers,
-      ),
-    ];
-    const resolvedTypes = numbers.map((number, index) => {
-      const entry = entries[index] || entries[0];
-      const calculated = getPitchType(number, entry?.element || context.reading);
+    const positionItems = getDirectListItems(context.position);
+    const fallbackNumbers = (positionItems.length ? positionItems : [context.position])
+      .flatMap((element) => Array.from(
+        element?.textContent.matchAll(/-?\d+/g) || [],
+        (match) => parseInt(match[0], 10),
+      )).filter((position) => position >= 0);
+    const numbers = [...new Set(fallbackNumbers)];
+    const resolvedTypes = numbers.map((number) => {
+      const entry = entries.find((entry) => entry.position === number) ||
+        (entries.length === 1 ? entries[0] : null);
+      const calculated = entry ? getPitchType(number, entry.element) : "unknown";
       return calculated !== "unknown"
         ? calculated
         : entry?.pitchType || "unknown";
     });
 
-    if (context.position && numbers.length) {
+    if (context.position) {
       context.position.replaceChildren(
         ...numbers.flatMap((number, index) => {
           const numberElement = document.createElement("span");
@@ -2610,8 +2535,7 @@ var senrenConfig = {};
     }
 
     const pitchTypes = new Set(
-      entries
-        .map((entry) => entry.pitchType)
+      [...resolvedTypes, ...entries.map((entry) => entry.pitchType)]
         .filter((pitchType) => senrenPitchClassNames.includes(pitchType)),
     );
     const multiplePitchTypes = pitchTypes.size > 1;
@@ -2639,7 +2563,7 @@ var senrenConfig = {};
       context.stack._senrenOriginalBaseHtml ??
       context.stack.dataset.originalBaseHtml;
     if (originalBaseHtml !== undefined) context.base.innerHTML = originalBaseHtml;
-    context.reading.style.display = "";
+    context.reading.style.display = context.stack._senrenOriginalReadingDisplay;
     context.word.classList.remove("reading-is-word");
   }
 
@@ -2647,15 +2571,14 @@ var senrenConfig = {};
     restoreKanaReading(context);
     if (senrenConfig.noDuplicateKana !== "true" || entries.length !== 1) return;
 
-    let wordText = context.base.textContent.trim();
-    const disambiguated = wordText.match(/^(.+?)\s*\(.*?\)\s*$/);
-    if (disambiguated) {
-      wordText = disambiguated[1].trim();
-      context.base.textContent = wordText;
-    }
-    if (!wordText || REGEX.KANJI.test(wordText)) return;
+    const wordText = normalizeReadingText(context.base).replace(/[（(].*?[）)]$/, "");
+    const toHiragana = (text) => text.replace(/[ァ-ヶ]/g,
+      (kana) => String.fromCharCode(kana.charCodeAt(0) - 0x60));
+    if (!REGEX.KANA_ONLY.test(wordText) ||
+        toHiragana(wordText) !== toHiragana(entries[0].readingText)) return;
 
     context.stack._senrenOriginalBaseHtml = context.base.innerHTML;
+    context.stack._senrenOriginalReadingDisplay = context.reading.style.display;
     context.base.innerHTML = entries[0].element.innerHTML;
     context.reading.style.display = "none";
     context.word.classList.add("reading-is-word");
@@ -2677,7 +2600,6 @@ var senrenConfig = {};
       ]);
       entries = deduplicateReadingEntries(context);
       resolveEntryPitchTypes(context, entries);
-      entries.forEach(buildPitchNotation);
       formatPitchMetadata(context, entries);
       context.stack._senrenReadingEntries = entries;
     }
@@ -2691,9 +2613,12 @@ var senrenConfig = {};
   window.noDuplicateKana = renderBackReading;
   window.senrenDeduplicatePitchReadings = (stackElement, positionElement) => {
     const context = getReadingContext();
-    if (stackElement) context.stack = stackElement;
+    if (stackElement) {
+      context.stack = stackElement;
+      context.reading = getWordReadingElement(stackElement);
+    }
     if (positionElement) context.position = positionElement;
-    const entries = deduplicateReadingEntries(context);
+    const entries = context.stack?._senrenReadingEntries || deduplicateReadingEntries(context);
     resolveEntryPitchTypes(context, entries);
     return new Set(entries.map((entry) => entry.pitchType));
   };

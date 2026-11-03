@@ -1,0 +1,108 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading rendering regression</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  .test-inline { display: inline !important; }
+  .test-mora { display: inline-block !important; position: relative !important; }
+  .test-high { display: block; position: absolute; top: .1em; left: 0; right: 0;
+    border-top: .1em solid currentColor; }
+  .test-drop { border-right: .1em solid currentColor; height: .4em; }
+</style>
+<body class="card nightMode">
+<output id="result">Running…</output>
+<div class="back" id="fixture"></div>
+<script>
+  // Serve the repository over HTTP and open tests/reading-rendering.html.
+  (async () => {
+    try {
+      const source = await (await fetch("../_senren_back_v4.7.0.js")).text();
+      const start = source.indexOf("  var senrenPitchClassNames =");
+      const end = source.indexOf("  // Highlight the target word", start);
+      const regexStart = source.indexOf("window.REGEX = {");
+      const regexEnd = source.indexOf("      // NSFW Cache", regexStart);
+      if ([start, end, regexStart, regexEnd].includes(-1)) throw Error("Cannot locate production code");
+      new Function(source.slice(regexStart, regexEnd))();
+      const build = new Function("ELS", "senrenConfig", source.slice(start, end) +
+        "\nreturn { renderBackReading, getReadingContext, getReadingMorae }; ");
+      const list = (...items) => `<ol>${items.map(item => `<li>${item}</li>`).join("")}</ol>`;
+      const graph = (text, drop = false) => `<span class="test-inline">${[...text].map((kana, i) =>
+        `<span class="test-mora"><span class="test-inline">${kana}</span><span class="${i ? "test-high" : ""} ${drop && i === text.length - 1 ? "test-drop" : ""}"></span></span>`).join("")}</span>`;
+      const a = graph("いる"), b = graph("いる", true);
+      const cases = [
+        { name: "five identical imports", word: "居る", reading: list(a, a, a, a, a), position: list(0, 0, 0, 0, 0), types: "heiban", count: 1, numbers: "0" },
+        { name: "different graphs with the same number", word: "居る", reading: list(a, b, a), position: list(0, 0, 0), count: 2, numbers: "0" },
+        { name: "different positions", word: "居る", reading: list(a, a, a), position: list(0, 2, 0), count: 2, numbers: "0・2" },
+        { name: "alternative readings", word: "明日", reading: list("あした", "あす", "あした"), count: 2, numbers: "" },
+        { name: "plain text stays plain", word: "居る", reading: "いる", position: "0", count: 1, numbers: "0", plain: true },
+        { name: "wrapped list and stylesheet", word: "居る", reading: `<style>.unchanged {color:inherit}</style><div>${list(a, a)}</div>`, count: 1, numbers: "" },
+        { name: "kana copy", word: "いる", reading: list(a, a), position: list(0, 0), count: 1, numbers: "0", kana: true },
+        { name: "katakana match", word: "イル", reading: list(a), count: 1, numbers: "", kana: true },
+        { name: "kana suffix restored", word: "いる (verb)", reading: list(a), count: 1, numbers: "", kana: true },
+        { name: "different kana is retained", word: "いる", reading: "おる", count: 1, numbers: "", kana: false },
+        { name: "multiple kana accents retained", word: "いる", reading: list(a, b), position: list(0, 2), count: 2, numbers: "0・2", kana: false },
+        { name: "missing positions keep original categories", word: "居る", reading: list(a, a, b), types: "heiban,heiban,odaka", count: 2, numbers: "", lastType: "odaka" },
+        { name: "mismatched positions are retained", word: "居る", reading: list(a, b, a), position: list(0, 2), count: 2, numbers: "0・2" },
+        { name: "nasal and devoiced annotations retained", word: "機嫌", reading: list(graph("きけ゚ん"), graph("きげん")), count: 2, numbers: "" },
+        { name: "handakuten stays different from dakuten", word: "葉", reading: list("ぱ", "ば"), count: 2, numbers: "" },
+        { name: "inline annotations stay visible", word: "居る", reading: `<span style="display:inline-block;position:relative;">い<span style="border:1.5px dotted #c83c28;position:absolute;width:.375em;height:.375em;"></span></span>る`, count: 1, numbers: "", marker: true },
+        { name: "empty reading", word: "空", reading: "<style>.unused {color:inherit}</style>", count: 0, numbers: "" },
+      ];
+      let checks = 0;
+      for (const theme of ["nord", "focus"]) {
+        document.documentElement.dataset.senrenTheme = theme;
+        document.documentElement.classList.toggle("custom-dark-mode", theme === "focus");
+        for (const test of cases) {
+          fixture.innerHTML = `<div class="grid-container"><div class="background-box"><div id="word" class="pitch card-a"><span><span class="word-reading-stack"><span class="ruby-base-word"></span><span class="word-reading"></span></span><span class="word-pitch-meta"><span id="position"></span><span id="categories"></span></span></span></div></div></div><span id="formattedSentence"></span>`;
+          const word = fixture.querySelector("#word");
+          const base = word.querySelector(".ruby-base-word");
+          const reading = word.querySelector(".word-reading");
+          base.textContent = test.word;
+          reading.innerHTML = test.reading;
+          const originalStyle = reading.querySelector("style")?.outerHTML;
+          const originalItems = [...reading.querySelectorAll("li")].map(li => li.innerHTML);
+          const position = word.querySelector("#position");
+          position.innerHTML = test.position || "";
+          word.querySelector("#categories").textContent = test.types || "";
+          const config = { noDuplicateKana: "true" };
+          const api = build({word, position, formattedSentence: fixture.querySelector("#formattedSentence")}, config);
+          const assert = (condition, message) => {
+            if (!condition) throw Error(`${theme}, ${test.name}: ${message}`);
+            checks++;
+          };
+          api.renderBackReading();
+          const stack = word.querySelector(".word-reading-stack");
+          const entries = stack._senrenReadingEntries;
+          assert(entries.length === test.count, `expected ${test.count} entries, got ${entries.length}`);
+          assert(position.textContent === test.numbers, `numbers ${position.textContent}`);
+          if (originalItems.length) assert(entries.every(entry => originalItems.includes(entry.element.innerHTML)), "graph markup changed");
+          if (originalStyle) assert(reading.querySelector("style")?.outerHTML === originalStyle, "stylesheet lost");
+          if (test.plain) assert(reading.innerHTML === "いる", "plain reading was rebuilt");
+          if (test.marker) assert(getComputedStyle(reading.querySelector('span[style*="dotted"]')).display !== "none", "devoicing marker hidden");
+          if (test.lastType) assert(entries.at(-1).pitchType === test.lastType, "category shifted after deduplication");
+          assert(word.classList.contains("reading-is-word") === Boolean(test.kana), "wrong kana shortcut");
+          if (test.kana) assert(base.innerHTML === entries[0].element.innerHTML, "kana graph not preserved");
+          if (test.count > 1) {
+            const rects = entries.map(entry => entry.element.getBoundingClientRect());
+            assert(rects.every((rect, i) => !i || rect.top >= rects[i - 1].bottom), "reading rows overlap");
+            assert(getComputedStyle(entries[0].element, "::after").content === "none", "slash injected");
+          }
+          const firstRender = word.innerHTML;
+          api.renderBackReading();
+          assert(word.innerHTML === firstRender, "second render changed output");
+          config.noDuplicateKana = "false";
+          api.renderBackReading();
+          assert(base.textContent === test.word, "original word not restored");
+          assert(reading.style.display !== "none", "reading not restored");
+          config.noDuplicateKana = "true";
+          api.renderBackReading();
+          assert(word.innerHTML === firstRender, "setting toggle changed output");
+        }
+      }
+      result.textContent = `PASS: ${checks} reading checks at ${innerWidth}px`;
+    } catch (error) {
+      result.textContent = `FAIL: ${error.stack}`;
+    }
+  })();
+</script>
