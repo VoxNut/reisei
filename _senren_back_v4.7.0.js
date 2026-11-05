@@ -2350,7 +2350,8 @@ var senrenConfig = {};
   }
 
   function getWordReadingElement(stackElement) {
-    return stackElement?.querySelector(".word-reading, rt") || null;
+    return stackElement?.querySelector(".word-reading") ||
+      stackElement?.querySelector("rt") || null;
   }
 
   function normalizeReadingText(element) {
@@ -2627,6 +2628,7 @@ var senrenConfig = {};
   function applyKanaReading(context, entries) {
     restoreKanaReading(context);
     if (senrenConfig.noDuplicateKana !== "true" || entries.length !== 1) return;
+    if (context.base.querySelector("img")) return;
 
     const wordText = normalizeReadingText(context.base).replace(/[（(].*?[）)]$/, "");
     const toHiragana = (text) => text.replace(/[ァ-ヶ]/g,

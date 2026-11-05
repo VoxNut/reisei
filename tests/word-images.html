@@ -1,0 +1,69 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word field image regression</title>
+<link rel="stylesheet" href="../style.css">
+<body class="card nightMode">
+<output id="result">Running…</output>
+<div id="fixture"></div>
+<script>
+  (async () => {
+    try {
+      const [front, back] = await Promise.all([
+        fetch("../_senren_front_v4.7.0.js").then(r => r.text()),
+        fetch("../_senren_back_v4.7.0.js").then(r => r.text()),
+      ]);
+      const sizeStart = front.indexOf("    function dynamicWordSize() {");
+      const sizeEnd = front.indexOf("    (function () {", sizeStart);
+      const readingStart = back.indexOf("  var senrenPitchClassNames =");
+      const readingEnd = back.indexOf("  // Highlight the target word", readingStart);
+      const regexStart = back.indexOf("window.REGEX = {");
+      const regexEnd = back.indexOf("      // NSFW Cache", regexStart);
+      if ([sizeStart, sizeEnd, readingStart, readingEnd, regexStart, regexEnd].includes(-1)) throw Error("Cannot locate production code");
+      new Function(back.slice(regexStart, regexEnd))();
+      const size = new Function("ELS", front.slice(sizeStart, sizeEnd) + "\nreturn dynamicWordSize;");
+      const reading = new Function("ELS", "senrenConfig", back.slice(readingStart, readingEnd) + "\nreturn renderBackReading;");
+      const image = '<img alt="Radical" width="64" height="64" src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'64\' height=\'64\'%3E%3Cpath d=\'M16 8v48h32V8M16 32h32\' fill=\'none\' stroke=\'white\' stroke-width=\'5\'/%3E%3C/svg%3E">';
+      let checks = 0;
+      const assert = (condition, message) => {if (!condition) throw Error(message); checks++;};
+      for (const theme of ["nord", "focus"]) {
+        document.documentElement.dataset.senrenTheme = theme;
+        document.documentElement.classList.toggle("custom-dark-mode", theme === "focus");
+        for (const html of [image, `<div>${image}</div>`, `か${image}`, `<ruby>${image}<rt>か</rt></ruby>`]) {
+          fixture.innerHTML = `<div class="front"><div class="desktop-word-layout"><div id="word">${html}</div></div><div class="mobile-word-layout"><div class="background-box"><div id="word">${html}</div></div></div></div>`;
+          const words = [...fixture.querySelectorAll("#word")];
+          const before = words.map(word => word.innerHTML);
+          const images = words.map(word => word.querySelector("img"));
+          size({words})();
+          size({words})();
+          assert(words.every((word, i) => word.innerHTML === before[i]), "front rewrote word image HTML");
+          await Promise.all(images.map(img => img.decode()));
+          const visible = images.filter(img => img.getBoundingClientRect().width > 0);
+          assert(visible.length === 1, "desktop/mobile image not visible or duplicated");
+          assert(visible[0].getBoundingClientRect().height > 0, "image has no height");
+
+          fixture.innerHTML = `<div class="back"><div class="grid-container"><div class="background-box"><div id="word"><span><span class="word-reading-stack"><span class="ruby-base-word">${html}</span><span class="word-reading"><ol><li>か</li></ol></span></span><span class="word-pitch-meta"><span id="position">0</span><span id="categories">heiban</span></span></span></div></div><div class="picture-container"></div></div></div>`;
+          const word = fixture.querySelector("#word");
+          const base = word.querySelector(".ruby-base-word");
+          const original = base.innerHTML;
+          const config = {noDuplicateKana:"true"};
+          const render = reading({word,position:word.querySelector("#position")}, config);
+          render(); render();
+          assert(base.innerHTML === original, `back replaced image with kana reading: ${original} -> ${base.innerHTML}`);
+          assert(!word.classList.contains("reading-is-word"), "image treated as a kana-only word");
+          const img = base.querySelector("img");
+          await img.decode();
+          assert(img.getBoundingClientRect().width > 0 && img.getBoundingClientRect().height > 0, "back word image not visible");
+          config.noDuplicateKana = "false"; render();
+          config.noDuplicateKana = "true"; render();
+          assert(base.innerHTML === original, "settings toggle lost word image");
+        }
+        fixture.innerHTML = '<div id="word">のに (Despite)</div><div id="word">差し支える</div>';
+        size({words:fixture.querySelectorAll("#word")})();
+        assert(fixture.children[0].textContent === "のに", "plain-text disambiguation changed");
+        assert(fixture.children[1].classList.contains("length-5"), "text sizing changed");
+      }
+      result.textContent = `PASS: ${checks} word-image checks at ${innerWidth}px`;
+    } catch(error) {result.textContent = `FAIL: ${error.stack}`;}
+  })();
+</script>

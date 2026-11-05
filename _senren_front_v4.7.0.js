@@ -672,7 +672,7 @@ var senrenConfig = {};
 
                 // Strip disambiguation parentheses: のに (Despite) → のに
                 content = content.replace(/\s*\(.*?\)\s*$/, "").trim();
-                if (!rubyElement) {
+                if (!rubyElement && !wordElement.querySelector("img")) {
                     wordElement.textContent = content;
                 }
 
