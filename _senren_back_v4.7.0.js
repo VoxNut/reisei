@@ -2356,7 +2356,32 @@ var senrenConfig = {};
   function normalizeReadingText(element) {
     const copy = element?.cloneNode(true);
     copy?.querySelectorAll("style, script, rt, rp").forEach((node) => node.remove());
+    if (copy) normalizeNasalAnnotations(copy);
     return (copy?.textContent || "").normalize("NFC").replace(/\s/g, "");
+  }
+
+  function normalizeNasalAnnotations(copy) {
+    let markerCount = 0;
+    copy.querySelectorAll("span").forEach((mark) => {
+      if (mark.textContent !== "゚") return;
+      const wrapper = mark.parentElement;
+      const kana = mark.previousElementSibling;
+      const voiced = kana?.textContent.normalize("NFC").replace(/[かきくけこカキクケコ]/g,
+        (character) => String.fromCharCode(character.charCodeAt(0) + 1));
+      if (!/^[がぎぐげごガギグゲゴ]$/.test(voiced || "")) return;
+      const circle = Array.from(wrapper.children).find((node) =>
+        node.classList.contains("ic-7946e4873e") ||
+        (node.style.borderRadius === "50%" && node.style.borderStyle === "solid"));
+      if (!circle) return;
+      // Yomitan encodes nasal が as a nested か + hidden handakuten + circle.
+      // Only the comparison copy changes; the selected field markup stays intact.
+      kana.textContent = voiced;
+      mark.remove();
+      circle.remove();
+      wrapper.replaceWith(...wrapper.childNodes);
+      markerCount++;
+    });
+    return markerCount;
   }
 
   function getReadingMorae(element) {
@@ -2400,9 +2425,10 @@ var senrenConfig = {};
         markerCount++;
       }
     });
+    markerCount += normalizeNasalAnnotations(copy);
     copy.querySelectorAll("style, script").forEach((node) => node.remove());
     return {
-      graphSignature: copy.innerHTML.replace(/>\s+</g, "><").trim(),
+      graphSignature: copy.innerHTML.normalize("NFC").replace(/>\s+</g, "><").trim(),
       markerCount,
     };
   }
