@@ -1,0 +1,99 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Preset and Save to Anki persistence regression</title>
+<body class="card nightMode">
+<output id="result">Running…</output>
+<script>
+  (async () => {
+    try {
+      const realFetch = window.fetch.bind(window);
+      const [css, settingsSource, themeSource] = await Promise.all([
+        realFetch("../style.css").then(r => r.text()),
+        realFetch("../_senren_settings_v4.7.0.js").then(r => r.text()),
+        realFetch("../_senren_theme_v4.7.0.js").then(r => r.text()),
+      ]);
+      const clean = value => value.replace(/["']/g, "").split(",")[0].trim().toLowerCase();
+      const markup = side => `<div class="${side}"><span class="toggle-settings-btn"></span><div id="word"><span><span class="word-reading-stack"><span class="ruby-base-word">確認</span><span class="word-reading">かくにん</span></span></span></div><div id="sentence">例文</div><div class="glossary-box">Glossary text</div></div>`;
+      let checks = 0;
+      const assert = (condition, message) => { if (!condition) throw Error(message); checks++; };
+      for (const theme of ["nord", "focus"]) {
+        const frame = document.createElement("iframe");
+        frame.style.cssText = "width:100%;height:500px";
+        document.body.appendChild(frame);
+        frame.srcdoc = `<style>${css}</style><body class="card nightMode">${markup("back")}</body>`;
+        await new Promise(resolve => frame.onload = resolve);
+        const win = frame.contentWindow, doc = frame.contentDocument;
+        win.localStorage.clear();
+        win.IS_MOBILE = false;
+        let savedCss = css;
+        let presets = {Default: {}, _active: "Default"};
+        const writes = [];
+        win.fetch = async (url, options = {}) => {
+          if (String(url).startsWith("http://127.0.0.1:8765")) {
+            const request = JSON.parse(options.body);
+            writes.push(request.action);
+            let result = null;
+            if (request.action === "guiCurrentCard") result = {modelName:"Test model"};
+            else if (request.action === "modelStyling") result = {css:savedCss};
+            else if (request.action === "updateModelStyling") savedCss = request.params.model.css;
+            else if (request.action === "storeMediaFile") {
+              assert(request.params.filename === "_senren_presets.js", "unexpected file write");
+              presets = JSON.parse(decodeURIComponent(escape(win.atob(request.params.data))));
+            } else throw Error(`Unexpected AnkiConnect action ${request.action}`);
+            return new Response(JSON.stringify({result,error:null}));
+          }
+          if (String(url).includes("_senren_deck_presets.js")) return new Response("{}");
+          if (String(url).includes("_senren_presets.js")) return new Response(JSON.stringify(presets));
+          return realFetch(new URL(url, location.href));
+        };
+        const alerts = [];
+        win.alert = text => alerts.push(text);
+        const run = source => { const script = doc.createElement("script"); script.textContent = source; doc.body.appendChild(script); };
+        run(themeSource);
+        win.SenrenTheme.apply(theme);
+        run(settingsSource);
+        for (let attempt = 0; attempt < 100 && !doc.querySelector('[data-var="--serif"]'); attempt++) {
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        assert(doc.querySelector('[data-var="--serif"]'), "settings UI did not initialize");
+        const wordChoice = [...doc.querySelectorAll('[data-var="--serif"] .senren-segment-btn')]
+          .find(button => button.textContent.trim() === "Klee");
+        const generalChoice = [...doc.querySelectorAll('[data-var="--sans"] .senren-segment-btn')]
+          .find(button => button.textContent.trim() === "Segoe");
+        wordChoice.click();
+        generalChoice.click();
+        assert(clean(win.getComputedStyle(doc.querySelector("#word")).fontFamily) === "klee one", "live word preview failed");
+        await win.senrenUpdateCurrentPreset();
+        assert(presets._active === "Default", "active preset changed");
+        assert(presets.Default["--serif"] === wordChoice.dataset.val, "preset lost word font");
+        assert(presets.Default["--sans"] === generalChoice.dataset.val, "preset lost general font");
+        await doc.querySelector("#senren-save-btn").onclick();
+        assert(writes.includes("updateModelStyling"), "Save to Anki did not write styling");
+        assert(alerts.length === 0, alerts.join("; "));
+        assert(win.localStorage.getItem("senren_--serif") === null, "temporary override masked saved CSS");
+        for (const side of ["front", "back"]) {
+          const restarted = document.createElement("iframe");
+          restarted.style.cssText = "width:100%;height:200px";
+          document.body.appendChild(restarted);
+          restarted.srcdoc = `<style>${savedCss}</style><body class="card nightMode">${markup(side)}</body>`;
+          await new Promise(resolve => restarted.onload = resolve);
+          const freshDoc = restarted.contentDocument, freshWin = restarted.contentWindow;
+          const themeScript = freshDoc.createElement("script");
+          themeScript.textContent = themeSource;
+          freshDoc.body.appendChild(themeScript);
+          freshWin.SenrenTheme.apply(theme);
+          assert(!freshDoc.documentElement.style.getPropertyValue("--serif"), "fresh card has a temporary font override");
+          assert(clean(freshWin.getComputedStyle(freshDoc.querySelector("#word")).fontFamily) === "klee one", `${theme} ${side}: saved word font overridden after restart`);
+          assert(clean(freshWin.getComputedStyle(freshDoc.querySelector(".glossary-box")).fontFamily) === "klee one", `${theme} ${side}: glossary lost the selected word font`);
+          assert(clean(freshWin.getComputedStyle(freshDoc.body).fontFamily) === "segoe ui", `${theme} ${side}: saved general font overridden after restart`);
+          if (side === "back") assert(clean(freshWin.getComputedStyle(freshDoc.querySelector(".word-reading")).fontFamily) === "noto sans jp", "reading lost its fixed font");
+          restarted.remove();
+        }
+        frame.remove();
+      }
+      result.textContent = `PASS: ${checks} preset/save/restart checks`;
+    } catch (error) {
+      result.textContent = `FAIL: ${error.stack}`;
+    }
+  })();
+</script>

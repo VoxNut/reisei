@@ -8714,12 +8714,6 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
 
 /* 1. Animation disabling is controlled by --enable-animations above. */
 
-/* 2. Unify typography to clean Serif (Mincho) font style */
-:root {
-  --serif: "Hiragino Mincho ProN", "Noto Serif JP", notoserifjp, "Yu Mincho", serif;
-  --sans: "Hiragino Mincho ProN", "Noto Serif JP", notoserifjp, "Yu Mincho", serif;
-}
-
 /* Force dictionary entries to inherit the main card font */
 .yomitan-glossary [data-dictionary] * {
   font-family: inherit !important;
