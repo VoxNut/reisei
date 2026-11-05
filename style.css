@@ -1225,7 +1225,7 @@ html[data-senren-theme="focus"] body {
   display: block;
   min-width: 0;
   max-width: 100%;
-  line-height: 1.2;
+  line-height: 1.5;
   margin: 0;
   padding: 0;
   transform: translateY(var(--furigana-height));
@@ -1233,6 +1233,12 @@ html[data-senren-theme="focus"] body {
 
 #word .word-reading {
   font-size: var(--furigana-size);
+}
+
+/* Imported pitch lines sit at the top of the line box. Match Anki's editor
+   spacing even when a kana reading replaces the larger base word. */
+#word.reading-is-word .ruby-base-word {
+  line-height: 1.5;
 }
 
 /* Keep readings independent of the configurable word and general fonts. */

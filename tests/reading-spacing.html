@@ -1,0 +1,102 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading pitch spacing regression</title>
+<link rel="stylesheet" href="../style.css">
+<body class="card nightMode">
+<output id="result">Running…</output>
+<div class="back" id="fixture"></div>
+<script>
+  (async () => {
+    try {
+      const source = await (await fetch("../_senren_back_v4.7.0.js")).text();
+      const start = source.indexOf("  var senrenPitchClassNames =");
+      const end = source.indexOf("  // Highlight the target word", start);
+      const regexStart = source.indexOf("window.REGEX = {");
+      const regexEnd = source.indexOf("      // NSFW Cache", regexStart);
+      if ([start, end, regexStart, regexEnd].includes(-1)) throw Error("Cannot locate reading code");
+      new Function(source.slice(regexStart, regexEnd))();
+      const build = new Function("ELS", "senrenConfig", source.slice(start, end) + "\nreturn renderBackReading;");
+      const font = '"Noto Sans JP", notosansjp, "Noto Sans CJK JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+      // Same imported layout as the reading field; the editor inherits 1.5
+      // from editor.css, while the card previously forced 1.2 (kana: 1.1).
+      const importedCSS = `.ic-inline {display:inline !important}
+        .ic-mora {display:inline-block !important;position:relative !important}
+        .ic-line {display:block !important;position:absolute !important;top:.1em !important;
+          left:0 !important;right:0 !important;height:0 !important;
+          border-top:.1em solid currentColor !important}
+        .ic-drop {height:.4em !important;border-right:.1em solid currentColor !important}
+        .ic-nasal {position:absolute;right:0;top:.1em;width:.375em;height:.375em;border:1px solid red;border-radius:50%}`;
+      const graph = (inline, drop = false, nested = false) => {
+        const wrapper = inline ? 'style="display:inline-block;position:relative;"' : 'class="ic-mora"';
+        return `<span class="ic-inline">${[..."そうそう"].map((kana, index) => {
+          const text = `<span class="ic-inline">${kana}</span>`;
+          const annotation = nested && index === 0 ? `<span ${wrapper}>${text}<span class="ic-nasal"></span></span>` : text;
+          const line = inline ? `style="position:absolute;top:.1em;left:0;right:0;border-top:.1em solid currentColor;${drop && index === 3 ? 'height:.4em;border-right:.1em solid currentColor;' : ''}"` : `class="ic-line ${drop && index === 3 ? 'ic-drop' : ''}"`;
+          return `<span ${wrapper}>${annotation}${index ? `<span data-line ${line}></span>` : ""}</span>`;
+        }).join("")}</span>`;
+      };
+      const iframe = document.createElement("iframe");
+      iframe.style.cssText = "position:absolute;left:-2000px;width:800px;height:300px";
+      iframe.srcdoc = `<style>@font-face{font-family:notosansjp;src:url('../_NotoSansJP.ttf')}
+        body{font-family:${font};line-height:1.5} ${importedCSS}</style><div id="reference"></div>`;
+      document.body.appendChild(iframe);
+      await new Promise(resolve => iframe.onload = resolve);
+      const style = document.createElement("style");
+      style.textContent = importedCSS;
+      document.head.appendChild(style);
+      const reference = iframe.contentDocument.getElementById("reference");
+      const glyphGaps = element => [...element.querySelectorAll("[data-line]")].map(line => {
+        const mora = line.parentElement;
+        const marker = document.createElement("i");
+        marker.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+        mora.prepend(marker);
+        const baseline = marker.getBoundingClientRect().top;
+        const text = [...mora.children].find(node => node !== marker && node !== line)?.textContent || "";
+        const css = getComputedStyle(mora);
+        const ctx = document.createElement("canvas").getContext("2d");
+        ctx.font = `${css.fontSize} ${css.fontFamily}`;
+        const inkTop = baseline - ctx.measureText(text).actualBoundingBoxAscent;
+        const gap = (inkTop - line.getBoundingClientRect().top - parseFloat(getComputedStyle(line).borderTopWidth)) / parseFloat(css.fontSize);
+        marker.remove();
+        return gap;
+      });
+      let checks = 0;
+      const assert = (value, message) => { if (!value) throw Error(message); checks++; };
+      for (const theme of ["nord", "focus"]) {
+        document.documentElement.dataset.senrenTheme = theme;
+        document.documentElement.classList.toggle("custom-dark-mode", theme === "focus");
+        for (const kanaOnly of [false, true]) {
+          for (const size of [15, 24, 48, 64]) {
+            for (const [inline, drop, nested] of [[false, false, false], [true, true, false], [false, true, true]]) {
+              const html = graph(inline, drop, nested);
+              fixture.innerHTML = `<div class="background-box"><div id="word"><span><span class="word-reading-stack"><span class="ruby-base-word">${kanaOnly ? "そうそう" : "早々"}</span><span class="word-reading"><ol><li>${html}</li><li>${html}</li></ol></span></span><span class="word-pitch-meta"><span id="position"><ol><li>0</li><li>0</li></ol></span><span id="categories">heiban</span></span></span></div></div><span id="formattedSentence"></span>`;
+              const word = fixture.querySelector("#word");
+              word.style.fontSize = `${size}px`;
+              word.querySelector(".word-reading").style.fontSize = `${size}px`;
+              reference.style.fontSize = `${size}px`;
+              reference.innerHTML = html;
+              const render = build({word, position: word.querySelector("#position"), formattedSentence: fixture.querySelector("#formattedSentence")}, {noDuplicateKana:"true"});
+              render();
+              await Promise.all([document.fonts.ready, iframe.contentDocument.fonts.ready]);
+              const target = word.querySelector(kanaOnly ? ".ruby-base-word" : ".word-reading");
+              const actual = glyphGaps(target), expected = glyphGaps(reference);
+              const label = `${theme}, kana=${kanaOnly}, ${size}px, inline=${inline}, nested=${nested}`;
+              assert(word.querySelectorAll(".word-reading li").length === 1, `${label}: duplicates returned`);
+              assert(target.firstElementChild !== null, `${label}: graph lost`);
+              assert(Math.abs(parseFloat(getComputedStyle(target).lineHeight) / size - 1.5) < .01, `${label}: compressed line box`);
+              assert(actual.every((gap, i) => Math.abs(gap - expected[i]) < .035), `${label}: glyph-to-line gaps differ from editor: ${actual} vs ${expected}`);
+              assert(actual.every(gap => gap > .08), `${label}: graph touches glyphs: ${actual}`);
+              const tops = [...target.querySelectorAll("[data-line]")].map(line => line.getBoundingClientRect().top);
+              assert(Math.max(...tops) - Math.min(...tops) < .5, `${label}: graph segments misaligned`);
+            }
+          }
+        }
+      }
+      iframe.remove();
+      result.textContent = `PASS: ${checks} editor/card pitch-spacing checks at ${innerWidth}px`;
+    } catch (error) {
+      result.textContent = `FAIL: ${error.stack}`;
+    }
+  })();
+</script>
