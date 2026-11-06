@@ -2414,24 +2414,77 @@ var senrenConfig = {};
   }
   window.senrenGetPitchType = getPitchType;
 
-  function addReadingPitchGraph(element, position) {
-    if (!element || !Number.isInteger(position)) return false;
-    const content = element.cloneNode(true);
+  function getManualReadingContent(element) {
+    const content = element?.cloneNode(true);
+    if (!content) return null;
     content.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => node.remove());
     // Preserve imported/formatted readings; Anki may wrap manual text in divs.
     if (Array.from(content.querySelectorAll("*")).some((node) =>
-      !node.matches("div, p, br"))) return false;
+      !node.matches("div, p, br"))) return null;
+    return content;
+  }
+
+  function getManualReadingLines(element) {
+    const content = getManualReadingContent(element);
+    if (!content) return null;
+    content.querySelectorAll("br").forEach((node) => node.replaceWith("\n"));
+    content.querySelectorAll("div, p").forEach((node) => node.append("\n"));
+    return content.textContent.split(/[\r\n]+/).map((text) => text.trim()).filter(Boolean);
+  }
+
+  function prepareManualReadingLists(context) {
+    if (!context.reading || !context.position) return;
+    const items = getDirectListItems(context.reading);
+    const lines = (items.length ? items : [context.reading]).map(getManualReadingLines);
+    if (lines.some((line) => !line)) return;
+    const readings = lines.flat();
+    if (!readings.length || readings.some((text) => !REGEX.KANA_ONLY.test(text))) return;
+    const positionItems = getDirectListItems(context.position);
+    const positions = positionItems.length ? positionItems.map((item) => item.textContent) :
+      getManualReadingLines(context.position) || [];
+    if (readings.length === 1 && positions.length <= 1) return;
+    if (readings.length > 1 && positions.length > 1 && positions.length !== readings.length) return;
+    const readingList = document.createElement("ol");
+    const positionList = document.createElement("ol");
+    // A row is one contour; several brackets within that row are its downsteps.
+    const rowCount = Math.max(readings.length, positions.length);
+    for (let index = 0; index < rowCount; index++) {
+      const reading = document.createElement("li");
+      reading.textContent = readings[readings.length === 1 ? 0 : index];
+      readingList.appendChild(reading);
+      if (positions.length) {
+        const position = document.createElement("li");
+        position.textContent = positions[positions.length === 1 ? 0 : index];
+        positionList.appendChild(position);
+      }
+    }
+    context.reading.replaceChildren(...context.reading.querySelectorAll('style, link[rel="stylesheet"]'), readingList);
+    if (positionList.children.length) context.position.replaceChildren(positionList);
+  }
+
+  function addReadingPitchGraph(element, position) {
+    if (!element) return false;
+    const content = getManualReadingContent(element);
+    if (!content) return false;
     const text = normalizeReadingText(content);
     if (!REGEX.KANA_ONLY.test(text)) return false;
     const morae = getReadingMorae(content);
-    if (!morae.length || position < 0 || position > morae.length) return false;
+    const positions = [...new Set(Array.isArray(position) ? position : [position])]
+      .filter((number) => Number.isInteger(number) && number >= 0 && number <= morae.length)
+      .sort((a, b) => a - b);
+    if (!morae.length || !positions.length) return false;
+    const drops = positions.filter((number) => number > 0);
+    // Consecutive morae cannot both fall: a low mora separates two downsteps.
+    if (drops.some((number, index) => index > 0 && number - drops[index - 1] === 1)) return false;
+    const lastDrop = drops.at(-1) ?? morae.length;
 
     const graph = document.createElement("span");
     graph.className = "senren-generated-reading";
     graph.style.display = "inline";
     morae.forEach((mora, index) => {
-      const high = position === 1 ? index === 0 : index > 0 && (position === 0 || index < position);
-      const drop = high && position > 0 && index + 1 === position;
+      const high = (index === 0 && drops[0] === 1) ||
+        (index > 0 && index < lastDrop && !drops.includes(index));
+      const drop = high && drops.includes(index + 1);
       const wrapper = document.createElement("span");
       wrapper.className = "senren-generated-mora";
       wrapper.style.cssText = "display:inline-block;position:relative;";
@@ -2461,7 +2514,7 @@ var senrenConfig = {};
   }
   window.senrenDrawPitchLines = (container) => {
     container?.querySelectorAll("li").forEach((entry) => {
-      addReadingPitchGraph(entry.querySelector("rt"), getPitchPosition(entry.querySelector(".pitch-number")));
+      addReadingPitchGraph(entry.querySelector("rt"), getPitchPositions(entry.querySelector(".position")));
     });
   };
 
@@ -2470,6 +2523,14 @@ var senrenConfig = {};
     if (!match) return null;
     const position = parseInt(match[0], 10);
     return position >= 0 ? position : null;
+  }
+
+  function getPitchPositions(element) {
+    const content = element?.cloneNode(true);
+    content?.querySelectorAll("style, script").forEach((node) => node.remove());
+    content?.querySelectorAll("li, div, p, br").forEach((node) => node.after(" "));
+    return [...new Set(Array.from(content?.textContent.matchAll(/-?\d+/g) || [],
+      (match) => Number(match[0])).filter((position) => position >= 0))].sort((a, b) => a - b);
   }
 
   function isDevoicingMarker(element) {
@@ -2552,18 +2613,25 @@ var senrenConfig = {};
         : [];
 
     return displayItems.map((element, index) => {
+      const moraCount = getReadingMorae(element).length;
+      const positionSource = aligned ? positionItems[index] :
+        displayItems.length === 1 ? context.position : null;
+      const positions = getManualReadingContent(element) ?
+        getPitchPositions(positionSource).filter((number) => number <= moraCount) : null;
       let position = aligned
         ? getPitchPosition(positionItems[index])
         : displayItems.length === 1 && positionItems.length <= 1
           ? getPitchPosition(context.position)
           : null;
-      if (position > getReadingMorae(element).length) {
+      if (positions?.length) position = positions[0];
+      if (position > moraCount) {
         position = getGraphPitchPosition(element);
       }
       return {
         element,
         positionElement: aligned ? positionItems[index] : null,
         position,
+        positions,
         readingText: normalizeReadingText(element),
         importedType: importedTypes.length === 1 ? importedTypes[0] : importedTypes[index],
         // Read styles for all entries before removing duplicates invalidates layout.
@@ -2580,7 +2648,7 @@ var senrenConfig = {};
     entries.forEach((entry) => {
       const signature = JSON.stringify([
         entry.readingText,
-        entry.position,
+        entry.positions?.length ? entry.positions : entry.position,
         Number.isInteger(entry.position) ? null : entry.importedType,
         entry.graphSignature,
       ]);
@@ -2651,11 +2719,11 @@ var senrenConfig = {};
         element?.textContent.matchAll(/-?\d+/g) || [],
         (match) => parseInt(match[0], 10),
       )).filter((position) => position >= 0);
-    const numbers = [...new Set(entries.length && entries.every((entry) => entry.positionElement)
-      ? entries.map((entry) => entry.position).filter(Number.isInteger)
+    const numbers = [...new Set(entries.length && entries.every((entry) => entry.positionElement || entry.positions?.length)
+      ? entries.flatMap((entry) => entry.positions || [entry.position]).filter(Number.isInteger)
       : fallbackNumbers)];
     const resolvedTypes = numbers.map((number) => {
-      const entry = entries.find((entry) => entry.position === number) ||
+      const entry = entries.find((entry) => entry.positions?.includes(number) || entry.position === number) ||
         (entries.length === 1 ? entries[0] : null);
       const calculated = entry ? getPitchType(number, entry.element) : "unknown";
       return calculated !== "unknown"
@@ -2752,9 +2820,10 @@ var senrenConfig = {};
         context.position,
         context.sentence,
       ]);
+      prepareManualReadingLists(context);
       entries = deduplicateReadingEntries(context);
       resolveEntryPitchTypes(context, entries);
-      entries.forEach((entry) => addReadingPitchGraph(entry.element, entry.position));
+      entries.forEach((entry) => addReadingPitchGraph(entry.element, entry.positions || entry.position));
       formatPitchMetadata(context, entries);
       context.stack._senrenReadingEntries = entries;
     }

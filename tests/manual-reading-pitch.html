@@ -33,6 +33,7 @@
         {name:"stylesheet prefix",text:"いくどとなく",html:'<style>.manual-unused{color:inherit}</style>いくどとなく',position:"[1]",type:"atamadaka",pattern:"HLLLLL",drop:0},
         {name:"missing pitch",text:"いくどとなく",position:"",type:"atamadaka",pattern:null},
         {name:"invalid pitch",text:"いくどとなく",position:"[9]",type:"atamadaka",pattern:null},
+        {name:"impossible consecutive downsteps",text:"いくどとなく",position:"[2] [3]",type:"",pattern:null},
         {name:"non-kana content",text:"幾度となく",position:"[1]",type:"atamadaka",pattern:null},
       ];
       let checks=0;
@@ -80,6 +81,45 @@
           const previous=word.innerHTML;render();assert(word.innerHTML===previous,`${label}: repeated rendering changed output`);
           config.noDuplicateKana="false";render();config.noDuplicateKana="true";render();
           assert(word.innerHTML===previous,`${label}: setting toggle duplicated graph`);
+        }
+        const list=(...items)=>`<ol>${items.map(item=>`<li>${item}</li>`).join("")}</ol>`;
+        for(const test of [
+          {name:"手間が省ける with two drops and empty Pitch",reading:"てまがはぶける",position:"[2] [6]",texts:["てまがはぶける"],positions:[[2,6]],patterns:["LHLHHHL"]},
+          {name:"alternative two-drop contour",reading:"てまがはぶける",position:"[3] [5]",texts:["てまがはぶける"],positions:[[3,5]],patterns:["LHHLHLL"]},
+          {name:"different contours on separate rows",reading:"てまがはぶける<br>てまがはぶける",position:"[2] [6]<br>[3] [5]",texts:["てまがはぶける","てまがはぶける"],positions:[[2,6],[3,5]],patterns:["LHLHHHL","LHHLHLL"]},
+          {name:"different kana readings in parallel lists",reading:list("てまがはぶける","テマガハブケル"),position:list("[2] [6]","[3] [5]"),texts:["てまがはぶける","テマガハブケル"],positions:[[2,6],[3,5]]},
+          {name:"Anki block rows",reading:"<div>てまがはぶける</div><div>てまがはぶける</div>",position:"<div>[2] [6]</div><div>[3] [5]</div>",texts:["てまがはぶける","てまがはぶける"],positions:[[2,6],[3,5]]},
+          {name:"newline rows",reading:"てまがはぶける\nてまがはぶける",position:"[2] [6]\n[3] [5]",texts:["てまがはぶける","てまがはぶける"],positions:[[2,6],[3,5]]},
+          {name:"shared drop contour",reading:list("てまがはぶける","テマガハブケル"),position:"[2] [6]",texts:["てまがはぶける","テマガハブケル"],positions:[[2,6],[2,6]]},
+          {name:"comma-separated drop positions",reading:"てまがはぶける",position:"[2,6]",texts:["てまがはぶける"],positions:[[2,6]]},
+          {name:"alternative contours without repeating kana",reading:"てまがはぶける",position:"[2] [6]<br>[3] [5]",texts:["てまがはぶける","てまがはぶける"],positions:[[2,6],[3,5]],patterns:["LHLHHHL","LHHLHLL"]},
+          {name:"alternative contours in position list",reading:"てまがはぶける",position:list("[2] [6]","[3] [5]"),texts:["てまがはぶける","てまがはぶける"],positions:[[2,6],[3,5]]},
+          {name:"duplicate drops",reading:"てまがはぶける",position:"[2] [6] [2]",texts:["てまがはぶける"],positions:[[2,6]]},
+          {name:"identical contours deduplicated",reading:list("てまがはぶける","てまがはぶける"),position:list("[2] [6]","[2] [6]"),texts:["てまがはぶける"],positions:[[2,6]]},
+          {name:"three drops",reading:"あいうえおかきくけ",position:"[1] [4] [8]",texts:["あいうえおかきくけ"],positions:[[1,4,8]],patterns:["HLHHLHHHL"]},
+          {name:"contracted mora counted once",reading:"きょうはぶける",position:"[2] [5]",texts:["きょうはぶける"],positions:[[2,5]],patterns:["LHLHHL"]},
+          {name:"stylesheet retained",reading:'<style>.manual-unused{color:inherit}</style>てまがはぶける',position:"[2] [6]",texts:["てまがはぶける"],positions:[[2,6]],styles:true},
+        ]){
+          fixture.innerHTML=`<div class="grid-container"><div class="background-box"><div id="word" class="pitch"><span><span class="word-reading-stack"><span class="ruby-base-word">手間が省ける</span><span class="word-reading">${test.reading}</span></span><span class="word-pitch-meta"><span id="position">${test.position}</span><span id="categories"></span></span></span></div></div></div>`;
+          const word=fixture.querySelector("#word"),config={noDuplicateKana:"true"};
+          const render=build({word,position:word.querySelector("#position")},config);
+          render();
+          const entries=word.querySelector('.word-reading-stack')._senrenReadingEntries;
+          const label=`${theme}: ${test.name}`;
+          assert(JSON.stringify(entries.map(e=>e.readingText))===JSON.stringify(test.texts),`${label}: extra or missing reading`);
+          assert(JSON.stringify(entries.map(e=>e.positions))===JSON.stringify(test.positions),`${label}: wrong drop grouping`);
+          assert(entries.every(e=>e.pitchType!=="unknown"),`${label}: empty Pitch field not handled`);
+          entries.forEach((entry,index)=>{
+            assert(entry.element.querySelectorAll('.senren-generated-reading').length===1,`${label}: expected one graph per reading`);
+            const morae=[...entry.element.querySelectorAll('.senren-generated-mora')];
+            const drops=morae.flatMap((mora,i)=>mora.lastElementChild.style.borderRightStyle==="solid"?[i+1]:[]);
+            assert(JSON.stringify(drops)===JSON.stringify(test.positions[index]),`${label}: downsteps missing`);
+            if(test.patterns)assert(morae.map(mora=>mora.lastElementChild.style.borderTopStyle==="solid"?"H":"L").join("")===test.patterns[index],`${label}: wrong contour`);
+          });
+          assert(word.querySelector('#position').textContent===[...new Set(test.positions.flat())].join("・"),`${label}: number badges lost`);
+          if(test.styles)assert(word.querySelector('.word-reading style'),`${label}: stylesheet lost`);
+          const previous=word.innerHTML;render();config.noDuplicateKana="false";render();config.noDuplicateKana="true";render();
+          assert(word.innerHTML===previous,`${label}: repeated rendering/settings toggle changed output`);
         }
       }
       result.textContent=`PASS: ${checks} manual-reading pitch checks at ${innerWidth}px`;
