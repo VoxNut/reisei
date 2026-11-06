@@ -76,6 +76,39 @@
               glossary.querySelector(`.toggle-area.${direction}`).click();
             }
           }
+          const emptyExport = '<style>@import url("missing-test-stylesheet.css");</style><div class="yomitan-glossary"><ol></ol></div>';
+          for (const test of [
+            {name:"stylesheet-only definition (やがて)", definition:emptyExport, order:["A","B","C"]},
+            {name:"empty wrappers and script", definition:'<div><br>\u200b</div><script>not a definition</'+'script>', order:["A","B","C"]},
+            {name:"empty selection", selection:emptyExport, order:["A","B","C"]},
+            {name:"empty glossary entry", extra:entry("EMPTY", emptyExport+'<div class="dictionary-title">EMPTY</div>'), order:["A","B","C"]},
+            {name:"text definition", definition:"Valid definition", order:["definition","A","B","C"]},
+            {name:"image definition", definition:'<img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E">', order:["definition","A","B","C"]},
+            {name:"definition duplicate", definition:entry("A","Valid definition"), order:["definition","B","C"]},
+            {name:"text selection", selection:"Selected text", order:["selectionText","A","B","C"]},
+          ]) {
+            const panel=(id,box,html)=>`<div id="${id}" class="yomitan-glossary"><div class="dictionary-counter"></div><div class="toggle-area left"></div><div class="toggle-area right"></div><div class="${box}"><span>${html||""}</span></div></div>`;
+            fixture.innerHTML=panel("selectionText","selection-box",test.selection)+panel("definition","definition-box",test.definition)+panel("glossary","glossary-box",`<div class="yomitan-glossary"><ol>${a}${b}${c}${test.extra||""}</ol></div>`);
+            const els=Object.fromEntries(["selectionText","definition","glossary"].map(id=>[id,fixture.querySelector(`#${id}`)]));
+            localStorage.setItem("lastSelectedDictionary","glossary");
+            localStorage.setItem("lastDictionaryName","B");
+            const toggle=buildToggle(els,()=>{},document.createElement("div"));
+            toggle();toggle(); // Existing counters must not make an empty panel count as content.
+            let index=test.selection==="Selected text"?0:test.order.indexOf("B");
+            for(let step=0;step<test.order.length*3;step++){
+              const expected=test.order[index];
+              const active=[...fixture.querySelectorAll("#selectionText.show,#definition.show,#glossary.show")];
+              const shown=active[0];
+              const actual=shown?.id==="glossary"?[...shown.querySelectorAll('li[data-dictionary]')].find(li=>li.style.display==="block")?.dataset.dictionary:shown?.id;
+              if(active.length!==1||actual!==expected||!shown.innerText.trim())throw Error(`${theme}, ${test.name}: expected ${expected}, got ${actual}`);
+              if(shown.querySelector('.dictionary-counter').textContent!==`${index+1} / ${test.order.length}`)throw Error(`${theme}, ${test.name}: incorrect counter`);
+              checks++;
+              const right=step%3!==2;
+              if(step%2)document.dispatchEvent(new KeyboardEvent("keydown",{key:right?"k":"j",bubbles:true}));
+              else shown.querySelector(`.toggle-area.${right?"right":"left"}`).click();
+              index=(index+(right?1:-1)+test.order.length)%test.order.length;
+            }
+          }
         }
       } finally {
         for (const [key, value] of saved) {

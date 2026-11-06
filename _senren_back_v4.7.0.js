@@ -245,9 +245,18 @@ var senrenConfig = {};
       return null;
     }
 
-    const hasSelectionText =
-      !!selectionText && selectionText.textContent.trim() !== "";
-    const hasDefinition = !!definition && definition.textContent.trim() !== "";
+    function hasDictionaryContent(element) {
+      if (!element) return false;
+      const content = element.cloneNode(true);
+      // Imported styles and navigation UI are not dictionary entries.
+      content.querySelectorAll("style, script, link, .dictionary-counter, .dictionary-title, .toggle-area")
+        .forEach((node) => node.remove());
+      return content.textContent.replace(/[\s\u200b\ufeff]/g, "") !== "" ||
+        Boolean(content.querySelector("img[src], svg, audio[src], video[src]"));
+    }
+
+    const hasSelectionText = hasDictionaryContent(selectionText);
+    const hasDefinition = hasDictionaryContent(definition);
     let definitionDictName = null;
 
     if (hasDefinition) {
@@ -260,6 +269,7 @@ var senrenConfig = {};
     }
 
     const visibleGlossaryItems = allGlossaryListItems.filter((li) => {
+      if (!hasDictionaryContent(li)) return false;
       const parentDiv = li.closest("div");
       if (parentDiv && parentDiv.classList.contains("ignore")) {
         return false;
