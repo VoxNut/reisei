@@ -29,9 +29,9 @@
       const numberSpan = li.querySelector('.pitch-number');
 
       if (!rt || !numberSpan) return;
-      if (rt.querySelector('.pronunciation')) return;
+      if (Array.from(rt.children).some(child => !child.matches('style, link'))) return;
 
-      const readingText = rt.textContent.trim();
+      const readingText = window.senrenGetReadingText(rt);
       const morae = readingText.match(moraRegex) || [];
       const moraCount = morae.length;
       if (moraCount === 0) return;
@@ -80,8 +80,7 @@
         container.appendChild(span);
       }
 
-      rt.innerHTML = '';
-      rt.appendChild(container);
+      rt.replaceChildren(...rt.querySelectorAll('style, link[rel="stylesheet"]'), container);
     });
   }
 
@@ -233,14 +232,8 @@
 
           let tempRt = null;
           if (wordInfo.reading) {
-            const tempReadingDiv = document.createElement('div');
-            tempReadingDiv.innerHTML = wordInfo.reading;
-            const readingTextContent = tempReadingDiv.textContent || tempReadingDiv.innerText || "";
-
-            if (readingTextContent) {
-              tempRt = document.createElement('rt');
-              tempRt.textContent = readingTextContent;
-            }
+            tempRt = document.createElement('rt');
+            tempRt.innerHTML = wordInfo.reading;
           }
 
           if (numbers.length > 0) {
@@ -342,7 +335,7 @@
     // element in the current template; replacing the whole stack would remove
     // its reading and pitch markup.
     const baseWordElement = wordStack.querySelector('.ruby-base-word');
-    const readingElement = wordStack.querySelector('.word-reading, rt');
+    const readingElement = wordStack.querySelector('.word-reading') || wordStack.querySelector('rt');
 
     let wordText = '';
     let readingText = '';
@@ -359,7 +352,7 @@
       }
     }
 
-    if (readingElement) readingText = readingElement.textContent.trim();
+    if (readingElement) readingText = window.senrenGetReadingText(readingElement);
 
     if (!readingText) {
       wordText = baseWordElement
@@ -410,20 +403,7 @@
           if (wordValue.trim() !== wordText && !uniqueWords.has(wordValue.trim())) {
             const readingValueFull = fields.reading ? fields.reading.value : '';
             const sentenceValue = fields.sentence ? fields.sentence.value : '';
-            let readingHtml = '';
-
-            if (readingValueFull && readingValueFull.includes('<li')) {
-              try {
-                const tempDivInner = document.createElement('div');
-                tempDivInner.innerHTML = readingValueFull;
-                const firstLi = tempDivInner.querySelector('li');
-                if (firstLi) readingHtml = firstLi.innerHTML;
-              } catch (e) {
-                readingHtml = readingValueFull.split(/[,、・]/)[0].trim();
-              }
-            } else {
-              readingHtml = readingValueFull.split(/[,、・]/)[0].trim();
-            }
+            const readingHtml = window.senrenGetFirstReadingHtml(readingValueFull);
 
             const pitchValue = fields.pitch ? fields.pitch.value : '';
             const pitchPositionValue = fields.pitchPosition ? fields.pitchPosition.value : '';

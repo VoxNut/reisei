@@ -1,0 +1,77 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kanji hover reading stylesheet regression</title>
+<link rel="stylesheet" href="../style.css">
+<body class="card nightMode">
+<output id="result">Running…</output>
+<div class="back" id="fixture"></div>
+<script>
+  (async () => {
+    try {
+      const realFetch = window.fetch.bind(window);
+      const [back, hover] = await Promise.all([
+        realFetch("../_senren_back_v4.7.0.js").then(r => r.text()),
+        realFetch("../_senren_kanji_hover_v4.7.0.js").then(r => r.text()),
+      ]);
+      const start = back.indexOf("  var senrenPitchClassNames =");
+      const end = back.indexOf("  // Highlight the target word", start);
+      const regexStart = back.indexOf("window.REGEX = {");
+      const regexEnd = back.indexOf("      // NSFW Cache", regexStart);
+      if ([start, end, regexStart, regexEnd].includes(-1)) throw Error("Cannot locate reading helpers");
+      new Function(back.slice(regexStart, regexEnd))();
+      new Function("ELS", "senrenConfig", back.slice(start, end))({}, {});
+      const loader = '<style>@import url("_icc_hover_test.css");</style>';
+      const graph = '<span class="hover-reading"><span class="hover-mora">い<span class="hover-line"></span></span><span class="hover-mora">く</span><span class="hover-mora">つ</span><span class="hover-mora">か</span></span>';
+      const cases = [
+        {name:"imported graph without list (幾つか)", html:loader + graph, text:"いくつか", imported:true, styles:true},
+        {name:"imported graph in ordered list", html:loader + `<ol><li>${graph}</li><li>いくらか</li></ol>`, text:"いくつか", imported:true, styles:true},
+        {name:"plain reading with stylesheet", html:loader + "いくつか", text:"いくつか", fallback:true, styles:true},
+        {name:"plain alternatives", html:"いくつか、いくらか", text:"いくつか", fallback:true},
+        {name:"inline graph containing comma", html:graph.replace('class="hover-reading"', 'class="hover-reading" style="color:rgb(255, 255, 255)"'), text:"いくつか", imported:true},
+        {name:"plain list with stylesheet", html:loader + "<ol><li>いくつか</li><li>いくらか</li></ol>", text:"いくつか", fallback:true, styles:true},
+        {name:"stylesheet only", html:loader, text:"", styles:true},
+      ];
+      let current = null;
+      window.fetch = async (url, options) => {
+        if (!String(url).includes(":8765")) return realFetch(url, options);
+        const {action} = JSON.parse(options.body);
+        const result = action === "findNotes" ? [123] : action === "notesInfo" ? [{noteId:123,cards:[456],fields:{
+          word:{value:"幾つか"}, reading:{value:current.html}, pitch:{value:"atamadaka"},
+          pitchPosition:{value:"1"},sentence:{value:"幾つか質問があります。"}
+        }}] : action === "cardsInfo" ? [{cardId:456,type:2}] : null;
+        return new Response(JSON.stringify({result,error:null}));
+      };
+      let checks = 0;
+      const assert = (condition, message) => {if (!condition) throw Error(`${current.name}: ${message}`); checks++;};
+      for (const theme of ["nord", "focus"]) {
+        document.documentElement.dataset.senrenTheme = theme;
+        document.documentElement.classList.toggle("custom-dark-mode", theme === "focus");
+        for (current of cases) {
+          fixture.innerHTML = '<div id="word"><span><span class="word-reading-stack"><span class="ruby-base-word">幾度となく</span><span class="word-reading">いくどとなく</span></span></span></div><div id="kanji-tooltip"></div>';
+          window.senrenConfig = {enableKanjiHover:"true"};
+          const script = document.createElement("script"); script.textContent = hover; document.body.appendChild(script);
+          for (let attempt = 0; attempt < 100 && !fixture.querySelector(".kanji"); attempt++) await new Promise(resolve => setTimeout(resolve, 10));
+          const kanji = fixture.querySelector(".kanji");
+          assert(kanji, "hover target did not initialize");
+          kanji.dispatchEvent(new MouseEvent("mouseover", {bubbles:true}));
+          const tooltip = fixture.querySelector("#kanji-tooltip");
+          const rt = tooltip.querySelector("rt");
+          assert(rt, "tooltip reading missing");
+          assert(window.senrenGetReadingText(rt) === current.text, `wrong reading text: ${window.senrenGetReadingText(rt)}`);
+          assert(!tooltip.innerText.includes("@import") && !tooltip.innerText.includes("_icc_"), "stylesheet displayed as reading");
+          assert(Boolean(rt.querySelector("style")) === Boolean(current.styles), "stylesheet loader lost");
+          if (current.imported) {
+            assert(rt.querySelector(".hover-reading"), "original graph discarded");
+            assert(!rt.querySelector(".pronunciation"), "imported graph rebuilt");
+          }
+          if (current.fallback) assert(rt.querySelectorAll(".pronunciation-mora").length === 4, "plain-reading fallback broken");
+          assert(tooltip.querySelector(".related-sentence").textContent === "幾つか質問があります。", "sentence changed");
+          script.remove();
+        }
+      }
+      window.fetch = realFetch;
+      result.textContent = `PASS: ${checks} kanji-hover reading checks`;
+    } catch (error) {result.textContent = `FAIL: ${error.stack}`;}
+  })();
+</script>

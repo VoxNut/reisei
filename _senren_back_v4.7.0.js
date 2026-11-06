@@ -956,16 +956,8 @@ var senrenConfig = {};
           if (uniqueWords.has(wordValue)) return;
           uniqueWords.add(wordValue);
 
-          var readingHtml = "";
           var readingVal = fields.reading ? fields.reading.value : "";
-          if (readingVal && readingVal.includes("<li")) {
-            var tDiv = document.createElement("div");
-            tDiv.innerHTML = readingVal;
-            var firstLi = tDiv.querySelector("li");
-            if (firstLi) readingHtml = firstLi.innerHTML;
-          } else {
-            readingHtml = readingVal.split(/[,\u3001\u30FB]/)[0].trim();
-          }
+          var readingHtml = getFirstReadingHtml(readingVal);
 
           var sentenceVal = fields.sentence ? fields.sentence.value : "";
           var pitchVal = fields.pitch ? fields.pitch.value : "";
@@ -1026,13 +1018,8 @@ var senrenConfig = {};
             if (numbers.length > 0 && window.senrenGetPitchType) {
               var tempRt = null;
               if (item.reading) {
-                var tDiv = document.createElement("div");
-                tDiv.innerHTML = item.reading;
-                var txt = tDiv.textContent || "";
-                if (txt) {
-                  tempRt = document.createElement("rt");
-                  tempRt.textContent = txt;
-                }
+                tempRt = document.createElement("rt");
+                tempRt.innerHTML = item.reading;
               }
               formattedPosition = numbers
                 .map(function (num) {
@@ -2354,12 +2341,27 @@ var senrenConfig = {};
       stackElement?.querySelector("rt") || null;
   }
 
+  function getFirstReadingHtml(html) {
+    const container = document.createElement("div");
+    container.innerHTML = html || "";
+    container.querySelectorAll("script").forEach((node) => node.remove());
+    const styles = Array.from(container.querySelectorAll('style, link[rel="stylesheet"]'));
+    styles.forEach((node) => node.remove());
+    const reading = container.querySelector("li") || container;
+    if (!reading.children.length) {
+      reading.textContent = reading.textContent.split(/[,、・]/)[0].trim();
+    }
+    return styles.map((node) => node.outerHTML).join("") + reading.innerHTML.trim();
+  }
+  window.senrenGetFirstReadingHtml = getFirstReadingHtml;
+
   function normalizeReadingText(element) {
     const copy = element?.cloneNode(true);
     copy?.querySelectorAll("style, script, rt, rp").forEach((node) => node.remove());
     if (copy) normalizeNasalAnnotations(copy);
     return (copy?.textContent || "").normalize("NFC").replace(/\s/g, "");
   }
+  window.senrenGetReadingText = normalizeReadingText;
 
   function normalizeNasalAnnotations(copy) {
     let markerCount = 0;
@@ -3904,7 +3906,7 @@ var senrenConfig = {};
                 } else {
                   const script = document.createElement("script");
                   script.src =
-                    "_senren_kanji_hover_v4.7.0.js?v=20261006.1";
+                    "_senren_kanji_hover_v4.7.0.js?v=20261106.1";
                   document.body.appendChild(script);
                 }
               }
