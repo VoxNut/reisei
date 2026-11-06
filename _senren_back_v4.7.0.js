@@ -2434,6 +2434,30 @@ var senrenConfig = {};
     };
   }
 
+  function getGraphPitchPosition(element) {
+    const wrappers = Array.from(element.querySelectorAll("span")).filter((span) =>
+      span.matches(".pronunciation-mora, .ic-d2079bc8a6, .ic-be55b7f1de") ||
+      (span.style.display === "inline-block" && span.style.position === "relative"));
+    const morae = wrappers.filter((span) =>
+      !wrappers.some((parent) => parent !== span && parent.contains(span)));
+    if (!morae.length) return null;
+    const pattern = morae.map((mora) => {
+      const line = Array.from(mora.children).find((child) =>
+        child.matches(".pronunciation-mora-line, .ic-7dcf23255c, .ic-f900b61947") ||
+        child.style.borderTopStyle === "solid");
+      return {
+        high: mora.dataset.pitch === "high" || Boolean(line &&
+          (line.matches(".ic-7dcf23255c, .ic-f900b61947") || line.style.borderTopWidth)),
+        drop: mora.dataset.pitchNext === "low" || Boolean(line &&
+          (line.classList.contains("ic-f900b61947") || line.style.borderRightWidth)),
+      };
+    });
+    const drop = pattern.findIndex((mora) => mora.high && mora.drop);
+    if (drop >= 0) return drop + 1;
+    if (!pattern[0].high && pattern.slice(1).every((mora) => mora.high)) return 0;
+    return null;
+  }
+
   function getReadingContext() {
     const word = ELS.word;
     const mainSpan = word?.querySelector(":scope > span");
@@ -2464,19 +2488,25 @@ var senrenConfig = {};
         ? [context.reading]
         : [];
 
-    return displayItems.map((element, index) => ({
-      element,
-      positionElement: aligned ? positionItems[index] : null,
-      position: aligned
+    return displayItems.map((element, index) => {
+      let position = aligned
         ? getPitchPosition(positionItems[index])
         : displayItems.length === 1 && positionItems.length <= 1
           ? getPitchPosition(context.position)
-          : null,
-      readingText: normalizeReadingText(element),
-      importedType: importedTypes.length === 1 ? importedTypes[0] : importedTypes[index],
-      // Read styles for all entries before removing duplicates invalidates layout.
-      ...getPitchGraphSignature(element),
-    }));
+          : null;
+      if (position > getReadingMorae(element).length) {
+        position = getGraphPitchPosition(element);
+      }
+      return {
+        element,
+        positionElement: aligned ? positionItems[index] : null,
+        position,
+        readingText: normalizeReadingText(element),
+        importedType: importedTypes.length === 1 ? importedTypes[0] : importedTypes[index],
+        // Read styles for all entries before removing duplicates invalidates layout.
+        ...getPitchGraphSignature(element),
+      };
+    });
   }
 
   function deduplicateReadingEntries(context) {
@@ -2558,7 +2588,9 @@ var senrenConfig = {};
         element?.textContent.matchAll(/-?\d+/g) || [],
         (match) => parseInt(match[0], 10),
       )).filter((position) => position >= 0);
-    const numbers = [...new Set(fallbackNumbers)];
+    const numbers = [...new Set(entries.length && entries.every((entry) => entry.positionElement)
+      ? entries.map((entry) => entry.position).filter(Number.isInteger)
+      : fallbackNumbers)];
     const resolvedTypes = numbers.map((number) => {
       const entry = entries.find((entry) => entry.position === number) ||
         (entries.length === 1 ? entries[0] : null);

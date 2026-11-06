@@ -37,7 +37,14 @@
       const nasal = (text, inline = false) => graph(text).replace(
         /<span class="test-inline">([がぎぐげごガギグゲゴ])<\/span>/g,
         (_, kana) => `<span class="test-mora"><span class="test-inline">${String.fromCharCode(kana.charCodeAt(0) - 1)}</span><span ${inline ? 'style="position:absolute;width:0;height:0;opacity:0"' : 'class="ic-1e50c58bf8"'}>゚</span><span ${inline ? 'style="border-radius:50%;border:1.5px solid #c83c28"' : 'class="ic-7946e4873e"'}></span></span>`);
+      const importedGraph = (text, drop = false) => graph(text, drop)
+        .replaceAll('class="test-mora"', 'class="ic-d2079bc8a6"')
+        .replaceAll('class="test-high "', 'class="ic-7dcf23255c"')
+        .replaceAll('class="test-high test-drop"', 'class="ic-f900b61947"');
       const cases = [
+        { name: "invalid imported numbers corrected from graph", word: "刑事", reading: list(importedGraph("けいじ"), importedGraph("けいじ")), position: list(4, 7), count: 1, numbers: "0" },
+        { name: "real pitch variants survive invalid metadata cleanup", word: "刑事", reading: list(importedGraph("けいじ", true), importedGraph("けいじ"), importedGraph("けいじ")), position: list(3, 4, 7), count: 2, numbers: "3・0" },
+        { name: "invalid pitch numbers do not split identical readings", word: "刑事", reading: list(graph("けいじ"), graph("けいじ")), position: list(4, 7), count: 1, numbers: "" },
         { name: "nasal ga prefers ordinary ga", word: "眼鏡", reading: list(nasal("めがね"), graph("めがね")), position: list(1, 1), count: 1, numbers: "1", noCircle: true },
         { name: "ordinary ga before nasal ga", word: "眼鏡", reading: list(graph("めがね"), nasal("めがね")), position: list(1, 1), count: 1, numbers: "1", noCircle: true },
         { name: "inline nasal marker without metadata", word: "眼鏡", reading: list(nasal("めがね", true), graph("めがね")), count: 1, numbers: "", noCircle: true },
