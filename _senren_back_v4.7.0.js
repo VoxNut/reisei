@@ -2404,6 +2404,57 @@ var senrenConfig = {};
   }
   window.senrenGetPitchType = getPitchType;
 
+  function addReadingPitchGraph(element, position) {
+    if (!element || !Number.isInteger(position)) return false;
+    const content = element.cloneNode(true);
+    content.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => node.remove());
+    // Preserve imported/formatted readings; Anki may wrap manual text in divs.
+    if (Array.from(content.querySelectorAll("*")).some((node) =>
+      !node.matches("div, p, br"))) return false;
+    const text = normalizeReadingText(content);
+    if (!REGEX.KANA_ONLY.test(text)) return false;
+    const morae = getReadingMorae(content);
+    if (!morae.length || position < 0 || position > morae.length) return false;
+
+    const graph = document.createElement("span");
+    graph.className = "senren-generated-reading";
+    graph.style.display = "inline";
+    morae.forEach((mora, index) => {
+      const high = position === 1 ? index === 0 : index > 0 && (position === 0 || index < position);
+      const drop = high && position > 0 && index + 1 === position;
+      const wrapper = document.createElement("span");
+      wrapper.className = "senren-generated-mora";
+      wrapper.style.cssText = "display:inline-block;position:relative;";
+      if (drop) {
+        wrapper.style.paddingRight = "0.1em";
+        wrapper.style.marginRight = "0.1em";
+      }
+      const kana = document.createElement("span");
+      kana.style.display = "inline";
+      kana.textContent = mora;
+      const line = document.createElement("span");
+      line.style.borderColor = "currentColor";
+      if (high) {
+        line.style.cssText += "display:block;user-select:none;pointer-events:none;position:absolute;top:0.1em;left:0;right:0;height:0;border-top-width:0.1em;border-top-style:solid;";
+        if (drop) {
+          line.style.right = "-0.1em";
+          line.style.height = "0.4em";
+          line.style.borderRightWidth = "0.1em";
+          line.style.borderRightStyle = "solid";
+        }
+      }
+      wrapper.append(kana, line);
+      graph.appendChild(wrapper);
+    });
+    element.replaceChildren(...element.querySelectorAll('style, link[rel="stylesheet"]'), graph);
+    return true;
+  }
+  window.senrenDrawPitchLines = (container) => {
+    container?.querySelectorAll("li").forEach((entry) => {
+      addReadingPitchGraph(entry.querySelector("rt"), getPitchPosition(entry.querySelector(".pitch-number")));
+    });
+  };
+
   function getPitchPosition(element) {
     const match = element?.textContent.match(/-?\d+/);
     if (!match) return null;
@@ -2693,6 +2744,7 @@ var senrenConfig = {};
       ]);
       entries = deduplicateReadingEntries(context);
       resolveEntryPitchTypes(context, entries);
+      entries.forEach((entry) => addReadingPitchGraph(entry.element, entry.position));
       formatPitchMetadata(context, entries);
       context.stack._senrenReadingEntries = entries;
     }
@@ -3906,7 +3958,7 @@ var senrenConfig = {};
                 } else {
                   const script = document.createElement("script");
                   script.src =
-                    "_senren_kanji_hover_v4.7.0.js?v=20261106.1";
+                    "_senren_kanji_hover_v4.7.0.js?v=20261106.2";
                   document.body.appendChild(script);
                 }
               }

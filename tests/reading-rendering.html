@@ -64,7 +64,8 @@
         { name: "different graphs with the same number", word: "居る", reading: list(a, b, a), position: list(0, 0, 0), count: 2, numbers: "0" },
         { name: "different positions", word: "居る", reading: list(a, a, a), position: list(0, 2, 0), count: 2, numbers: "0・2" },
         { name: "alternative readings", word: "明日", reading: list("あした", "あす", "あした"), count: 2, numbers: "" },
-        { name: "plain text stays plain", word: "居る", reading: "いる", position: "0", count: 1, numbers: "0", plain: true },
+        { name: "manual kana receives pitch graph", word: "居る", reading: "いる", position: "0", count: 1, numbers: "0", generated: true },
+        { name: "plain text without pitch stays plain", word: "居る", reading: "いる", count: 1, numbers: "", plain: true },
         { name: "wrapped list and stylesheet", word: "居る", reading: `<style>.unchanged {color:inherit}</style><div>${list(a, a)}</div>`, count: 1, numbers: "" },
         { name: "kana copy", word: "いる", reading: list(a, a), position: list(0, 0), count: 1, numbers: "0", kana: true },
         { name: "katakana match", word: "イル", reading: list(a), count: 1, numbers: "", kana: true },
@@ -121,9 +122,11 @@
           const entries = stack._senrenReadingEntries;
           assert(entries.length === test.count, `expected ${test.count} entries, got ${entries.length}`);
           assert(position.textContent === test.numbers, `numbers ${position.textContent}`);
-          if (originalItems.length) assert(entries.every(entry => originalItems.includes(entry.element.innerHTML)), "graph markup changed");
+          if (originalItems.length) assert(entries.every(entry => originalItems.includes(entry.element.innerHTML) ||
+            (entry.element.querySelector('.senren-generated-reading') && entry.element.textContent === entry.readingText)), "imported graph markup changed");
           if (originalStyle) assert(reading.querySelector("style")?.outerHTML === originalStyle, "stylesheet lost");
           if (test.plain) assert(reading.innerHTML === "いる", "plain reading was rebuilt");
+          if (test.generated) assert(reading.querySelector('.senren-generated-reading') && reading.textContent === "いる", "manual pitch graph missing");
           if (test.noCircle) assert(entries.every(entry => !entry.element.querySelector('.ic-3c7893fbde, .ic-7946e4873e, .ic-1e50c58bf8, [style*="dotted"], [style*="border-radius:50%"]')), "circled duplicate was preferred");
           if (test.marker) assert(getComputedStyle(reading.querySelector('span[style*="dotted"]')).display !== "none", "devoicing marker hidden");
           if (test.lastType) assert(entries.at(-1).pitchType === test.lastType, "category shifted after deduplication");

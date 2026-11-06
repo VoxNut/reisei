@@ -65,7 +65,7 @@
             assert(rt.querySelector(".hover-reading"), "original graph discarded");
             assert(!rt.querySelector(".pronunciation"), "imported graph rebuilt");
           }
-          if (current.fallback) assert(rt.querySelectorAll(".pronunciation-mora").length === 4, "plain-reading fallback broken");
+          if (current.fallback) assert(rt.querySelectorAll(".senren-generated-mora").length === 4, "plain-reading fallback broken");
           assert(tooltip.querySelector(".related-sentence").textContent === "幾つか質問があります。", "sentence changed");
           script.remove();
         }

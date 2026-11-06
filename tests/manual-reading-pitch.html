@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual reading pitch fallback regression</title>
+<link rel="stylesheet" href="../style.css">
+<body class="card nightMode">
+<output id="result">Running…</output>
+<div class="back" id="fixture"></div>
+<script>
+  (async () => {
+    try {
+      const source = await (await fetch("../_senren_back_v4.7.0.js")).text();
+      const start = source.indexOf("  var senrenPitchClassNames =");
+      const end = source.indexOf("  // Highlight the target word", start);
+      const regexStart = source.indexOf("window.REGEX = {");
+      const regexEnd = source.indexOf("      // NSFW Cache", regexStart);
+      if ([start,end,regexStart,regexEnd].includes(-1)) throw Error("Cannot locate reading helpers");
+      new Function(source.slice(regexStart,regexEnd))();
+      const build = new Function("ELS","senrenConfig",source.slice(start,end)+"\nreturn renderBackReading;");
+      // Yomitan's inline field markup, with the same atamadaka reading.
+      const importedExample = '<span style="display:inline"><span style="display:inline-block;position:relative;padding-right:.1em;margin-right:.1em"><span style="display:inline">い</span><span style="border-color:currentColor;display:block;user-select:none;pointer-events:none;position:absolute;top:.1em;left:0;right:-.1em;height:.4em;border-top:.1em solid;border-right:.1em solid"></span></span>' +
+        [..."くどとなく"].map(kana=>`<span style="display:inline-block;position:relative"><span style="display:inline">${kana}</span><span style="border-color:currentColor"></span></span>`).join("") + '</span>';
+      const cases = [
+        {name:"user example",text:"いくどとなく",position:"[1]",type:"atamadaka",pattern:"HLLLLL",drop:0},
+        {name:"heiban",text:"いくどとなく",position:"[0]",type:"heiban",pattern:"LHHHHH",drop:-1},
+        {name:"nakadaka",text:"いくどとなく",position:"[3]",type:"nakadaka",pattern:"LHHLLL",drop:2},
+        {name:"odaka",text:"いくどとなく",position:"[6]",type:"odaka",pattern:"LHHHHH",drop:5},
+        {name:"contracted mora",text:"きょう",position:"[1]",type:"atamadaka",pattern:"HL",drop:0},
+        {name:"katakana and long vowel",text:"ティー",position:"[2]",type:"odaka",pattern:"LH",drop:1},
+        {name:"one-mora atamadaka",text:"き",position:"[1]",type:"atamadaka",pattern:"H",drop:0},
+        {name:"kana-only word",text:"いくどとなく",position:"[1]",type:"atamadaka",pattern:"HLLLLL",drop:0,kana:true},
+        {name:"Anki wrapper",text:"いくどとなく",html:"<div>いくどとなく</div>",position:"[1]",type:"atamadaka",pattern:"HLLLLL",drop:0},
+        {name:"stylesheet prefix",text:"いくどとなく",html:'<style>.manual-unused{color:inherit}</style>いくどとなく',position:"[1]",type:"atamadaka",pattern:"HLLLLL",drop:0},
+        {name:"missing pitch",text:"いくどとなく",position:"",type:"atamadaka",pattern:null},
+        {name:"invalid pitch",text:"いくどとなく",position:"[9]",type:"atamadaka",pattern:null},
+        {name:"non-kana content",text:"幾度となく",position:"[1]",type:"atamadaka",pattern:null},
+      ];
+      let checks=0;
+      const assert=(condition,message)=>{if(!condition)throw Error(message);checks++;};
+      for(const theme of ["nord","focus"]){
+        document.documentElement.dataset.senrenTheme=theme;
+        document.documentElement.classList.toggle("custom-dark-mode",theme==="focus");
+        for(const test of cases){
+          fixture.innerHTML=`<div class="grid-container"><div class="background-box"><div id="word" class="pitch"><span><span class="word-reading-stack"><span class="ruby-base-word">${test.kana?test.text:"幾度となく"}</span><span class="word-reading">${test.html||test.text}</span></span><span class="word-pitch-meta"><span id="position">${test.position}</span><span id="categories">${test.type}</span></span></span></div></div></div>`;
+          const word=fixture.querySelector("#word");
+          const config={noDuplicateKana:"true"};
+          const render=build({word,position:word.querySelector("#position")},config);
+          render();
+          const target=word.querySelector(test.kana?".ruby-base-word":".word-reading");
+          const morae=[...target.querySelectorAll(".senren-generated-mora")];
+          const label=`${theme}: ${test.name}`;
+          assert(window.senrenGetReadingText(target)===test.text,`${label}: text lost`);
+          if(test.pattern){
+            const pattern=morae.map(mora=>mora.lastElementChild.style.borderTopStyle==="solid"?"H":"L").join("");
+            const drop=morae.findIndex(mora=>mora.lastElementChild.style.borderRightStyle==="solid");
+            assert(pattern===test.pattern,`${label}: ${pattern}`);
+            assert(drop===test.drop,`${label}: wrong downstep ${drop}`);
+            assert(morae.every(mora=>mora.style.paddingTop===""),`${label}: fallback spacing added`);
+            const high=morae.filter(mora=>mora.lastElementChild.style.borderTopStyle==="solid");
+            const tops=high.map(mora=>mora.lastElementChild.getBoundingClientRect().top);
+            assert(!tops.length||Math.max(...tops)-Math.min(...tops)<.5,`${label}: disconnected pitch line`);
+            if(test.name==="user example"){
+              const reference=target.cloneNode(false);
+              reference.innerHTML=importedExample;
+              target.after(reference);
+              for(const size of [18,32,48]){
+                target.style.fontSize=reference.style.fontSize=`${size}px`;
+                await document.fonts.ready;
+                const actual=morae[0].lastElementChild.getBoundingClientRect();
+                const expected=reference.firstElementChild.firstElementChild.lastElementChild.getBoundingClientRect();
+                const actualBox=target.getBoundingClientRect(),expectedBox=reference.getBoundingClientRect();
+                assert(Math.abs(actualBox.width-expectedBox.width)<.1,`${label}: width differs from Yomitan at ${size}px`);
+                assert(Math.abs((actual.top-actualBox.top)-(expected.top-expectedBox.top))<.1,`${label}: line height differs from Yomitan at ${size}px`);
+                assert(Math.abs(actual.height-expected.height)<.1,`${label}: downstep differs from Yomitan at ${size}px`);
+              }
+              target.style.removeProperty("font-size");
+              reference.remove();
+            }
+          }else assert(morae.length===0,`${label}: graph guessed without valid kana/pitch`);
+          const previous=word.innerHTML;render();assert(word.innerHTML===previous,`${label}: repeated rendering changed output`);
+          config.noDuplicateKana="false";render();config.noDuplicateKana="true";render();
+          assert(word.innerHTML===previous,`${label}: setting toggle duplicated graph`);
+        }
+      }
+      result.textContent=`PASS: ${checks} manual-reading pitch checks at ${innerWidth}px`;
+    }catch(error){result.textContent=`FAIL: ${error.stack}`;}
+  })();
+</script>

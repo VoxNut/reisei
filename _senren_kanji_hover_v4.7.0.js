@@ -9,8 +9,6 @@
 
   const preloadedKanjiData = {};
   const fallbackKanjiRegex = /[\u3400-\u4DBF\u4E00-\u9FFF\u3005\u3007]/;
-  const fallbackMoraRegex =
-    /[きしちにひみりぎじぢびぴゔ][ゃゅょ]|[うくすつぬふむゆるぐずづぶゔ][ぁぃぅぇぉ]|[てで][ぃ]|[とど][ぅ]|[キシチニヒミリギジヂビピヴ][ャュョ]|[ウクスツヌフムユルグズヅブプヴ][ァィゥェォ]|[テデ][ィ]|[トド][ぅ]|[クグ][ヮ]|[フ][ォ]|[っッ]|ー|[んン]|[\u3041-\u3096\u30A1-\u30F6\u30FD\u30FE]|\S/g;
 
   function isKanji(char) {
     return (window.REGEX?.KANJI || fallbackKanjiRegex).test(char);
@@ -18,70 +16,7 @@
 
   // Helper function to draw pitch accent lines in the tooltip (fallback)
   function drawTooltipPitchLines(tooltip) {
-    if (!tooltip) return;
-
-    const moraRegex = window.REGEX?.MORA || fallbackMoraRegex;
-
-    const entries = tooltip.querySelectorAll('li');
-
-    entries.forEach(li => {
-      const rt = li.querySelector('rt');
-      const numberSpan = li.querySelector('.pitch-number');
-
-      if (!rt || !numberSpan) return;
-      if (Array.from(rt.children).some(child => !child.matches('style, link'))) return;
-
-      const readingText = window.senrenGetReadingText(rt);
-      const morae = readingText.match(moraRegex) || [];
-      const moraCount = morae.length;
-      if (moraCount === 0) return;
-
-      const pitchNum = parseInt(numberSpan.textContent.trim(), 10);
-      if (isNaN(pitchNum)) return;
-
-      let pattern = [];
-      for (let i = 0; i < moraCount; i++) {
-        if (pitchNum === 0) { // Heiban
-          pattern.push(i === 0 ? 'L' : 'H');
-        } else if (pitchNum === 1) { // Atamadaka
-          pattern.push(i === 0 ? 'H' : 'L');
-        } else { // Nakadaka or Odaka
-          if (i === 0) pattern.push('L');
-          else if (i < pitchNum) pattern.push('H');
-          else pattern.push('L');
-        }
-      }
-
-      let pClass = 'heiban';
-      if (pitchNum === 1) pClass = 'atamadaka';
-      else if (pitchNum === 0) pClass = 'heiban';
-      else if (pitchNum === moraCount) pClass = 'odaka';
-      else pClass = 'nakadaka';
-
-      const container = document.createElement('span');
-      container.className = `pronunciation ${pClass}`;
-
-      for (let i = 0; i < moraCount; i++) {
-        const type = pattern[i] === 'H' ? 'high' : 'low';
-        const span = document.createElement('span');
-        span.className = 'pronunciation-mora';
-        span.textContent = morae[i];
-        span.dataset.pitch = type;
-
-        if (type === 'high') {
-          if ((i + 1 < moraCount && pattern[i + 1] === 'L') || (pClass === 'odaka' && i === moraCount - 1)) {
-            span.dataset.pitchNext = 'low';
-          }
-        }
-
-        const line = document.createElement('span');
-        line.className = 'pronunciation-mora-line';
-        span.appendChild(line);
-        container.appendChild(span);
-      }
-
-      rt.replaceChildren(...rt.querySelectorAll('style, link[rel="stylesheet"]'), container);
-    });
+    window.senrenDrawPitchLines(tooltip);
   }
 
   // Helper function to send requests to AnkiConnect
