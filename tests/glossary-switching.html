@@ -109,6 +109,36 @@
               index=(index+(right?1:-1)+test.order.length)%test.order.length;
             }
           }
+          const preferredName="三省堂国語辞典　第八版";
+          const showCard=(preference="",definition="",selection="",extra="")=>{
+            fixture.innerHTML=`<div id="dictionaryPreference" hidden></div><div id="selectionText"><div class="dictionary-counter"></div><div class="toggle-area right"></div><span>${selection}</span></div><div id="definition"><div class="dictionary-counter"></div><div class="toggle-area right"></div><div class="definition-box">${definition}</div></div><div id="glossary" class="yomitan-glossary"><div class="dictionary-counter"></div><div class="toggle-area right"></div><div class="glossary-box"><span><ol>${a}${extra}${entry(preferredName,"Preferred definition")}${b}</ol></span></div></div>`;
+            fixture.querySelector('#dictionaryPreference').textContent=preference;
+            const els=Object.fromEntries(["selectionText","definition","glossary"].map(id=>[id,fixture.querySelector(`#${id}`)]));
+            buildToggle(els,()=>{},document.createElement('div'))();
+          };
+          const assertActive=(expected,label)=>{
+            const active=fixture.querySelector('#selectionText.show,#definition.show,#glossary.show');
+            const actual=active?.id==='glossary'?[...active.querySelectorAll('li[data-dictionary]')].find(li=>li.style.display==='block')?.dataset.dictionary:active?.id;
+            if(actual!==expected)throw Error(`${theme}, ${label}: expected ${expected}, got ${actual}`);
+            checks++;
+          };
+          localStorage.removeItem('lastSelectedDictionary');localStorage.removeItem('lastDictionaryName');
+          showCard();assertActive('A','first card default');
+          fixture.querySelector('#glossary .toggle-area.right').click();
+          fixture.querySelector('#glossary .toggle-area.right').click();
+          assertActive('B','manual choice on first card');
+          showCard(preferredName);assertActive(preferredName,'next card preference overrides remembered B');
+          fixture.querySelector('#glossary .toggle-area.right').click();assertActive('B','manual switching still works on preferred card');
+          showCard('A');assertActive('A','next card uses its own preference');
+          showCard();assertActive('B','no preference keeps remembered choice');
+          showCard('Unavailable dictionary');assertActive('B','unavailable preference keeps remembered choice');
+          showCard('glossary');assertActive('A','generic glossary preference overrides remembered choice');
+          showCard('三省堂');assertActive(preferredName,'partial dictionary preference');
+          showCard(preferredName,entry(preferredName,'Preferred dictionary in Definition'));assertActive('definition','preferred dictionary in Definition');
+          showCard(preferredName,entry(preferredName,'Preferred dictionary in Definition'),'Selected passage');assertActive('selectionText','selection text priority retained');
+          showCard('B','','',entry('B extended','Another edition'));assertActive('B','exact dictionary match preferred');
+          localStorage.setItem('lastDictionaryName','Missing previous dictionary');
+          showCard(preferredName);assertActive(preferredName,'missing remembered dictionary does not override preference');
         }
       } finally {
         for (const [key, value] of saved) {

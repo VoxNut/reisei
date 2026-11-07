@@ -418,7 +418,24 @@ var senrenConfig = {};
           }
         }
 
-        // Priority 2: Local Storage
+        // Priority 2: This card's preference overrides the previous card's choice.
+        if (!initialStateSet && dictionaryPreference) {
+          const preference = dictionaryPreference.toLowerCase();
+          const matches = (item) => (getDictionaryName(item.element) || "").toLowerCase();
+          initialIndex = preference === "glossary"
+            ? currentVisibleItems.findIndex((item) => item.type === "glossary")
+            : currentVisibleItems.findIndex((item) => matches(item) === preference);
+          if (initialIndex === -1 && preference !== "glossary") {
+            initialIndex = currentVisibleItems.findIndex((item) => matches(item).includes(preference));
+          }
+          if (initialIndex !== -1) {
+            const preferredItem = currentVisibleItems[initialIndex];
+            if (preferredItem.type === "glossary") preferredItem.element.style.display = "block";
+            initialStateSet = true;
+          }
+        }
+
+        // Priority 3: Local Storage
         if (
           !initialStateSet &&
           permanentLastSelected === "glossary" &&
@@ -454,51 +471,6 @@ var senrenConfig = {};
             if (initialIndex !== -1) {
               currentVisibleItems[initialIndex].element.style.display = "block";
               initialStateSet = true;
-            }
-          }
-        }
-
-        // Priority 3: Dictionary Preference
-        if (
-          !initialStateSet &&
-          dictionaryPreference &&
-          visibleGlossaryItems.length > 0
-        ) {
-          const lowerCasePref = dictionaryPreference.toLowerCase();
-
-          if (lowerCasePref === "glossary") {
-            // Preference is "glossary", show the first available one
-            initialIndex = currentVisibleItems.findIndex(
-              (item) => item.type === "glossary",
-            );
-            if (initialIndex !== -1) {
-              currentVisibleItems[initialIndex].element.style.display = "block";
-              initialStateSet = true;
-            }
-          } else {
-            // Preference is a specific dictionary name
-            let preferredLiElement = null;
-
-            for (const [name, li] of dictionaryMap) {
-              if (name.toLowerCase().includes(lowerCasePref)) {
-                preferredLiElement = li;
-                break;
-              }
-            }
-
-            if (
-              preferredLiElement &&
-              visibleGlossaryItems.includes(preferredLiElement)
-            ) {
-              initialIndex = currentVisibleItems.findIndex(
-                (item) =>
-                  item.type === "glossary" &&
-                  item.element === preferredLiElement,
-              );
-              if (initialIndex !== -1) {
-                preferredLiElement.style.display = "block";
-                initialStateSet = true;
-              }
             }
           }
         }
