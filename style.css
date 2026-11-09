@@ -1,4 +1,18 @@
-/* Bundled fonts are loaded on demand by _senren_fonts_v4.7.0.css. */
+/* Keep bundled fonts in card styling so the reviewer can preload them. */
+@font-face {
+  font-family: klee;
+  src: url("_KleeOne-SemiBold.ttf");
+}
+
+@font-face {
+  font-family: notosansjp;
+  src: url("_NotoSansJP.ttf");
+}
+
+@font-face {
+  font-family: notoserifjp;
+  src: url("_NotoSerifJP.ttf");
+}
 
 /* Custom Variables for Styling */
 :root {
@@ -8945,6 +8959,11 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
   .back > .header .freqbt {
     position: static;
     inset: auto;
+  }
+
+  /* Keep the phone header height stable if the frequency font loads late. */
+  html.android .back > .header .freqbt {
+    line-height: 1.45;
   }
 
   .back > .header .frequency-content {

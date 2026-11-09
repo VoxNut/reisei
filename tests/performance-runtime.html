@@ -88,7 +88,7 @@
     await wait(()=>backNode.style.minHeight==='180px');
     visibleImage.style.height='300px';await wait(()=>backNode.style.minHeight==='280px');
     assert(backNode.style.minHeight==='280px','Dynamic height did not follow image resize');
-    assert(!/@font-face/.test(css),'Inline font faces still trigger Anki preloading');
+    assert((css.match(/@font-face\s*\{/g)||[]).length>=3,'Bundled fonts are missing from reviewer preloading');
     run(theme);visibleImage.style.height='400px';await new Promise(r=>setTimeout(r,40));
     assert(backNode.style.minHeight==='280px','Old height observer survived card cleanup');
     assert(window.senrenCardController.signal.aborted===false,'Card lifecycle failed to restart');
