@@ -2,6 +2,7 @@
 <meta charset="utf-8">
 <title>Glossary switching regression</title>
 <link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../_senren_fonts_v4.7.0.css">
 <body class="card nightMode">
 <output id="result">Running…</output>
 <div class="back" id="fixture"></div>
@@ -12,12 +13,12 @@
       const response = await fetch("../_senren_back_v4.7.0.js");
       if (!response.ok) throw new Error("Cannot load the back script");
       const source = await response.text();
-      const start = source.indexOf("  function toggleDefinition() {");
+      const start = source.indexOf("  function prepareDictionarySources() {");
       const end = source.indexOf("  function enableInteractions() {", start);
       if (start < 0 || end < 0) throw new Error("Cannot locate toggleDefinition");
-      const buildToggle = new Function("ELS", "collapseDictionary", "lightbox",
-        source.slice(start, end) + "\nreturn toggleDefinition;");
-      const consolidateStart = source.indexOf("  function consolidateYomitanGlossaryEntries() {");
+      const buildToggle = new Function("ELS", "collapseDictionary", "lightbox", "collectGlossaryImages", "consolidateYomitanGlossaryEntries",
+        source.slice(start, end) + "\nprepareDictionarySources(); return toggleDefinition;");
+      const consolidateStart = source.indexOf("  function consolidateYomitanGlossaryEntries(");
       const consolidateEnd = source.indexOf("  // Collapses long dictionary entries", consolidateStart);
       if (consolidateStart < 0 || consolidateEnd < 0) throw new Error("Cannot locate glossary consolidation");
       const buildConsolidate = new Function("ELS",
@@ -40,16 +41,16 @@
         for (const theme of ["nord", "focus"]) {
           document.documentElement.dataset.senrenTheme = theme;
           document.documentElement.classList.toggle("custom-dark-mode", theme === "focus");
-          for (const [name, html] of cases) {
+          for (const [name, html, lazy] of cases.flatMap(([name,html])=>[[name,html,false],[name+' (lazy)',html,true]])) {
             fixture.innerHTML = `<div id="glossary" class="yomitan-glossary"><div class="dictionary-counter"></div><div class="toggle-area left"></div><div class="toggle-area right"></div><div class="glossary-box"><span></span></div></div>`;
             const glossary = fixture.querySelector("#glossary");
-            glossary.querySelector(".glossary-box > span").innerHTML = html;
+            glossary.querySelector(".glossary-box > span").innerHTML = lazy?`<template class="senren-dictionary-source">${html}</template>`:html;
             localStorage.setItem("lastSelectedDictionary", "glossary");
             localStorage.setItem("lastDictionaryName", "B");
             const consolidate = buildConsolidate({ glossary });
             consolidate();
             consolidate();
-            buildToggle({ glossary }, () => {}, null)();
+            buildToggle({ glossary }, () => {}, null, ()=>{}, consolidate)();
             for (const [expected, direction] of [
               ["B", "right"], ["C", "right"], ["A", "right"],
               ["B", "left"], ["A", "left"], ["C", "right"],

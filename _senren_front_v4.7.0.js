@@ -516,7 +516,7 @@ var senrenConfig = {};
             window.currentSceneKeyHandler = null;
         }
         window.currentSceneKeyHandler = handleFrontShortcuts;
-        document.addEventListener("keydown", handleFrontShortcuts);
+        document.addEventListener("keydown", handleFrontShortcuts, {signal:window.senrenCardController?.signal});
 
         function updateDisplay(playAudio) {
             textContainers.forEach((container) => {
@@ -652,7 +652,7 @@ var senrenConfig = {};
             }
         };
 
-        document.addEventListener("keydown", window.senrenFrontSettingsHandler);
+        document.addEventListener("keydown", window.senrenFrontSettingsHandler, {signal:window.senrenCardController?.signal});
     }
 
     // Adjusts word size based on character length

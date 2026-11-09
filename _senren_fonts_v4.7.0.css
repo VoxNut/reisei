@@ -1,0 +1,15 @@
+@font-face {
+  font-family: klee;
+  src: url("_KleeOne-SemiBold.ttf");
+  font-display: swap;
+}
+@font-face {
+  font-family: notosansjp;
+  src: url("_NotoSansJP.ttf");
+  font-display: swap;
+}
+@font-face {
+  font-family: notoserifjp;
+  src: url("_NotoSerifJP.ttf");
+  font-display: swap;
+}

@@ -1,19 +1,4 @@
-/* MOBILE FONTS
-============================================ */
-@font-face {
-  font-family: klee;
-  src: url("_KleeOne-SemiBold.ttf");
-}
-
-@font-face {
-  font-family: notosansjp;
-  src: url("_NotoSansJP.ttf");
-}
-
-@font-face {
-  font-family: notoserifjp;
-  src: url("_NotoSerifJP.ttf");
-}
+/* Bundled fonts are loaded on demand by _senren_fonts_v4.7.0.css. */
 
 /* Custom Variables for Styling */
 :root {

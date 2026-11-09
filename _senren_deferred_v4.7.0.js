@@ -1,21 +1,21 @@
 /* _senren_deferred_v4.7.0.js */
 (function () {
   // Adds hover effects to Jitendex dictionary content
-  function jitendexHover() {
-    const sentencePairs = document.querySelectorAll(
+  function jitendexHover(root = document) {
+    const sentencePairs = root.querySelectorAll(
       '[data-sc-content="example-sentence-a"]',
     );
-    const xrefPairs = document.querySelectorAll('[data-sc-content="xref"]');
-    const antonymPairs = document.querySelectorAll(
+    const xrefPairs = root.querySelectorAll('[data-sc-content="xref"]');
+    const antonymPairs = root.querySelectorAll(
       '[data-sc-content="antonym"]',
     );
-    const notePairs = document.querySelectorAll(
+    const notePairs = root.querySelectorAll(
       '[data-sc-content="sense-note"]',
     );
-    const explanationPairs = document.querySelectorAll(
+    const explanationPairs = root.querySelectorAll(
       '[data-sc-content="info-gloss"]',
     );
-    const langPairs = document.querySelectorAll(
+    const langPairs = root.querySelectorAll(
       '[data-sc-content="lang-source"]',
     );
 
@@ -203,8 +203,7 @@
 
   // Creates lightbox for image viewing
   function enableLightbox() {
-    const images = document.querySelectorAll(".picture-container img:not(.senren-filtered-image)");
-    if (!images.length) return;
+    let images = Array.from(document.querySelectorAll(".picture-container img:not(.senren-filtered-image)"));
 
     let currentIndex = 0;
     let scale = 1,
@@ -223,6 +222,15 @@
 
     if (!lightbox || !lightboxImg || !leftButton || !rightButton || !showAll)
       return;
+    if (lightbox._senrenRefresh) {
+      lightbox._senrenRefresh();
+      return;
+    }
+    window.senrenLightboxEvents?.abort();
+    const events = new AbortController();
+    window.senrenLightboxEvents = events;
+    window.senrenCardController?.signal.addEventListener("abort", () => events.abort(), {once:true});
+    const documentEvents = {signal:events.signal};
 
     if (images.length <= 1) {
       leftButton.classList.add("hidden");
@@ -280,6 +288,7 @@
     }
 
     const showImage = (index) => {
+      if (!images[index]) return;
       if (isGridView) hideGridView();
       currentIndex = index;
       lightboxImg.src = images[index].src;
@@ -299,7 +308,8 @@
       lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
     };
 
-    images.forEach((img, index) => {
+    function bindImages() {
+      images.forEach((img) => {
       if (!img.dataset.hasLightboxListener) {
         const container = img.closest(".picture-container");
         const isNSFW =
@@ -308,17 +318,26 @@
         if (isNSFW) {
           img.addEventListener("click", (e) => {
             if (img.classList.contains("clicked")) {
-              showImage(index);
+              showImage(images.indexOf(img));
             } else {
               img.classList.add("clicked");
             }
           });
         } else {
-          img.addEventListener("click", () => showImage(index));
+          img.addEventListener("click", () => showImage(images.indexOf(img)));
         }
         img.dataset.hasLightboxListener = "true";
       }
-    });
+      });
+    }
+    lightbox._senrenRefresh = () => {
+      images = Array.from(document.querySelectorAll(".picture-container img:not(.senren-filtered-image)"));
+      bindImages();
+      leftButton.classList.toggle("hidden", images.length <= 1);
+      rightButton.classList.toggle("hidden", images.length <= 1);
+      showAll.style.display = images.length <= 1 ? "none" : "";
+    };
+    bindImages();
 
     if (!showAll.dataset.hasClickListener) {
       showAll.addEventListener("click", (e) => {
@@ -356,7 +375,7 @@
             );
           }
         }
-      });
+      }, documentEvents);
       lightbox.dataset.hasShortcutsListener = "true";
     }
 
@@ -474,12 +493,12 @@
     if (!lightbox.dataset.hasMouseMoveListeners) {
       document.addEventListener("mousemove", (e) => {
         if (isPanning) requestAnimationFrame(() => moveImage(e));
-      });
+      }, documentEvents);
 
       document.addEventListener("mouseup", () => {
         isPanning = false;
         lightboxImg.style.cursor = "grab";
-      });
+      }, documentEvents);
       lightbox.dataset.hasMouseMoveListeners = "true";
     }
 
@@ -684,105 +703,74 @@
       }
     };
 
-    document.addEventListener("keydown", window.senrenBackKeyHandler);
+    document.addEventListener("keydown", window.senrenBackKeyHandler, {signal:window.senrenCardController?.signal});
   }
 
   // Filter out tiny divider / icon / dash images
-  async function filterTinyImages() {
-    const images = Array.from(
-      document.querySelectorAll(".picture-container img")
-    );
-    const skipBlobCheck =
-      window.senrenConfig &&
-      window.senrenConfig.collectGlossaryImages === "true";
-    const maxBlobChecks = 6;
+  function filterTinyImages() {
+    const signal = window.senrenCardController?.signal;
+    const skipBlobCheck = window.senrenConfig?.collectGlossaryImages === "true";
     let blobChecks = 0;
-    const canCheckBlob = (w, h) =>
-      !skipBlobCheck &&
-      blobChecks < maxBlobChecks &&
-      (w <= 160 || h <= 160);
-
-    const filterPromises = images.map(async (img) => {
-      if (img.classList.contains("senren-filtered-image")) return;
-
-      // If the image is not complete, wait for it to load
-      if (!img.complete) {
-        await Promise.race([
-          new Promise((resolve) => {
-            img.addEventListener("load", resolve);
-            img.addEventListener("error", resolve);
-          }),
-          new Promise((resolve) => setTimeout(resolve, 300))
-        ]);
-      }
-
-      let isTiny = false;
-      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-        // A horizontal line/dash typically has a very small height (e.g., <= 24px)
-        // or both width and height are extremely small (e.g., <= 32px)
-        if (
-          img.naturalHeight <= 24 ||
-          img.naturalWidth <= 24 ||
-          (img.naturalWidth <= 32 && img.naturalHeight <= 32)
-        ) {
-          isTiny = true;
-        } else if (canCheckBlob(img.naturalWidth, img.naturalHeight)) {
-          // Limit blob checks to avoid slowing down cards with many images
-          blobChecks += 1;
+    document.querySelectorAll(".picture-container img").forEach((img) => {
+      if (img.dataset.senrenFilterStarted) return;
+      img.dataset.senrenFilterStarted = "true";
+      const check = async () => {
+        img.removeEventListener("load", check);
+        img.removeEventListener("error", check);
+        if (!img.isConnected || signal?.aborted) return;
+        const w = img.naturalWidth, h = img.naturalHeight;
+        let tiny = w > 0 && h > 0 && (w <= 24 || h <= 24 || (w <= 32 && h <= 32));
+        if (!tiny && !skipBlobCheck && blobChecks < 6 && (!w || !h || w <= 160 || h <= 160)) {
+          blobChecks++;
           try {
-            const res = await fetch(img.src);
-            const blob = await res.blob();
-            if (blob.size < 2000) {
-              isTiny = true;
-            }
-          } catch (e) {
-            // Keep image on fetch error
-          }
+            const response = await fetch(img.src, {signal});
+            if (response.ok) tiny = (await response.blob()).size < 2000;
+          } catch (_) { /* Keep images when unavailable or cancelled. */ }
         }
-      } else {
-        // If image failed to load or timed out, check its size via fetch (limited)
-        if (!skipBlobCheck && blobChecks < maxBlobChecks) {
-          blobChecks += 1;
-          try {
-            const res = await fetch(img.src);
-            const blob = await res.blob();
-            if (blob.size < 2000) {
-              isTiny = true;
-            }
-          } catch (e) {
-            // Keep image on error
-          }
+        if (!img.isConnected || signal?.aborted) return;
+        if (tiny) {
+          img.classList.add("senren-filtered-image");
+          img.style.setProperty("display", "none", "important");
+          window.senrenRefreshPictures?.();
         }
-      }
-
-      if (isTiny) {
-        img.classList.add("senren-filtered-image");
-        img.style.setProperty("display", "none", "important");
-        if (typeof window.senrenRefreshScenes === "function") {
-          window.senrenRefreshScenes();
-        }
+      };
+      if (img.complete) check();
+      else {
+        img.addEventListener("load", check, {once:true, signal});
+        img.addEventListener("error", check, {once:true, signal});
       }
     });
-
-    // Wait up to 500ms for filtering to complete to keep card loading snappy
-    await Promise.race([
-      Promise.all(filterPromises),
-      new Promise((resolve) => setTimeout(resolve, 500))
-    ]);
   }
 
   // Init
-  async function senrenInitDeferred() {
-    if (!window.SENREN_COMPACT_VIEW && window.SENREN_HAS_HOVER !== false) {
-      jitendexHover();
-    }
-    await filterTinyImages();
+  function senrenInitDeferred() {
+    const back = document.querySelector(".back");
+    if (!back || back._senrenDeferredDone) return;
+    back._senrenDeferredDone = true;
+    let refreshFrame = 0;
+    window.senrenRefreshPictures = () => {
+      if (refreshFrame || !back.isConnected) return;
+      refreshFrame = requestAnimationFrame(() => {
+        refreshFrame = 0;
+        if (!back.isConnected) return;
+        window.senrenRefreshScenes?.();
+        enableImageSwitching();
+        enableLightbox();
+        filterTinyImages();
+        window.dynamicCardHeight?.();
+      });
+    };
+    window.senrenCardController?.signal.addEventListener("abort", () => cancelAnimationFrame(refreshFrame), {once:true});
+    window.senrenInitDictionaryHover(back);
     enableImageSwitching();
     enableLightbox();
-    if (!window.SENREN_COMPACT_VIEW) {
-      enableCustomShortcuts();
-    }
+    if (!window.SENREN_COMPACT_VIEW) enableCustomShortcuts();
+    filterTinyImages();
   }
+
+  window.senrenInitDictionaryHover = (root) => {
+    if (!window.SENREN_COMPACT_VIEW && window.SENREN_HAS_HOVER !== false) jitendexHover(root);
+  };
 
   window.senrenInitDeferred = senrenInitDeferred;
   senrenInitDeferred();

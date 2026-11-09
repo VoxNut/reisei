@@ -1,6 +1,18 @@
 (function () {
   "use strict";
 
+  window.senrenCardController?.abort();
+  window.senrenCardController = new AbortController();
+  const cardController = window.senrenCardController;
+  const cardRoot = document.querySelector(".front, .back");
+  const reviewer = document.getElementById("qa");
+  if (reviewer && cardRoot) {
+    const observer = new MutationObserver(() => {
+      if (!cardRoot.isConnected) cardController.abort();
+    });
+    observer.observe(reviewer, {childList:true});
+    cardController.signal.addEventListener("abort", () => observer.disconnect(), {once:true});
+  }
   if (window.SenrenTheme) return;
 
   const modes = Object.freeze(["nord", "focus"]);

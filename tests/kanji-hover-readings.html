@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kanji hover reading stylesheet regression</title>
 <link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../_senren_fonts_v4.7.0.css">
 <body class="card nightMode">
 <output id="result">Running…</output>
 <div class="back" id="fixture"></div>
@@ -57,6 +58,7 @@
           assert(kanji, "hover target did not initialize");
           kanji.dispatchEvent(new MouseEvent("mouseover", {bubbles:true}));
           const tooltip = fixture.querySelector("#kanji-tooltip");
+          for (let attempt = 0; attempt < 100 && !tooltip.querySelector("rt"); attempt++) await new Promise(resolve => setTimeout(resolve, 10));
           const rt = tooltip.querySelector("rt");
           assert(rt, "tooltip reading missing");
           assert(window.senrenGetReadingText(rt) === current.text, `wrong reading text: ${window.senrenGetReadingText(rt)}`);

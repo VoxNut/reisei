@@ -118,6 +118,7 @@ var senrenConfig = {};
       newImg.src = src;
 
       newImg.onload = () => {
+        if (!pictureContainer.isConnected) return;
         const w = newImg.naturalWidth;
         const h = newImg.naturalHeight;
         const aspectRatio = w / h;
@@ -139,6 +140,7 @@ var senrenConfig = {};
         }
 
         pictureContainer.appendChild(newImg);
+        window.senrenRefreshPictures?.();
       };
     });
 
@@ -208,6 +210,59 @@ var senrenConfig = {};
   }
 
   // Manages cycling between Selection Text, Definition, and Glossary
+  function prepareDictionarySources() {
+    document.querySelectorAll("template.senren-dictionary-source").forEach((source) => {
+      const host = source.parentElement;
+      const content = source.content.ownerDocument.createElement("div");
+      content.append(source.content);
+      content.querySelectorAll("script").forEach((node) => node.remove());
+      consolidateYomitanGlossaryEntries(content);
+      const entries = Array.from(content.querySelectorAll("li[data-dictionary]"))
+        .filter((entry) => !entry.parentElement.closest("li[data-dictionary]"));
+      if (entries.length) {
+        const styles = Array.from(content.querySelectorAll('style, link[rel="stylesheet"]'))
+          .filter((style) => !style.closest("li[data-dictionary]"));
+        styles.forEach((style) => style.remove());
+        const loadStyles = () => {
+          host.prepend(...styles);
+          styles.length = 0;
+        };
+        entries.forEach((entry) => {
+          const copy = entry.cloneNode(true);
+          copy.querySelectorAll("style, script, .dictionary-title").forEach((node) => node.remove());
+          entry._senrenHasContent = Boolean(copy.textContent.replace(/[\s\u200b\ufeff]/g, "") ||
+            copy.querySelector("img[src], svg, audio[src], video[src]"));
+          const payload = content.ownerDocument.createElement("template");
+          payload.content.append(...entry.childNodes);
+          entry.appendChild(payload);
+          entry._senrenMount = () => {
+            loadStyles();
+            payload.replaceWith(payload.content);
+            entry._senrenMount = null;
+          };
+        });
+      } else {
+        const probe = content.cloneNode(true);
+        probe.querySelectorAll('style, link, script').forEach((node) => node.remove());
+        if (!probe.textContent.trim() && !probe.querySelector("img, svg, audio, video")) {
+          source.remove();
+          return;
+        }
+      }
+      source.replaceWith(...content.childNodes);
+    });
+  }
+
+  function activateDictionary(item) {
+    const mounting = Boolean(item.element._senrenMount);
+    item.element._senrenMount?.();
+    window.senrenInitDictionaryHover?.(item.element);
+    if (mounting && ELS.pictureContainer) {
+      delete ELS.pictureContainer.dataset.senrenGlossaryCollectionDone;
+      collectGlossaryImages(true);
+    }
+  }
+
   function toggleDefinition() {
     const toggleAreas = document.querySelectorAll(
       ".toggle-area:not(#notes .toggle-area)",
@@ -247,6 +302,11 @@ var senrenConfig = {};
 
     function hasDictionaryContent(element) {
       if (!element) return false;
+      if (element._senrenHasContent !== undefined) return element._senrenHasContent;
+      const entries = Array.from(element.querySelectorAll("li[data-dictionary]"));
+      if (entries.length && entries.every((entry) => entry._senrenHasContent !== undefined)) {
+        return entries.some((entry) => entry._senrenHasContent);
+      }
       const content = element.cloneNode(true);
       // Imported styles and navigation UI are not dictionary entries.
       content.querySelectorAll("style, script, link, .dictionary-counter, .dictionary-title, .toggle-area")
@@ -516,6 +576,7 @@ var senrenConfig = {};
       if (initialIndex !== -1) {
         const initialItem = currentVisibleItems[initialIndex];
         if (initialItem.container) {
+          activateDictionary(initialItem);
           initialItem.container.classList.add("show");
           // For collapsed dictionary entries 1
           collapseDictionary(
@@ -555,6 +616,7 @@ var senrenConfig = {};
       }
 
       const nextItem = currentVisibleItems[nextIndex];
+      activateDictionary(nextItem);
 
       if (currentItem.type === "glossary" && nextItem.type !== "glossary") {
         if (currentItem.container)
@@ -649,7 +711,7 @@ var senrenConfig = {};
       }
     };
 
-    document.addEventListener("keydown", window.senrenDefinitionKeyHandler);
+    document.addEventListener("keydown", window.senrenDefinitionKeyHandler, {signal:window.senrenCardController?.signal});
   }
 
   // Enables interaction effects
@@ -1967,7 +2029,7 @@ var senrenConfig = {};
             closeLegend();
           }
         };
-        document.addEventListener("keydown", window._senrenLegendKeyHandler);
+        document.addEventListener("keydown", window._senrenLegendKeyHandler, {signal:window.senrenCardController?.signal});
 
         // Details section: info icon click → show legend
         notesBox
@@ -2077,7 +2139,7 @@ var senrenConfig = {};
             handleNoteToggle("right");
           }
         };
-        document.addEventListener("keydown", window._senrenNotesNavHandler);
+        document.addEventListener("keydown", window._senrenNotesNavHandler, {signal:window.senrenCardController?.signal});
 
         updateCounter();
       } catch (err) {
@@ -2128,7 +2190,7 @@ var senrenConfig = {};
           });
         }
       };
-      document.addEventListener("keydown", window._senrenNotesToggleHandler);
+      document.addEventListener("keydown", window._senrenNotesToggleHandler, {signal:window.senrenCardController?.signal});
     })();
 
     // Auto-expand notes if setting is true
@@ -2387,8 +2449,7 @@ var senrenConfig = {};
 
   // Explicit downstep positions are authoritative. Imported pitch classes are
   // used only when no usable position was supplied by the note.
-  function getPitchType(number, readingElement) {
-    const moraCount = getReadingMorae(readingElement).length;
+  function getPitchType(number, readingElement, moraCount = getReadingMorae(readingElement).length) {
     if (!moraCount || !Number.isInteger(number) || number < 0) return "unknown";
     if (number === 0) return "heiban";
     if (number === 1) return "atamadaka";
@@ -2399,6 +2460,7 @@ var senrenConfig = {};
   window.senrenGetPitchType = getPitchType;
 
   function getManualReadingContent(element) {
+    if (!element || element.querySelector(':not(div):not(p):not(br):not(style):not(link[rel="stylesheet"])')) return null;
     const content = element?.cloneNode(true);
     if (!content) return null;
     content.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => node.remove());
@@ -2452,7 +2514,7 @@ var senrenConfig = {};
     if (!content) return false;
     const text = normalizeReadingText(content);
     if (!REGEX.KANA_ONLY.test(text)) return false;
-    const morae = getReadingMorae(content);
+    const morae = text.replace(/[゙゚]/g, "").match(REGEX.MORA) || [];
     const positions = [...new Set(Array.isArray(position) ? position : [position])]
       .filter((number) => Number.isInteger(number) && number >= 0 && number <= morae.length)
       .sort((a, b) => a - b);
@@ -2518,6 +2580,7 @@ var senrenConfig = {};
   }
 
   function isDevoicingMarker(element) {
+    if (element.textContent.trim()) return false;
     // The extracted-media class identifies the circle before its CSS loads.
     return element.classList.contains("ic-3c7893fbde") ||
       element.style.borderStyle === "dotted" ||
@@ -2597,7 +2660,8 @@ var senrenConfig = {};
         : [];
 
     return displayItems.map((element, index) => {
-      const moraCount = getReadingMorae(element).length;
+      const readingText = normalizeReadingText(element);
+      const moraCount = (readingText.replace(/[゙゚]/g, "").match(REGEX.MORA) || []).length;
       const positionSource = aligned ? positionItems[index] :
         displayItems.length === 1 ? context.position : null;
       const positions = getManualReadingContent(element) ?
@@ -2616,7 +2680,8 @@ var senrenConfig = {};
         positionElement: aligned ? positionItems[index] : null,
         position,
         positions,
-        readingText: normalizeReadingText(element),
+        readingText,
+        moraCount,
         importedType: importedTypes.length === 1 ? importedTypes[0] : importedTypes[index],
         // Read styles for all entries before removing duplicates invalidates layout.
         ...getPitchGraphSignature(element),
@@ -2686,7 +2751,7 @@ var senrenConfig = {};
       entry.element.classList.add("pitch-reading");
       entry.element.classList.remove(...senrenPitchClassNames);
       const calculated = Number.isInteger(entry.position)
-        ? getPitchType(entry.position, entry.element)
+        ? getPitchType(entry.position, entry.element, entry.moraCount)
         : "unknown";
       entry.pitchType =
         calculated !== "unknown" ? calculated : entry.importedType || "unknown";
@@ -2709,7 +2774,7 @@ var senrenConfig = {};
     const resolvedTypes = numbers.map((number) => {
       const entry = entries.find((entry) => entry.positions?.includes(number) || entry.position === number) ||
         (entries.length === 1 ? entries[0] : null);
-      const calculated = entry ? getPitchType(number, entry.element) : "unknown";
+      const calculated = entry ? getPitchType(number, entry.element, entry.moraCount) : "unknown";
       return calculated !== "unknown"
         ? calculated
         : entry?.pitchType || "unknown";
@@ -3045,22 +3110,17 @@ var senrenConfig = {};
   }
 
   // Merge entries from the same dictionary
-  function consolidateYomitanGlossaryEntries() {
-    const glossaryOuterDiv = ELS.glossary;
-    if (!glossaryOuterDiv) return;
-
-    const glossaryBox = glossaryOuterDiv.querySelector(".glossary-box");
-    if (!glossaryBox) return;
-
-    const glossarySpan = glossaryBox.querySelector("span");
+  function consolidateYomitanGlossaryEntries(root) {
+    const glossarySpan = root || ELS.glossary?.querySelector(".glossary-box > span");
     if (!glossarySpan) return;
+    const owner = glossarySpan.ownerDocument;
 
     if (glossarySpan.dataset.consolidated === "true") return;
 
     // Some exports close the dictionary entry before its definition list.
     glossarySpan.querySelectorAll("li[data-dictionary]").forEach((entry) => {
       if (!entry.nextElementSibling?.matches("li:not([data-dictionary])")) return;
-      const continuation = document.createElement("ul");
+      const continuation = owner.createElement("ul");
       while (entry.nextElementSibling?.matches("li:not([data-dictionary])")) {
         continuation.appendChild(entry.nextElementSibling);
       }
@@ -3072,15 +3132,14 @@ var senrenConfig = {};
     );
     if (yomitanGlossaryDivs.length === 0) return;
 
-    let consolidationHappened = false;
 
     yomitanGlossaryDivs.forEach((ygDiv) => {
       const olElement = ygDiv.querySelector("ol");
       if (!olElement) return;
 
       const listItems = Array.from(
-        olElement.querySelectorAll("li[data-dictionary]"),
-      );
+        olElement.children,
+      ).filter((item) => item.matches("li[data-dictionary]"));
       if (listItems.length === 0) return;
 
       const groupedItems = {};
@@ -3100,14 +3159,14 @@ var senrenConfig = {};
         if (items.length > 1) {
           const firstItem = items[0];
           const consolidatedLi = firstItem.cloneNode(false);
-          const fragment = document.createDocumentFragment();
+          const fragment = owner.createDocumentFragment();
 
           items.forEach((li, index) => {
             while (li.firstChild) {
               fragment.appendChild(li.firstChild);
             }
             if (index < items.length - 1) {
-              const hr = document.createElement("hr");
+              const hr = owner.createElement("hr");
               hr.className = "consolidated-entry-separator";
               fragment.appendChild(hr);
             }
@@ -3120,14 +3179,11 @@ var senrenConfig = {};
             olElement.removeChild(items[i]);
           }
 
-          consolidationHappened = true;
         }
       });
     });
 
-    if (consolidationHappened) {
-      glossarySpan.dataset.consolidated = "true";
-    }
+    glossarySpan.dataset.consolidated = "true";
   }
 
   // Collapses long dictionary entries and adds a clickable fade-out.
@@ -3495,7 +3551,7 @@ var senrenConfig = {};
     };
 
     window.currentSceneKeyHandler = handleSceneShortcuts;
-    document.addEventListener("keydown", handleSceneShortcuts);
+    document.addEventListener("keydown", handleSceneShortcuts, {signal:window.senrenCardController?.signal});
 
     function updateDisplay(shouldPlayAudio = false) {
       const pictureContainer = ELS.pictureContainer;
@@ -3740,51 +3796,44 @@ var senrenConfig = {};
 
   // Adjusts the height of the card to match the picture in Backdrop Layout (BG Card mode)
   function dynamicCardHeight() {
-    const back = ELS.back;
-    const img = ELS.pictureContainer?.querySelector(
-      "img:not(.senren-filtered-image)",
-    );
-
-    if (!back || !img) return;
-
-    const applyHeight = () => {
-      if (back.classList.contains("image-removed")) {
-        back.style.removeProperty("min-height");
-        return;
-      }
-
-      const enabled = senrenConfig.enableBackdropLayout;
-      const dynamicHeight = senrenConfig.backdropDynamicHeight;
-      const backdropStyle = senrenConfig.backdropStyle;
-
-      const isActive =
-        enabled === "1" && dynamicHeight === "1" && backdropStyle === "0";
-
-      if (!isActive) {
-        back.style.removeProperty("min-height");
-        return;
-      }
-
-      if (img.offsetHeight > 0) {
-        const style = window.getComputedStyle(back);
-        const paddingTop = parseFloat(style.paddingTop) || 0;
-        const paddingBottom = parseFloat(style.paddingBottom) || 0;
-        const totalPadding = paddingTop + paddingBottom;
-
-        const targetHeight = img.offsetHeight - totalPadding + "px";
-
-        back.style.setProperty("min-height", targetHeight, "important");
-      } else if (img.complete) {
-        requestAnimationFrame(() => applyHeight());
-      }
-    };
-
-    requestAnimationFrame(() => applyHeight());
-
-    if (!window._senren_height_init) {
-      window.addEventListener("resize", dynamicCardHeight);
-      window._senren_height_init = true;
+    const back = ELS.back, pictures = ELS.pictureContainer;
+    if (!back || !pictures) return;
+    const active = senrenConfig.enableBackdropLayout === "1" &&
+      senrenConfig.backdropDynamicHeight === "1" && senrenConfig.backdropStyle === "0";
+    if (!active) {
+      back._senrenHeightObserver?.disconnect();
+      back._senrenHeightObserver = null;
+      back._senrenHeightSchedule = null;
+      back.style.removeProperty("min-height");
+      return;
     }
+    if (back._senrenHeightSchedule) { back._senrenHeightSchedule(); return; }
+    let frame = 0;
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        if (!back.isConnected) return;
+        const img = pictures.querySelector("img:not(.senren-filtered-image)");
+        const height = img?.offsetHeight || 0;
+        if (back.classList.contains("image-removed") || !height) {
+          back.style.removeProperty("min-height");
+          return;
+        }
+        const style = getComputedStyle(back);
+        const target = Math.max(0, height - (parseFloat(style.paddingTop) || 0) -
+          (parseFloat(style.paddingBottom) || 0)) + "px";
+        if (back.style.minHeight !== target) back.style.setProperty("min-height", target, "important");
+      });
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(pictures);
+    back._senrenHeightObserver = observer;
+    back._senrenHeightSchedule = schedule;
+    window.senrenCardController?.signal.addEventListener("abort", () => {
+      observer.disconnect(); cancelAnimationFrame(frame);
+    }, {once:true});
+    schedule();
   }
 
   (function () {
@@ -3946,6 +3995,7 @@ var senrenConfig = {};
       renderBackReading();
       dynamicWordSize();
       alternativePitchStyle();
+      prepareDictionarySources();
       dictionaryTitle();
       prefilterTinyImages();
       consolidateYomitanGlossaryEntries();
@@ -3999,18 +4049,21 @@ var senrenConfig = {};
 
     // initializes deferred functions
     function initDeferred() {
+      const signal = window.senrenCardController?.signal;
       delayedFunctions(() => {
+        if (signal?.aborted) return;
         collectGlossaryImages(true);
 
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             setTimeout(() => {
+              if (signal?.aborted) return;
               // External deferred functions
               if (window.senrenInitDeferred) {
                 window.senrenInitDeferred();
               } else {
                 const script = document.createElement("script");
-                script.src = "_senren_deferred_v4.7.0.js";
+                script.src = "_senren_deferred_v4.7.0.js?v=20261109.2";
                 document.body.appendChild(script);
               }
 
@@ -4021,7 +4074,7 @@ var senrenConfig = {};
                 } else {
                   const script = document.createElement("script");
                   script.src =
-                    "_senren_kanji_hover_v4.7.0.js?v=20261106.2";
+                    "_senren_kanji_hover_v4.7.0.js?v=20261109.2";
                   document.body.appendChild(script);
                 }
               }

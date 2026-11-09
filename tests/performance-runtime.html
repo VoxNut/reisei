@@ -1,0 +1,100 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Review runtime regression</title>
+<output id="result">Running…</output><div id="fixture"></div>
+<script>
+(async()=>{
+  try {
+    const fixture=document.getElementById('fixture');
+    const realFetch=fetch.bind(window);
+    const [back,hover,deferred,theme,css]=await Promise.all(['_senren_back_v4.7.0.js','_senren_kanji_hover_v4.7.0.js','_senren_deferred_v4.7.0.js','_senren_theme_v4.7.0.js','style.css'].map(name=>realFetch('../'+name).then(r=>r.text())));
+    let checks=0;
+    const assert=(ok,message)=>{if(!ok)throw Error(message);checks++;};
+    const wait=async(predicate)=>{for(let i=0;i<100&&!predicate();i++)await new Promise(r=>setTimeout(r,10));assert(predicate(),'Timed out');};
+    const run=source=>{const script=document.createElement('script');script.textContent=source;document.body.append(script);script.remove();};
+    const start=back.indexOf('  function prepareDictionarySources() {'),end=back.indexOf('  function enableInteractions() {',start);
+    const cstart=back.indexOf('  function consolidateYomitanGlossaryEntries('),cend=back.indexOf('  // Collapses long dictionary entries',cstart);
+    window.failedA=0;window.failedB=0;
+    fixture.innerHTML='<div class="back"><div id="glossary" class="yomitan-glossary"><div class="dictionary-counter"></div><div class="toggle-area right"></div><div class="glossary-box"><span><template class="senren-dictionary-source"><style>.test-import{color:inherit}</style><div class="yomitan-glossary"><ol><li data-dictionary="A">First<img src="missing-active-test.png" onerror="window.failedA++"></li><li data-dictionary="B">Second<img src="missing-inactive-test.png" onerror="window.failedB++"></li></ol></div></template></span></div></div></div>';
+    const glossary=fixture.querySelector('#glossary');
+    const api=new Function('ELS','collapseDictionary','lightbox','collectGlossaryImages',back.slice(cstart,cend)+back.slice(start,end)+';return {prepareDictionarySources,toggleDefinition};')({glossary},()=>{},document.createElement('div'),()=>{});
+    localStorage.removeItem('lastSelectedDictionary');localStorage.removeItem('lastDictionaryName');
+    api.prepareDictionarySources();
+    await new Promise(r=>setTimeout(r,40));
+    assert(failedA===0&&failedB===0,'Inert dictionary preparation fetched images');
+    api.toggleDefinition();await wait(()=>failedA===1);
+    assert(failedB===0&&!glossary.querySelector('li[data-dictionary="B"] img'),'Inactive dictionary image fetched or mounted');
+    assert(glossary.querySelectorAll('style').length===1,'Active dictionary styles not mounted');
+    glossary.querySelector('.toggle-area.right').click();await wait(()=>failedB===1);
+    assert(glossary.querySelector('li[data-dictionary="B"]').innerText.includes('Second'),'Dictionary switch lost content');
+    assert(glossary.querySelectorAll('style').length===1,'Shared stylesheet duplicated');
+    run(theme);
+    const rstart=back.indexOf('  var senrenPitchClassNames ='),rend=back.indexOf('  // Highlight the target word',rstart);
+    const regexStart=back.indexOf('window.REGEX = {'),regexEnd=back.indexOf('      // NSFW Cache',regexStart);
+    new Function(back.slice(regexStart,regexEnd))();
+    new Function('ELS','senrenConfig',back.slice(rstart,rend))({},{});
+    fixture.innerHTML='<div class="back"><div id="word"><span><span class="word-reading-stack"><span class="ruby-base-word">幾度</span><span class="word-reading">いくど</span></span></span></div><div id="kanji-tooltip"></div></div>';
+    window.senrenConfig={enableKanjiHover:'true'};
+    const requests=[];let stall=false;
+    window.fetch=async(url,options)=>{
+      if(!String(url).includes(':8765'))return realFetch(url,options);
+      const {action,params}=JSON.parse(options.body);requests.push({action,params});
+      if(stall)return new Promise((resolve,reject)=>options.signal.addEventListener('abort',()=>reject(new DOMException('Cancelled','AbortError')),{once:true}));
+      const response=action==='findNotes'?[123]:action==='notesInfo'?[{noteId:123,cards:[456],fields:{word:{value:'幾つか'},reading:{value:'いくつか'},pitchPosition:{value:'1'},sentence:{value:'Example'}}}]:[{cardId:456,type:2}];
+      return new Response(JSON.stringify({result:response,error:null}));
+    };
+    run(hover);await wait(()=>fixture.querySelector('.kanji'));
+    assert(requests.length===0,'Kanji Hover queried the collection before hovering');
+    const kanji=fixture.querySelector('.kanji');kanji.dispatchEvent(new MouseEvent('mouseover',{bubbles:true}));
+    await wait(()=>fixture.querySelector('#kanji-tooltip rt'));
+    assert(requests.length===3,'Hover did not fetch its three small datasets');
+    assert(JSON.stringify(requests.find(r=>r.action==='cardsInfo').params.fields)==='["cardId","type"]','Full cardsInfo payload requested');
+    kanji.dispatchEvent(new MouseEvent('mouseover',{bubbles:true}));await new Promise(r=>setTimeout(r,20));
+    assert(requests.length===3,'Repeated hover bypassed cache');
+    stall=true;const other=fixture.querySelectorAll('.kanji')[1];other.dispatchEvent(new MouseEvent('mouseover',{bubbles:true}));
+    const oldSignal=window.senrenHoverController.signal;
+    run(theme);fixture.innerHTML='<div class="back">Next card</div>';
+    await new Promise(r=>setTimeout(r,30));
+    assert(oldSignal.aborted,'Old hover request was not cancelled on card change');
+    assert(fixture.innerText==='Next card','Old hover changed the next card');
+    window.fetch=realFetch;window.SENREN_COMPACT_VIEW=true;
+    const image='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22/%3E';
+    const imageCard=()=>`<div class="back"><div class="picture-container"><img src="${image}"><div class="nav-arrow left"></div><div class="nav-arrow right"></div></div><div id="lightbox"><img id="lightbox-img"><button class="lightbox-nav left"></button><button class="lightbox-nav right"></button><button id="show-all"></button></div></div>`;
+    const oldImages=[];
+    for(let i=0;i<20;i++){
+      run(theme);fixture.innerHTML=imageCard();window.senrenConfig={collectGlossaryImages:'true'};
+      if(i===0)run(deferred);else window.senrenInitDeferred();
+      assert(fixture.querySelector('.picture-container img').dataset.hasLightboxListener==='true','Image controls waited for filtering');
+      oldImages.push(fixture.querySelector('#lightbox-img'));
+    }
+    document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+    assert(oldImages.slice(0,-1).every(img=>img.style.cursor===''),'Old document handlers survived card replacement');
+    assert(oldImages.at(-1).style.cursor==='grab','Current image handler is missing');
+    fixture.querySelector('.picture-container img').click();
+    assert(fixture.querySelector('#lightbox').classList.contains('active'),'Image click did not open lightbox');
+    const extra=document.createElement('img');extra.src=image;fixture.querySelector('.picture-container').append(extra);window.senrenRefreshPictures();
+    await wait(()=>extra.dataset.hasLightboxListener==='true');
+    extra.click();assert(fixture.querySelector('#lightbox-img').src===extra.src,'Late image cannot open');
+    const hstart=back.indexOf('  function dynamicCardHeight() {'),hend=back.indexOf('  (function () {',hstart);
+    const backNode=fixture.querySelector('.back'),pictures=fixture.querySelector('.picture-container');
+    pictures.querySelectorAll('img').forEach(img=>img.style.display='none');
+    const height=new Function('ELS','senrenConfig',back.slice(hstart,hend)+';return dynamicCardHeight;')({back:backNode,pictureContainer:pictures},{enableBackdropLayout:'1',backdropDynamicHeight:'1',backdropStyle:'0'});
+    const raf=window.requestAnimationFrame;let frames=0;window.requestAnimationFrame=fn=>{frames++;return raf(fn);};
+    height();await new Promise(r=>setTimeout(r,100));const settled=frames;
+    await new Promise(r=>setTimeout(r,100));assert(frames===settled,'Hidden image keeps scheduling height frames');
+    window.requestAnimationFrame=raf;
+    const visibleImage=pictures.querySelector('img');backNode.style.padding='10px';visibleImage.style.display='block';visibleImage.style.height='200px';
+    await wait(()=>backNode.style.minHeight==='180px');
+    visibleImage.style.height='300px';await wait(()=>backNode.style.minHeight==='280px');
+    assert(backNode.style.minHeight==='280px','Dynamic height did not follow image resize');
+    assert(!/@font-face/.test(css),'Inline font faces still trigger Anki preloading');
+    run(theme);visibleImage.style.height='400px';await new Promise(r=>setTimeout(r,40));
+    assert(backNode.style.minHeight==='280px','Old height observer survived card cleanup');
+    assert(window.senrenCardController.signal.aborted===false,'Card lifecycle failed to restart');
+    fixture.id='qa';run(theme);const outgoing=window.senrenCardController.signal;fixture.innerHTML='Another note type';
+    await new Promise(r=>setTimeout(r,10));assert(outgoing.aborted,'Leaving Senren did not clean up the outgoing card');fixture.id='fixture';
+    result.textContent=`PASS: ${checks} lazy-loading, cancellation, controls, cleanup and height checks`;
+  }catch(error){result.textContent='FAIL: '+error.stack;}
+})();
+</script>

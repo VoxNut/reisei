@@ -7,7 +7,11 @@
   let tooltipElement = document.getElementById("kanji-tooltip");
   let hideTooltipTimeout = null;
 
-  const preloadedKanjiData = {};
+  let preloadedKanjiData = {};
+  let pendingKanjiData = new Map();
+  let hoverController;
+  let hoverTarget = null;
+  let currentWordText = "";
   const fallbackKanjiRegex = /[\u3400-\u4DBF\u4E00-\u9FFF\u3005\u3007]/;
 
   function isKanji(char) {
@@ -20,10 +24,11 @@
   }
 
   // Helper function to send requests to AnkiConnect
-  async function ankiConnectRequest(action, params = {}) {
+  async function ankiConnectRequest(action, params = {}, signal) {
     try {
       const response = await fetch(ankiConnectUrl, {
         method: "POST",
+        signal,
         headers: {
           "Content-Type": "application/json",
         },
@@ -38,7 +43,7 @@
       }
       return data.result;
     } catch (error) {
-      console.error("[Senren Hover] AnkiConnect Failure:", error);
+      if (error.name !== "AbortError") console.error("[Senren Hover] AnkiConnect Failure:", error);
       return null;
     }
   }
@@ -114,6 +119,7 @@
         const isOverTooltip = tooltipElement.matches(':hover');
 
         if (!isOverKanji && !isOverTooltip) {
+          hoverTarget = null;
           tooltipElement.classList.remove('active');
           tooltipElement.style.display = 'none';
         }
@@ -127,6 +133,18 @@
     clearTimeout(hideTooltipTimeout);
     const kanji = element.textContent;
 
+    hoverTarget = element;
+    const signal = hoverController.signal;
+    tooltipElement.textContent = "Loading…";
+    tooltipElement.classList.add('active');
+    tooltipElement.style.display = 'block';
+    positionTooltipNearElement(tooltipElement, element);
+    if (!preloadedKanjiData[kanji]) {
+      if (!pendingKanjiData.has(kanji)) pendingKanjiData.set(kanji, loadKanjiData(kanji, currentWordText, signal));
+      const words = await pendingKanjiData.get(kanji);
+      if (signal.aborted || !element.isConnected || hoverTarget !== element) return;
+      preloadedKanjiData[kanji] = words;
+    }
     tooltipElement.innerHTML = "";
 
     if (preloadedKanjiData[kanji]) {
@@ -232,9 +250,9 @@
         });
       }
 
-      tooltipElement.addEventListener('mouseover', () => clearTimeout(hideTooltipTimeout));
-      tooltipElement.addEventListener('mouseout', () => hideKanjiInfo());
-      tooltipElement.addEventListener('mouseover', (event) => {
+      tooltipElement.onmouseenter = () => clearTimeout(hideTooltipTimeout);
+      tooltipElement.onmouseleave = () => hideKanjiInfo();
+      tooltipElement.onmouseover = (event) => {
         const positionElement = event.target.closest('.position');
         if (positionElement) {
           const categoriesElement = positionElement.nextElementSibling;
@@ -244,14 +262,85 @@
             }
           }
         }
-      });
+      };
     }
   }
 
   window.senrenAnkiRequest = ankiConnectRequest;
 
+  async function loadKanjiData(kanji, wordText, signal) {
+    const query = `note:Senren+ "word:*${kanji}*"`;
+    const noteIds = await ankiConnectRequest("findNotes", { query }, signal);
+
+    if (!noteIds || noteIds.length === 0 || signal.aborted) return [];
+
+    const notesInfo = await ankiConnectRequest("notesInfo", { notes: noteIds }, signal);
+    if (!notesInfo || signal.aborted) return [];
+
+    const allCardIds = [];
+    notesInfo.forEach(n => { if (n.cards && n.cards.length) allCardIds.push(...n.cards); });
+
+    const cardTypeMap = {};
+    if (allCardIds.length > 0) {
+      const cardsInfo = await ankiConnectRequest("cardsInfo", { cards: allCardIds, fields: ["cardId", "type"] }, signal);
+      if (cardsInfo) {
+        cardsInfo.forEach(c => cardTypeMap[c.cardId] = c.type);
+      } else if (!signal.aborted) {
+        const learned = await ankiConnectRequest("findCards", {
+          query: `nid:${noteIds.join(',')} -is:new`
+        }, signal);
+        learned?.forEach((id) => cardTypeMap[id] = 1);
+      }
+    }
+
+    const relatedWords = [];
+    const uniqueWords = new Set();
+
+    for (const note of notesInfo) {
+      const fields = note.fields;
+      if (fields && fields.word && fields.word.value) {
+        const wordValueRaw = fields.word.value;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = wordValueRaw;
+        const wordValue = tempDiv.textContent || tempDiv.innerText || "";
+
+        if (wordValue.trim() !== wordText && !uniqueWords.has(wordValue.trim())) {
+          const readingValueFull = fields.reading ? fields.reading.value : '';
+          const sentenceValue = fields.sentence ? fields.sentence.value : '';
+          const readingHtml = window.senrenGetFirstReadingHtml(readingValueFull);
+
+          const pitchValue = fields.pitch ? fields.pitch.value : '';
+          const pitchPositionValue = fields.pitchPosition ? fields.pitchPosition.value : '';
+          const tagsValue = fields.Tags ? fields.Tags.value : '';
+          const isNewCard = !note.cards.some(cid => cardTypeMap[cid] > 0);
+
+          relatedWords.push({
+            word: wordValue,
+            reading: readingHtml,
+            sentence: sentenceValue,
+            pitch: pitchValue,
+            pitchPosition: pitchPositionValue,
+            tags: tagsValue,
+            isNew: isNewCard,
+            noteId: note.noteId
+          });
+
+          uniqueWords.add(wordValue.trim());
+        }
+      }
+    }
+    return signal.aborted ? [] : relatedWords;
+  }
+
   // init
   window.senrenInitKanjiHover = async function () {
+    window.senrenHoverController?.abort();
+    hoverController = new AbortController();
+    window.senrenHoverController = hoverController;
+    window.senrenCardController?.signal.addEventListener('abort', () => hoverController.abort(), {once:true});
+    preloadedKanjiData = {};
+    pendingKanjiData = new Map();
+    hoverTarget = null;
     tooltipElement = document.getElementById("kanji-tooltip");
     if (!tooltipElement) return;
 
@@ -296,73 +385,7 @@
     }
     if (!/[一-龯㐀-䶿]/.test(wordText)) return;
 
-    const uniqueKanji = new Set();
-    for (const char of wordText) {
-      if (isKanji(char)) uniqueKanji.add(char);
-    }
-
-    // Fetch related words for all identified Kanji
-    await Promise.all(Array.from(uniqueKanji).map(async (kanji) => {
-      if (preloadedKanjiData[kanji]) return;
-
-      const query = `note:Senren+ "word:*${kanji}*"`;
-      const noteIds = await ankiConnectRequest("findNotes", { query });
-
-      if (!noteIds || noteIds.length === 0) return;
-
-      const notesInfo = await ankiConnectRequest("notesInfo", { notes: noteIds });
-      if (!notesInfo) return;
-
-      const allCardIds = [];
-      notesInfo.forEach(n => { if (n.cards && n.cards.length) allCardIds.push(...n.cards); });
-
-      const cardTypeMap = {};
-      if (allCardIds.length > 0) {
-        const cardsInfo = await ankiConnectRequest("cardsInfo", { cards: allCardIds });
-        if (cardsInfo) {
-          cardsInfo.forEach(c => cardTypeMap[c.cardId] = c.type);
-        }
-      }
-
-      const relatedWords = [];
-      const uniqueWords = new Set();
-
-      for (const note of notesInfo) {
-        const fields = note.fields;
-        if (fields && fields.word && fields.word.value) {
-          const wordValueRaw = fields.word.value;
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = wordValueRaw;
-          const wordValue = tempDiv.textContent || tempDiv.innerText || "";
-
-          if (wordValue.trim() !== wordText && !uniqueWords.has(wordValue.trim())) {
-            const readingValueFull = fields.reading ? fields.reading.value : '';
-            const sentenceValue = fields.sentence ? fields.sentence.value : '';
-            const readingHtml = window.senrenGetFirstReadingHtml(readingValueFull);
-
-            const pitchValue = fields.pitch ? fields.pitch.value : '';
-            const pitchPositionValue = fields.pitchPosition ? fields.pitchPosition.value : '';
-            const tagsValue = fields.Tags ? fields.Tags.value : '';
-            const isNewCard = !note.cards.some(cid => cardTypeMap[cid] > 0);
-
-            relatedWords.push({
-              word: wordValue,
-              reading: readingHtml,
-              sentence: sentenceValue,
-              pitch: pitchValue,
-              pitchPosition: pitchPositionValue,
-              tags: tagsValue,
-              isNew: isNewCard,
-              noteId: note.noteId
-            });
-
-            uniqueWords.add(wordValue.trim());
-          }
-        }
-      }
-      preloadedKanjiData[kanji] = relatedWords;
-    }));
-
+    currentWordText = wordText;
     // Wrap Kanji in spans for hover
     const textContent = wordText;
     const fragment = document.createDocumentFragment();
