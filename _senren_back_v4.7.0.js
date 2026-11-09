@@ -4084,6 +4084,12 @@ var senrenConfig = {};
       });
     }
 
-    init();
+    try {
+      init();
+    } finally {
+      const back = ELS.back;
+      if (window.SenrenTheme?.revealCard) window.SenrenTheme.revealCard(back);
+      else back?.removeAttribute("data-senren-layout-pending");
+    }
     initDeferred();
   })();

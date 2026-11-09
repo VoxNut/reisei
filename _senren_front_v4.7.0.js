@@ -818,7 +818,13 @@ var senrenConfig = {};
             });
         }
 
-        init();
+        try {
+            init();
+        } finally {
+            const front = ELS.front;
+            if (window.SenrenTheme?.revealCard) window.SenrenTheme.revealCard(front);
+            else front?.removeAttribute("data-senren-layout-pending");
+        }
         initDeferred();
     })();
 

@@ -1,8 +1,9 @@
+<style>html.android .front[data-senren-layout-pending] { opacity: 0; }</style>
 <link rel="stylesheet" href="_senren_fonts_v4.7.0.css">
-<script src="_senren_theme_v4.7.0.js?v=20261109.2"></script>
+<script src="_senren_theme_v4.7.0.js?v=20261109.3"></script>
 <!-- FRONT -->
 <div id="senren-metadata" data-deck="{{Deck}}" data-audio-card="{{#audioCard}}true{{/audioCard}}{{^audioCard}}false{{/audioCard}}"></div>
-<div class="front">
+<div class="front" data-senren-layout-pending>
     <!-- HEADER -->
     <div class="header">
         <span
@@ -111,4 +112,5 @@
 <div id="hiddenReading" style="display: none !important">{{reading}}</div>
 
 
-<script src="_senren_front_v4.7.0.js?v=20261109.2"></script>
+<script src="_senren_front_v4.7.0.js?v=20261109.3"
+    onerror="document.querySelector('.front')?.removeAttribute('data-senren-layout-pending')"></script>

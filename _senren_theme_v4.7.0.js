@@ -258,6 +258,21 @@
     });
   }
 
+  function revealCard(card) {
+    if (!card?.hasAttribute("data-senren-layout-pending")) return;
+    const reveal = () => card.removeAttribute("data-senren-layout-pending");
+    if (!document.documentElement.classList.contains("android") || !document.fonts) {
+      reveal();
+      return;
+    }
+    // Resolve the fonts used by the initialized layout before its first visible frame.
+    requestAnimationFrame(() => {
+      if (!card.isConnected) return;
+      card.getBoundingClientRect();
+      document.fonts.ready.then(reveal, reveal);
+    });
+  }
+
   const api = Object.freeze({
     modes,
     themeScopedVariables,
@@ -267,6 +282,7 @@
     apply,
     cycle,
     syncControls,
+    revealCard,
     isThemeScopedVariable: (variable) =>
       themeScopedVariables.includes(variable),
   });
