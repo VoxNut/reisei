@@ -3922,6 +3922,39 @@ span[style*="color-mix(in srgb, lime"] {
   outline: none;
 }
 
+/* Size Sanseido pitch SVGs before the imported dictionary stylesheet loads. */
+:is(#glossary, #definition) [data-dictionary^="三省堂国語辞典"]
+  :is([data-sc-name="平板"], [data-sc-name="アクセント"]) a[href$=".svg" i] {
+  display: inline-block;
+  line-height: 1;
+
+  & > span:has(> img) {
+    display: inline-block;
+    position: relative;
+    width: 0.5em;
+    height: 1em;
+    vertical-align: top;
+    line-height: 0;
+  }
+
+  & > span > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  & > span + span {
+    display: none;
+  }
+}
+
+:is(#glossary, #definition) [data-dictionary^="三省堂国語辞典"]
+  [data-sc-name="平板"] a[href$=".svg" i] > span:has(> img) {
+  width: 0.7em;
+}
+
 #glossary.yomitan-glossary .example {
   margin-left: 1.5em;
   font-size: 0.9em;
