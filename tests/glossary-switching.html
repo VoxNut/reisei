@@ -139,6 +139,26 @@
           showCard('B','','',entry('B extended','Another edition'));assertActive('B','exact dictionary match preferred');
           localStorage.setItem('lastDictionaryName','Missing previous dictionary');
           showCard(preferredName);assertActive(preferredName,'missing remembered dictionary does not override preference');
+          const orderedNames=[preferredName,"新明解国語辞典　第八版","広辞苑 第七版","大辞林　第四版","デジタル大辞泉","実用日本語表現辞典v2","Pixiv Light [2026-10-03]","使い方の分かる 類語例解辞典","Jitendex.org [2026-10-03]","新和英大辞典 第5版","daijirin4-gpt-6-luna en-jp"];
+          for(const definitionName of ["Jitendex.org [2026-03-05]",orderedNames[8]]){
+            fixture.innerHTML=`<div id="dictionaryPreference" hidden>${preferredName}</div><div id="definition"><div class="dictionary-counter"></div><div class="toggle-area left"></div><div class="toggle-area right"></div><div class="definition-box"><ol>${entry(definitionName,"Definition copy")}</ol></div></div><div id="glossary" class="yomitan-glossary"><div class="dictionary-counter"></div><div class="toggle-area left"></div><div class="toggle-area right"></div><div class="glossary-box"><span><ol>${orderedNames.map(name=>entry(name,"Glossary content")).join("")}</ol></span></div></div>`;
+            const definition=fixture.querySelector('#definition'),glossary=fixture.querySelector('#glossary');
+            buildToggle({definition,glossary},()=>{},document.createElement('div'))();
+            let index=0;
+            for(const direction of ['left','right']){
+              for(let step=0;step<orderedNames.length+1;step++){
+                const active=fixture.querySelector('#definition.show,#glossary.show');
+                const dictionary=[...active.querySelectorAll('li[data-dictionary]')].find(li=>getComputedStyle(li).display!=='none')?.dataset.dictionary;
+                if(dictionary!==orderedNames[index])throw Error(`${theme}, 概要 ${definitionName}: expected index ${index+1} ${orderedNames[index]}, got ${dictionary}`);
+                if(active.querySelector('.dictionary-counter').textContent!==`${index+1} / 11`)throw Error(`${theme}, 概要: dictionary indices changed`);
+                if(definitionName!==orderedNames[8]&&active===definition)throw Error(`${theme}, 概要: obsolete Definition inserted into glossary cycle`);
+                checks++;
+                if(step%2)active.querySelector(`.toggle-area.${direction}`).click();
+                else document.dispatchEvent(new KeyboardEvent('keydown',{key:direction==='left'?'j':'k',bubbles:true}));
+                index=(index+(direction==='left'?-1:1)+orderedNames.length)%orderedNames.length;
+              }
+            }
+          }
         }
       } finally {
         for (const [key, value] of saved) {

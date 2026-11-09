@@ -268,21 +268,26 @@ var senrenConfig = {};
       }
     }
 
-    const visibleGlossaryItems = allGlossaryListItems.filter((li) => {
+    const availableGlossaryItems = allGlossaryListItems.filter((li) => {
       if (!hasDictionaryContent(li)) return false;
       const parentDiv = li.closest("div");
       if (parentDiv && parentDiv.classList.contains("ignore")) {
         return false;
       }
 
-      if (hasDefinition && definitionDictName) {
-        const glossaryDictName = getDictionaryName(li);
-        if (glossaryDictName && glossaryDictName === definitionDictName) {
-          return false;
-        }
-      }
       return true;
     });
+    const dictionaryFamily = (name) => name.replace(/\s*\[\d{4}-\d{2}-\d{2}\]\s*$/, "");
+    const matchingDefinition = definitionDictName ? availableGlossaryItems.find((li) =>
+      getDictionaryName(li) === definitionDictName) || availableGlossaryItems.find((li) => {
+        const name = getDictionaryName(li);
+        return name && dictionaryFamily(name) === dictionaryFamily(definitionDictName);
+      }) : null;
+    // Use the glossary's dated entry instead of adding a second Definition version.
+    const useDefinition = hasDefinition && (!matchingDefinition ||
+      getDictionaryName(matchingDefinition) === definitionDictName);
+    const visibleGlossaryItems = availableGlossaryItems.filter((li) =>
+      !useDefinition || !definitionDictName || getDictionaryName(li) !== definitionDictName);
 
     const currentVisibleItems = [];
     if (hasSelectionText)
@@ -291,19 +296,26 @@ var senrenConfig = {};
         element: selectionText,
         container: selectionText,
       });
-    if (hasDefinition) {
+    let definitionItem = null;
+    if (useDefinition) {
       const defLi = definition.querySelector(
         ".definition-box li[data-dictionary]",
       );
-      currentVisibleItems.push({
+      definitionItem = {
         type: "definition",
         element: defLi || definition,
         container: definition,
-      });
+      };
+      if (!matchingDefinition) currentVisibleItems.push(definitionItem);
     }
 
-    if (visibleGlossaryItems.length > 0) {
-      visibleGlossaryItems.forEach((li) => {
+    if (availableGlossaryItems.length > 0) {
+      availableGlossaryItems.forEach((li) => {
+        // A Definition duplicate occupies its dictionary's original glossary slot.
+        if (!visibleGlossaryItems.includes(li)) {
+          if (!currentVisibleItems.includes(definitionItem)) currentVisibleItems.push(definitionItem);
+          return;
+        }
         currentVisibleItems.push({
           type: "glossary",
           element: li,
@@ -476,7 +488,7 @@ var senrenConfig = {};
         }
 
         // Priority 4: Definition
-        if (!initialStateSet && hasDefinition) {
+        if (!initialStateSet && useDefinition) {
           initialIndex = currentVisibleItems.findIndex(
             (item) => item.type === "definition",
           );
