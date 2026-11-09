@@ -94,27 +94,7 @@
     assert(window.senrenCardController.signal.aborted===false,'Card lifecycle failed to restart');
     fixture.id='qa';run(theme);const outgoing=window.senrenCardController.signal;fixture.innerHTML='Another note type';
     await new Promise(r=>setTimeout(r,10));assert(outgoing.aborted,'Leaving Senren did not clean up the outgoing card');fixture.id='fixture';
-    const card=document.createElement('div');
-    card.setAttribute('data-senren-layout-pending','');
-    fixture.append(card);
-    window.SenrenTheme.revealCard(card);
-    assert(!card.hasAttribute('data-senren-layout-pending'),'Desktop waited for Android layout');
-    document.documentElement.classList.add('android');
-    let finishFonts;
-    const ready=new Promise(resolve=>{finishFonts=resolve;});
-    Object.defineProperty(document,'fonts',{configurable:true,value:{ready}});
-    try {
-      card.setAttribute('data-senren-layout-pending','');
-      window.SenrenTheme.revealCard(card);
-      await new Promise(resolve=>requestAnimationFrame(resolve));
-      assert(card.hasAttribute('data-senren-layout-pending'),'Android revealed before its fonts were ready');
-      finishFonts();
-      await wait(()=>!card.hasAttribute('data-senren-layout-pending'));
-    } finally {
-      delete document.fonts;
-      document.documentElement.classList.remove('android');
-    }
-    result.textContent=`PASS: ${checks} review runtime checks`;
+    result.textContent=`PASS: ${checks} lazy-loading, cancellation, controls, cleanup and height checks`;
   }catch(error){result.textContent='FAIL: '+error.stack;}
 })();
 </script>
