@@ -1,0 +1,68 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Misc Info visibility with scene switching</title>
+<link rel="stylesheet" href="../style.css">
+<body class="card nightMode">
+<output id="result">Running…</output>
+<div id="fixture"></div>
+<script>
+(async () => {
+  try {
+    const source = await fetch('../_senren_back_v4.7.0.js').then(r => r.text());
+    const configStart = source.indexOf('    window.senrenUpdateConfig = function');
+    const configEnd = source.indexOf('    // Initial load', configStart);
+    const sceneStart = source.indexOf('  function enableSceneSwitching() {');
+    const sceneEnd = source.indexOf('  // Toggle Image', sceneStart);
+    if ([configStart, configEnd, sceneStart, sceneEnd].includes(-1)) throw Error('Cannot locate card configuration or scenes');
+    const config = {};
+    new Function('senrenConfig', source.slice(configStart, configEnd))(config);
+    const buildScenes = new Function('ELS', 'senrenConfig', source.slice(sceneStart, sceneEnd) + ';return enableSceneSwitching;');
+    let checks = 0;
+    const assert = (ok, message) => { if (!ok) throw Error(message); checks++; };
+    const root = document.documentElement;
+    for (const theme of ['nord', 'focus']) {
+      root.dataset.senrenTheme = theme;
+      root.classList.toggle('custom-dark-mode', theme === 'focus');
+      for (const [name, content, shown] of [
+        ['墓, plain footer', '墓 – Vocabulary details – jpdb', [true, false, false]],
+        ['grouped footer', '<span class="group1">First source</span><span class="group2">Second source</span>', [true, true, false]],
+        ['second scene only', '<span class="group2">Second source</span>', [false, true, false]],
+        ['empty footer', '', [false, false, false]],
+      ]) {
+        fixture.innerHTML = `<div class="back"><div class="sentenceaudio"><button>Audio 1</button><button>Audio 2</button><button>Audio 3</button></div><div class="misc-info${content ? ' has-content' : ''}">${content}</div></div>`;
+        root.style.setProperty('--misc-info-visibility', '0');
+        root.style.setProperty('--misc-info-default-expanded', 'true');
+        window.senrenUpdateConfig();
+        const info = ELS.miscInfo;
+        buildScenes(ELS, config)();
+        const right = fixture.querySelector('.sentence-nav.right');
+        const assertVisible = (expected, label) => assert((getComputedStyle(info).display !== 'none') === expected, `${theme}, ${name}, ${label}: incorrect footer visibility`);
+        assertVisible(false, 'initially disabled');
+        for (let scene = 0; scene < 3; scene++) {
+          // Settings use this same configuration refresh for their live preview.
+          root.style.setProperty('--misc-info-visibility', '1');
+          window.senrenUpdateConfig(true);
+          assertVisible(shown[scene], `enabled on scene ${scene + 1}`);
+          root.style.setProperty('--misc-info-visibility', '0');
+          window.senrenUpdateConfig(true);
+          assertVisible(false, `disabled on scene ${scene + 1}`);
+          right.click();
+          assertVisible(false, 'navigation while disabled');
+          window.senrenRefreshScenes();
+          assertVisible(false, 'scene refresh while disabled');
+        }
+        root.style.setProperty('--misc-info-visibility', '1');
+        window.senrenUpdateConfig(true);
+        assertVisible(shown[0], 'returned to first scene');
+        right.click();
+        assertVisible(shown[1], 'navigation while enabled');
+        if (name === 'grouped footer') assert(info.innerText.includes('Second source') && !info.innerText.includes('First source'), 'Scene navigation exposed the wrong source');
+      }
+    }
+    result.textContent = `PASS: ${checks} footer visibility, live setting and scene navigation checks`;
+  } catch (error) {
+    result.textContent = 'FAIL: ' + error.stack;
+  }
+})();
+</script>

@@ -4934,7 +4934,8 @@ li[data-dictionary="漢検漢字辞典　第二版"]
   }
 }
 
-.misc-info.senren-misc-info-hidden {
+.misc-info.senren-misc-info-hidden,
+.misc-info.senren-misc-info-scene-hidden {
   display: none !important;
 }
 

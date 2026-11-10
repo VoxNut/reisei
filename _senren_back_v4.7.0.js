@@ -3663,19 +3663,16 @@ var senrenConfig = {};
         });
 
         if (mainMiscContainer) {
-          const displayValue = isAnyChildVisible ? "flex" : "none";
-          mainMiscContainer.style.setProperty(
-            "display",
-            displayValue,
-            "important",
+          mainMiscContainer.classList.toggle(
+            "senren-misc-info-scene-hidden",
+            !isAnyChildVisible,
           );
         }
       } else if (mainMiscContainer) {
-        if (currentIndex === 0) {
-          mainMiscContainer.style.setProperty("display", "flex", "important");
-        } else {
-          mainMiscContainer.style.setProperty("display", "none", "important");
-        }
+        mainMiscContainer.classList.toggle(
+          "senren-misc-info-scene-hidden",
+          currentIndex !== 0,
+        );
       }
 
       const mainEngContainer = ELS.sentenceEng;
