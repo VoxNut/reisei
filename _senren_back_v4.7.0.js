@@ -228,6 +228,8 @@ var senrenConfig = {};
           styles.length = 0;
         };
         entries.forEach((entry) => {
+          // Keep inactive dictionaries hidden before their shells enter the card.
+          entry.style.display = "none";
           const copy = entry.cloneNode(true);
           copy.querySelectorAll("style, script, .dictionary-title").forEach((node) => node.remove());
           entry._senrenHasContent = Boolean(copy.textContent.replace(/[\s\u200b\ufeff]/g, "") ||
@@ -238,6 +240,7 @@ var senrenConfig = {};
           entry._senrenMount = () => {
             loadStyles();
             payload.replaceWith(payload.content);
+            entry.style.display = "block";
             entry._senrenMount = null;
           };
         });
@@ -3988,6 +3991,10 @@ var senrenConfig = {};
     // Initializes immediate functions
     function init() {
       darkMode();
+      prepareDictionarySources();
+      dictionaryTitle();
+      consolidateYomitanGlossaryEntries();
+      toggleDefinition();
       nsfw();
       muteSentence();
       splitTags();
@@ -3995,11 +4002,7 @@ var senrenConfig = {};
       renderBackReading();
       dynamicWordSize();
       alternativePitchStyle();
-      prepareDictionarySources();
-      dictionaryTitle();
       prefilterTinyImages();
-      consolidateYomitanGlossaryEntries();
-      toggleDefinition();
       enableInteractions();
       enableSceneSwitching();
       enableImageToggle();

@@ -23,12 +23,34 @@
     api.prepareDictionarySources();
     await new Promise(r=>setTimeout(r,40));
     assert(failedA===0&&failedB===0,'Inert dictionary preparation fetched images');
+    assert([...glossary.querySelectorAll('li[data-dictionary]')].every(li=>getComputedStyle(li).display==='none'),'A dictionary shell is visible before initial selection');
     api.toggleDefinition();await wait(()=>failedA===1);
     assert(failedB===0&&!glossary.querySelector('li[data-dictionary="B"] img'),'Inactive dictionary image fetched or mounted');
     assert(glossary.querySelectorAll('style').length===1,'Active dictionary styles not mounted');
     glossary.querySelector('.toggle-area.right').click();await wait(()=>failedB===1);
     assert(glossary.querySelector('li[data-dictionary="B"]').innerText.includes('Second'),'Dictionary switch lost content');
     assert(glossary.querySelectorAll('style').length===1,'Shared stylesheet duplicated');
+    // A reused reviewer must never reveal the remembered/default dictionary first.
+    for (const preferred of ['B','A','B']) {
+      localStorage.setItem('lastSelectedDictionary','glossary');
+      localStorage.setItem('lastDictionaryName',preferred==='A'?'B':'A');
+      fixture.innerHTML=`<div class="back"><div id="dictionaryPreference" hidden>${preferred}</div><div id="definition"><div class="definition-box"><span><template class="senren-dictionary-source"><ol><li data-dictionary="A">Definition A</li></ol></template></span></div></div><div id="glossary" class="show"><div class="dictionary-counter"></div><div class="toggle-area right"></div><div class="glossary-box"><span><template class="senren-dictionary-source"><ol><li data-dictionary="A">Glossary A</li><li data-dictionary="B">Glossary B</li></ol></template></span></div></div></div>`;
+      const els={definition:fixture.querySelector('#definition'),glossary:fixture.querySelector('#glossary')};
+      const initial=new Function('ELS','collapseDictionary','lightbox','collectGlossaryImages',back.slice(cstart,cend)+back.slice(start,end)+';return {prepareDictionarySources,toggleDefinition};')(els,()=>{},document.createElement('div'),()=>{});
+      initial.prepareDictionarySources();
+      await new Promise(requestAnimationFrame);
+      assert([...fixture.querySelectorAll('li[data-dictionary]')].every(li=>getComputedStyle(li).display==='none'),'New card flashed a dictionary before applying its preference');
+      initial.toggleDefinition();
+      await new Promise(requestAnimationFrame);
+      const visible=[...fixture.querySelectorAll('#definition.show li[data-dictionary],#glossary.show li[data-dictionary]')].filter(li=>getComputedStyle(li).display!=='none');
+      assert(visible.length===1&&visible[0].dataset.dictionary===preferred,'First revealed dictionary is not the card preference');
+      assert(visible[0].textContent.includes(preferred==='A'?'Definition A':'Glossary B'),'Preferred lazy entry was not mounted');
+      const inactive=fixture.querySelector(`template.senren-dictionary-source, li[data-dictionary="${preferred==='A'?'B':'A'}"] template`);
+      assert(Boolean(inactive),'Inactive dictionary mounted before selection');
+    }
+    const initStart=back.indexOf('    function init() {'),initEnd=back.indexOf('    window.senrenLoadSettingsMenu',initStart);
+    const init=back.slice(initStart,initEnd);
+    assert(init.indexOf('toggleDefinition();')<init.indexOf('renderBackReading();'),'Dictionary selection waits for reading rendering');
     run(theme);
     const rstart=back.indexOf('  var senrenPitchClassNames ='),rend=back.indexOf('  // Highlight the target word',rstart);
     const regexStart=back.indexOf('window.REGEX = {'),regexEnd=back.indexOf('      // NSFW Cache',regexStart);
