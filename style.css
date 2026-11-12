@@ -3922,16 +3922,27 @@ span[style*="color-mix(in srgb, lime"] {
   outline: none;
 }
 
-/* Size Sanseido pitch SVGs before the imported dictionary stylesheet loads. */
+/* Yomitan can export invalid dimensions and supply the real size in imported CSS. */
+:is(#glossary, #definition) a > span > img[width="NaN"][height="NaN"] {
+  width: auto;
+  height: 1em;
+}
+
+/* Reserve space for Sanseido's inline symbols before its stylesheet loads. */
 :is(#glossary, #definition) [data-dictionary^="三省堂国語辞典"]
-  :is([data-sc-name="平板"], [data-sc-name="アクセント"]) a[href$=".svg" i] {
+  :is(
+    [data-sc-name="平板"],
+    [data-sc-name="アクセント"],
+    [data-sc-name="仮名書き可"] [data-sc-name="red"],
+    [data-sc-name="表記解説M"]
+  ) a[href$=".svg" i] {
   display: inline-block;
   line-height: 1;
 
   & > span:has(> img) {
     display: inline-block;
     position: relative;
-    width: 0.5em;
+    width: var(--senren-inline-symbol-width, 0.5em);
     height: 1em;
     vertical-align: top;
     line-height: 0;
@@ -3951,8 +3962,18 @@ span[style*="color-mix(in srgb, lime"] {
 }
 
 :is(#glossary, #definition) [data-dictionary^="三省堂国語辞典"]
-  [data-sc-name="平板"] a[href$=".svg" i] > span:has(> img) {
-  width: 0.7em;
+  [data-sc-name="平板"] {
+  --senren-inline-symbol-width: 0.7em;
+}
+
+:is(#glossary, #definition) [data-dictionary^="三省堂国語辞典"]
+  [data-sc-name="仮名書き可"] [data-sc-name="red"] {
+  --senren-inline-symbol-width: 1em;
+}
+
+:is(#glossary, #definition) [data-dictionary^="三省堂国語辞典"]
+  [data-sc-name="表記解説M"] {
+  --senren-inline-symbol-width: 2em;
 }
 
 #glossary.yomitan-glossary .example {
