@@ -8908,7 +8908,7 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
 }
 
 .ipad :is(#sentence, #sentence-audio) {
-  font-size: var(--sentence-size) !important;
+  font-size: calc(var(--sentence-size) * 1.5) !important;
 }
 
 .ipad :is(#sentence, #sentence-audio) :is(span, b, strong, ruby, rb) {

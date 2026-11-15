@@ -24,15 +24,20 @@
               <ruby>圧倒<rt style="font-size:.8rem">あっとう</rt></ruby>されて声も出ないようだ。
             </span></div>
           </div>
-          <div id="glossary" class="card-b show">Glossary</div>
+          <div id="glossary" class="card-b show"><div class="glossary-box">
+            <ol><li data-dictionary="三省堂国語辞典　第八版"><span data-sc-name="語釈" style="font-size:1.8rem">くらべるものがないほどの力を見せつけること。</span></li></ol>
+          </div></div>
         </div>`;
         root.style.fontSize = "125%";
-        const fields = [side === "back" ? ".ruby-base-word" : "#word", "#sentence > span", "#sentence rt", "#glossary"];
+        const fields = [side === "back" ? ".ruby-base-word" : "#word", "#sentence > span", "#sentence rt", "[data-sc-name='語釈']"];
         const initial = fields.map(size);
         assert(initial[0] > initial[1] && initial[1] > initial[3], "Reviewer inline sizes flattened the text");
         assert(initial[2] === initial[1] / 2, "Furigana lost its ratio to sentence text");
         const card = qa.firstElementChild;
         const width = card.offsetWidth;
+        root.style.fontSize = "137.5%";
+        assert(size(fields[1]) > size(fields[3]), "Sentence is smaller than dictionary text at 2.2×");
+        assert(Math.abs(size(fields[1]) / initial[1] - 1.1) < 0.002, "Sentence did not scale at 2.2×");
         root.style.fontSize = "162.5%";
         fields.forEach((field, i) => {
           assert(Math.abs(size(field) / initial[i] - 1.3) < 0.002, field + " scaled unevenly");
