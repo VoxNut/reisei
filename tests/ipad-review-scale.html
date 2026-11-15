@@ -1,0 +1,52 @@
+<!doctype html>
+<html class="ipad mobile">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iPad reviewer text scale</title>
+<link rel="stylesheet" href="../style.css">
+<body class="card nightMode">
+<output id="result">Running…</output>
+<div id="qa"></div>
+<script>
+  window.addEventListener("load", () => {
+    try {
+      const root = document.documentElement;
+      const qa = document.getElementById("qa");
+      const size = selector => parseFloat(getComputedStyle(qa.querySelector(selector)).fontSize);
+      const assert = (ok, message) => { if (!ok) throw Error(message); };
+      for (const side of ["front", "back"]) {
+        const word = side === "front" ? "圧倒" :
+          '<span style="font-size:.8rem"><span class="word-reading-stack" style="font-size:.8rem"><span class="ruby-base-word" style="font-size:.8rem">圧倒</span></span></span>';
+        qa.innerHTML = `<div class="${side}">
+          <div id="word" style="font-size:.8rem">${word}</div>
+          <div id="sentence-wrapper" class="expanded" style="max-height:1px">
+            <div id="sentence" style="font-size:.8rem"><span style="font-size:.8rem">
+              <ruby>圧倒<rt style="font-size:.8rem">あっとう</rt></ruby>されて声も出ないようだ。
+            </span></div>
+          </div>
+          <div id="glossary" class="card-b show">Glossary</div>
+        </div>`;
+        root.style.fontSize = "125%";
+        const fields = [side === "back" ? ".ruby-base-word" : "#word", "#sentence > span", "#sentence rt", "#glossary"];
+        const initial = fields.map(size);
+        assert(initial[0] > initial[1] && initial[1] > initial[3], "Reviewer inline sizes flattened the text");
+        assert(initial[2] === initial[1] / 2, "Furigana lost its ratio to sentence text");
+        const card = qa.firstElementChild;
+        const width = card.offsetWidth;
+        root.style.fontSize = "162.5%";
+        fields.forEach((field, i) => {
+          assert(Math.abs(size(field) / initial[i] - 1.3) < 0.002, field + " scaled unevenly");
+        });
+        assert(card.offsetWidth === width, "Text scale changed the card width");
+        qa.style.width = "55%";
+        assert(card.offsetWidth === width, "Stale inline reviewer width narrowed the card");
+        const prompt = qa.querySelector("#sentence-wrapper");
+        assert(prompt.clientHeight === prompt.scrollHeight, "Expanded sentence was clipped");
+        qa.style.removeProperty("width");
+      }
+      result.textContent = "PASS: iPad word, sentence, furigana, glossary and width checks";
+    } catch (error) {
+      result.textContent = "FAIL: " + error.message;
+    }
+  });
+</script>

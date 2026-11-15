@@ -1151,11 +1151,12 @@ html[data-senren-theme="focus"] body {
 }
 
 #word {
+  --senren-word-size: var(--word-size-base);
   position: relative;
   min-width: 0;
   max-width: 100%;
   font-family: var(--serif);
-  font-size: var(--word-size-base);
+  font-size: var(--senren-word-size);
   text-align: center;
 }
 
@@ -1168,22 +1169,22 @@ html[data-senren-theme="focus"] body {
 }
 
 #word.length-4 {
-  font-size: var(--word-size-4);
+  --senren-word-size: var(--word-size-4);
 }
 #word.length-5 {
-  font-size: var(--word-size-5);
+  --senren-word-size: var(--word-size-5);
 }
 #word.length-6 {
-  font-size: var(--word-size-6);
+  --senren-word-size: var(--word-size-6);
 }
 #word.length-7 {
-  font-size: var(--word-size-7);
+  --senren-word-size: var(--word-size-7);
 }
 #word.length-8 {
-  font-size: var(--word-size-8);
+  --senren-word-size: var(--word-size-8);
 }
 #word.length-9 {
-  font-size: var(--word-size-9);
+  --senren-word-size: var(--word-size-9);
 }
 
 #word .word-reading-stack {
@@ -8887,6 +8888,57 @@ html[data-senren-theme="nord"] :is(.definition-box, .glossary-box)
 
   .picture-container img {
     max-height: min(var(--picture-height), 24vh);
+  }
+}
+
+/* AnkiMobile on iPad scales rem and can write font sizes inline. */
+.ipad #word {
+  font-size: var(--senren-word-size) !important;
+}
+
+.ipad #word > span,
+.ipad #word :is(.word-reading-stack, .ruby-base-word, .ruby-base-word span) {
+  font-size: inherit !important;
+}
+
+.ipad #word,
+.ipad #word .ruby-base-word {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.ipad :is(#sentence, #sentence-audio) {
+  font-size: var(--sentence-size) !important;
+}
+
+.ipad :is(#sentence, #sentence-audio) :is(span, b, strong, ruby, rb) {
+  font-size: inherit !important;
+}
+
+.ipad #sentence rt {
+  font-size: 50% !important;
+}
+
+/* Expanded prompts must reflow when the reviewer text size changes. */
+.ipad :is(#word-wrapper, #sentence-wrapper, #sentence-wrapper-audio).expanded {
+  max-height: none !important;
+}
+
+/* Use the review container's available width across text scale and layout changes. */
+.ipad #qa {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.ipad :is(.front, .back) {
+  width: calc(100% - 24px) !important;
+  max-width: var(--card-max-width);
+  box-sizing: border-box;
+}
+
+@media (orientation: portrait) {
+  .ipad .back {
+    max-width: min(760px, var(--card-max-width));
   }
 }
 
