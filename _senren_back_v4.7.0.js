@@ -256,14 +256,52 @@ var senrenConfig = {};
     });
   }
 
+  function prepareDictionaryImages(element) {
+    if (element._senrenImagesReady) return element._senrenImagesReady;
+    const images = Array.from(element.querySelectorAll("img[src], img[srcset]"));
+    if (!images.length) return Promise.resolve();
+
+    const opacity = element.style.opacity;
+    element.style.opacity = "0";
+    const signal = window.senrenCardController?.signal;
+    const ready = new Promise((resolve) => {
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timeout);
+        signal?.removeEventListener("abort", finish);
+        element.style.opacity = opacity;
+        resolve();
+      };
+      // A missing or stalled image must not hold the answer indefinitely.
+      const timeout = setTimeout(finish, 1500);
+      signal?.addEventListener("abort", finish, {once: true});
+      Promise.all(images.map((img) => {
+        img.loading = "eager";
+        return img.decode().catch(() => {});
+      })).then(finish);
+      if (signal?.aborted) finish();
+    });
+    element._senrenImagesReady = ready;
+    return ready;
+  }
+
   function activateDictionary(item) {
     const mounting = Boolean(item.element._senrenMount);
     item.element._senrenMount?.();
+    const ready = prepareDictionaryImages(item.element);
+    ready.then(() => {
+      if (item.container.isConnected && item.container.classList.contains("show")) {
+        collapseDictionary(item.container.querySelector(".definition-box, .glossary-box"));
+      }
+    });
     window.senrenInitDictionaryHover?.(item.element);
     if (mounting && ELS.pictureContainer) {
       delete ELS.pictureContainer.dataset.senrenGlossaryCollectionDone;
       collectGlossaryImages(true);
     }
+    return ready;
   }
 
   function toggleDefinition() {
@@ -579,7 +617,11 @@ var senrenConfig = {};
       if (initialIndex !== -1) {
         const initialItem = currentVisibleItems[initialIndex];
         if (initialItem.container) {
-          activateDictionary(initialItem);
+          const imagesReady = activateDictionary(initialItem);
+          // Desktop Anki waits for update hooks before revealing the answer.
+          if (Array.isArray(window.onUpdateHook)) {
+            window.onUpdateHook.push(() => imagesReady);
+          }
           initialItem.container.classList.add("show");
           // For collapsed dictionary entries 1
           collapseDictionary(

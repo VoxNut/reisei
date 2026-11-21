@@ -1,0 +1,63 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Glossary image reveal regression</title>
+<output id="result">Running…</output>
+<div id="fixture"></div>
+<script>
+(async () => {
+  const originalDecode = HTMLImageElement.prototype.decode;
+  try {
+    const source = await fetch("../_senren_back_v4.7.0.js").then(r => r.text());
+    const start = source.indexOf("  function prepareDictionarySources() {");
+    const end = source.indexOf("  function enableInteractions() {", start);
+    const build = new Function("ELS", "collapseDictionary", "lightbox", "collectGlossaryImages", "consolidateYomitanGlossaryEntries",
+      source.slice(start, end) + "; return {prepareDictionarySources, toggleDefinition, prepareDictionaryImages};");
+    const tick = () => new Promise(requestAnimationFrame);
+    const image = '<img loading="lazy" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22/%3E">';
+    const assert = (ok, message) => { if (!ok) throw Error(message); };
+    let decoded, requests;
+    HTMLImageElement.prototype.decode = function () {
+      requests.push(this);
+      return new Promise(resolve => { decoded = resolve; });
+    };
+    window.senrenCardController = new AbortController();
+    window.onUpdateHook = [];
+    fixture.innerHTML = '<div id="dictionaryPreference" hidden>A</div><div id="glossary"><div class="dictionary-counter"></div><div class="toggle-area right"></div><div class="glossary-box"><template class="senren-dictionary-source"><ol><li data-dictionary="A">Text A' + image + '</li><li data-dictionary="B">Text B' + image + '</li></ol></template></div></div>';
+    const glossary = fixture.querySelector("#glossary");
+    requests = [];
+    const api = build({glossary}, () => {}, document.createElement("div"), () => {}, () => {});
+    api.prepareDictionarySources();
+    api.toggleDefinition();
+    const first = glossary.querySelector('[data-dictionary="A"]');
+    assert(first.style.opacity === "0", "Text appeared before the image decoded");
+    assert(requests.length === 1 && requests[0].loading === "eager", "Inactive image loaded, or active image remained lazy");
+    let revealed = false;
+    const hook = onUpdateHook[0]().then(() => { revealed = true; });
+    await tick();
+    assert(!revealed, "Desktop answer reveal did not wait for the image");
+    decoded();
+    await hook;
+    assert(first.style.opacity === "", "Decoded entry stayed hidden");
+    glossary.querySelector(".toggle-area.right").click();
+    const second = glossary.querySelector('[data-dictionary="B"]');
+    assert(second.style.opacity === "0" && requests.length === 2, "Dictionary switching skipped image readiness");
+    senrenCardController.abort();
+    await second._senrenImagesReady;
+    assert(second.style.opacity === "", "Leaving a card stranded pending image work");
+    decoded();
+    await tick();
+    HTMLImageElement.prototype.decode = () => Promise.reject(new Error("Missing image"));
+    await api.prepareDictionaryImages(Object.assign(document.createElement("div"), {innerHTML: image}));
+    HTMLImageElement.prototype.decode = () => new Promise(() => {});
+    window.senrenCardController = new AbortController();
+    const stalled = Object.assign(document.createElement("div"), {innerHTML: image});
+    await api.prepareDictionaryImages(stalled);
+    assert(stalled.style.opacity === "", "Stalled image blocked the glossary indefinitely");
+    result.textContent = "PASS: decoded image reveal, reviewer hook, switching, cancellation, missing and stalled images";
+  } catch (error) {
+    result.textContent = "FAIL: " + error.stack;
+  } finally {
+    HTMLImageElement.prototype.decode = originalDecode;
+  }
+})();
+</script>
