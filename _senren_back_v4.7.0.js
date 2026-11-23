@@ -318,6 +318,11 @@ var senrenConfig = {};
         Boolean(content.querySelector("img[src], svg, audio[src], video[src]"));
     }
 
+    const glossaryBox = glossary?.querySelector(".glossary-box");
+    if (!allGlossaryListItems.length && hasDictionaryContent(glossaryBox)) {
+      allGlossaryListItems.push(glossaryBox);
+    }
+
     const hasSelectionText = hasDictionaryContent(selectionText);
     const hasDefinition = hasDictionaryContent(definition);
     let definitionDictName = null;

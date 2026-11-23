@@ -109,6 +109,42 @@
               index=(index+(right?1:-1)+test.order.length)%test.order.length;
             }
           }
+          const mnemonic = 'Here we have a unique enclosure made up of two elements:<br>compass and reclining. Think of the banner as a standard for<br>rallying around; then imagine a crowd reclining before a com-<br>pass (presumably to give them a "direction" in life). [6]';
+          for (const html of [mnemonic, '<p>A <b>formatted</b> mnemonic.</p><ul><li>First idea</li><li>Second idea</li></ul>', '<img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E">', emptyExport]) {
+            for (const lazy of [false, true]) {
+              for (const mixed of [false, true]) {
+                const panel = (id, box, content) => `<div id="${id}"><div class="dictionary-counter"></div><div class="toggle-area right"></div><div class="${box}"><span>${content}</span></div></div>`;
+                const source = lazy ? `<template class="senren-dictionary-source">${html}</template>` : html;
+                fixture.innerHTML = panel("definition", "definition-box", mixed ? "Other definition" : "") + panel("glossary", "glossary-box", source);
+                const els = {definition:fixture.querySelector("#definition"), glossary:fixture.querySelector("#glossary")};
+                localStorage.setItem("lastSelectedDictionary", "glossary");
+                localStorage.setItem("lastDictionaryName", "Dictionary from previous card");
+                const toggle = buildToggle(els, () => {}, document.createElement("div"), () => {}, buildConsolidate(els));
+                toggle(); toggle();
+                const empty = html === emptyExport;
+                const order = mixed ? empty ? ["definition"] : ["glossary", "definition"] : empty ? [] : ["glossary"];
+                if (!order.length) {
+                  if (fixture.querySelector("#glossary.show")) throw Error("Stylesheet-only glossary became visible");
+                  checks++;
+                  continue;
+                }
+                for (let step = 0; step < order.length * 2; step++) {
+                  const active = fixture.querySelector("#definition.show,#glossary.show");
+                  const expected = order[step % order.length];
+                  if (active?.id !== expected || getComputedStyle(active).display === "none") throw Error(`${theme}: plain glossary expected ${expected}`);
+                  if (expected === "glossary") {
+                    const box = active.querySelector(".glossary-box");
+                    if (getComputedStyle(box).display === "none" || (html === mnemonic && !box.innerText.includes("direction"))) throw Error("Kanji mnemonic stayed hidden");
+                    if (box.querySelectorAll("br").length !== (html === mnemonic ? 3 : 0)) throw Error("Plain glossary formatting changed");
+                  }
+                  const index = mixed && !empty && expected === "glossary" ? 2 : 1;
+                  if (active.querySelector(".dictionary-counter").textContent !== `${index} / ${order.length}`) throw Error("Plain glossary counter is incorrect");
+                  checks++;
+                  active.querySelector(".toggle-area.right").click();
+                }
+              }
+            }
+          }
           const preferredName="三省堂国語辞典　第八版";
           const showCard=(preference="",definition="",selection="",extra="")=>{
             fixture.innerHTML=`<div id="dictionaryPreference" hidden></div><div id="selectionText"><div class="dictionary-counter"></div><div class="toggle-area right"></div><span>${selection}</span></div><div id="definition"><div class="dictionary-counter"></div><div class="toggle-area right"></div><div class="definition-box">${definition}</div></div><div id="glossary" class="yomitan-glossary"><div class="dictionary-counter"></div><div class="toggle-area right"></div><div class="glossary-box"><span><ol>${a}${extra}${entry(preferredName,"Preferred definition")}${b}</ol></span></div></div>`;
