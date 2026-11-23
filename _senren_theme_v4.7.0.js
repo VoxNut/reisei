@@ -13,6 +13,21 @@
     observer.observe(reviewer, {childList:true});
     cardController.signal.addEventListener("abort", () => observer.disconnect(), {once:true});
   }
+  document.addEventListener("keydown", (event) => {
+    if (event.key.toLowerCase() !== "t" || event.ctrlKey || event.altKey ||
+        event.metaKey || event.repeat) return;
+    if (document.activeElement?.matches("input, textarea, select") ||
+        document.activeElement?.isContentEditable ||
+        document.querySelector("#senren-settings-modal.active")) return;
+    const wordAudio = document.querySelector(
+      ":is(.audio, #wordAudio) :is(.soundLink, .replaybutton, .replay-button)",
+    );
+    if (!wordAudio) return;
+    event.preventDefault();
+    event.stopPropagation();
+    wordAudio.click();
+  }, {signal: cardController.signal});
+
   if (window.SenrenTheme) return;
 
   const modes = Object.freeze(["nord", "focus"]);

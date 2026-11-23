@@ -1,0 +1,53 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Word audio shortcut</title>
+<output id="result">Running…</output>
+<div id="qa"></div>
+<script>
+(async () => {
+  try {
+    const theme = await fetch("../_senren_theme_v4.7.0.js").then(r => r.text());
+    let wordPlays = 0, sentencePlays = 0, checks = 0;
+    const assert = (ok, message) => { if (!ok) throw Error(message); checks++; };
+    const press = (key = "t", options = {}) => {
+      const event = new KeyboardEvent("keydown", {key, bubbles: true, cancelable: true, ...options});
+      document.activeElement.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    for (const side of ["front", "back", "front", "back"]) {
+      qa.innerHTML = `<div class="${side}">
+        <div ${side === "front" ? 'id="wordAudio"' : 'class="audio"'}><button class="replay-button">Word</button></div>
+        <div class="sentenceaudio"><button class="replay-button">Sentence</button></div>
+        <textarea></textarea><div contenteditable="true" tabindex="0">Editable</div>
+      </div>`;
+      qa.querySelector(":is(.audio, #wordAudio) button").onclick = () => wordPlays++;
+      qa.querySelector(".sentenceaudio button").onclick = () => sentencePlays++;
+      const script = document.createElement("script");
+      script.textContent = theme;
+      document.body.append(script);
+      script.remove();
+      const before = wordPlays;
+      assert(press() && press("T", {shiftKey: true}), "T did not handle word replay");
+      assert(wordPlays === before + 2 && sentencePlays === 0, "Word replay fired twice or played sentence audio");
+      for (const options of [{ctrlKey: true}, {altKey: true}, {metaKey: true}, {repeat: true}]) press("t", options);
+      qa.querySelector("textarea").focus();
+      press();
+      qa.querySelector("[contenteditable]").focus();
+      press();
+      document.activeElement.blur();
+      const modal = document.createElement("div");
+      modal.id = "senren-settings-modal";
+      modal.className = "active";
+      qa.append(modal);
+      press();
+      modal.remove();
+      assert(wordPlays === before + 2, "Shortcut interrupted typing, settings, or modifiers");
+      qa.querySelector(":is(.audio, #wordAudio)").remove();
+      assert(!press() && sentencePlays === 0, "Missing word audio fell back to sentence audio");
+    }
+    result.textContent = `PASS: ${checks} word-only replay, typing, modifiers and card lifecycle checks`;
+  } catch (error) {
+    result.textContent = "FAIL: " + error.stack;
+  }
+})();
+</script>
